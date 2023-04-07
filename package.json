@@ -1,35 +1,52 @@
 {
-  "name": "better-console-utilities",
-  "version": "1.0.0",
-  "description": "This node.js module provides a better way of handling the build-in console for node.js and also adds custom colors with auto colorization and custom color tags.",
-  "main": "index.ts",
-  "scripts": {
-    "start": "npm run build && node build/index.js",
-    "start:dev": "npx nodemon",
-    "build": "rimraf ./build && tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/CTN-Originals/Better-Console-Utilities.git"
-  },
-  "keywords": [
-	"CTN", "CTN-Originals", "CTN Originals",
-	"console", "console.log", "better console", "console utilities", "better console utilities",
-	"node", "node.js", "nodejs", 
-	"color", "colors", "colorize", "colorization", "colorize", "colorized", "colorizing"
-  ],
-  "author": "CTN-Originals",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/CTN-Originals/Better-Console-Utilities/issues"
-  },
-  "homepage": "https://github.com/CTN-Originals/Better-Console-Utilities#readme",
-  "devDependencies": {
-    "@types/node": "^18.15.11",
-    "nodemon": "^2.0.22",
-    "rimraf": "^4.4.1",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.0.3"
-  }
+	"name": "better-console-utilities",
+	"version": "1.0.6",
+	"description": "This node.js module provides a better way of handling the build-in console for node.js and also adds custom colors with auto colorization and custom color tags.",
+	"main": "index.ts",
+	"scripts": {
+		"start": "npm run build && node build/index.js",
+		"start:dev": "npx nodemon",
+		"build": "rimraf ./build && tsc",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"exports": {
+		".": "./build/index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/CTN-Originals/Better-Console-Utilities.git"
+	},
+	"keywords": [
+		"CTN",
+		"CTN-Originals",
+		"CTN Originals",
+		"console",
+		"console.log",
+		"better console",
+		"console utilities",
+		"better console utilities",
+		"node",
+		"node.js",
+		"nodejs",
+		"color",
+		"colors",
+		"colorize",
+		"colorization",
+		"colorize",
+		"colorized",
+		"colorizing"
+	],
+	"author": "CTN-Originals",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/CTN-Originals/Better-Console-Utilities/issues"
+	},
+	"homepage": "https://github.com/CTN-Originals/Better-Console-Utilities#readme",
+	"devDependencies": {
+		"@types/node": "^18.15.11",
+		"nodemon": "^2.0.22",
+		"rimraf": "^4.4.1",
+		"ts-node": "^10.9.1",
+		"typescript": "^5.0.3"
+	}
 }

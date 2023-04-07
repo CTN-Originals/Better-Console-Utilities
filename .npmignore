@@ -1,0 +1,8 @@
+# folders
+src
+test
+.vscode
+
+# files
+tsconfig.json
+.gitattributes
