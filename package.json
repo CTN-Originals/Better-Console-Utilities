@@ -1,6 +1,6 @@
 {
 	"name": "better-console-utilities",
-	"version": "1.0.6",
+	"version": "1.0.7",
 	"description": "This node.js module provides a better way of handling the build-in console for node.js and also adds custom colors with auto colorization and custom color tags.",
 	"main": "index.ts",
 	"scripts": {

@@ -23,17 +23,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// import * as color from './handlers/colorHandler';
-var handler = __importStar(require("./handlers"));
-exports = {
-    ConsoleInstance: handler.betterConsole.ConsoleInstance,
-};
-// console.log(color.tags.fg.red + 'Hello world!');
-var cons = new handler.betterConsole.ConsoleInstance('');
-cons.log('hello world');
-// console.log('hello world');
-// console.log('hello world2');
-// console.log('x = [fg=red]' + cons.settings.indent + '[bg=white] y = ' + cons.settings.indentString);
-// console.group('Object cons: ');
-// cons.log(JSON.parse(JSON.stringify(cons)));
-// console.groupEnd();
+exports.betterConsole = exports.color = void 0;
+exports.color = __importStar(require("./colorHandler"));
+exports.betterConsole = __importStar(require("./consoleHandler"));

@@ -1,0 +1,1 @@
+export { collectionToString } from './parser';

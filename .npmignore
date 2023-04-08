@@ -2,6 +2,7 @@
 src
 test
 .vscode
+node_modules
 
 # files
 tsconfig.json
