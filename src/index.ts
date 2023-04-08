@@ -10,6 +10,7 @@ exports = {
 // console.log(color.tags.fg.red + 'Hello world!');
 
 const cons = new handler.betterConsole.ConsoleInstance('');
+cons.log(handler.color.styles)
 
 // console.log('hello world');
 // console.log('hello world2');

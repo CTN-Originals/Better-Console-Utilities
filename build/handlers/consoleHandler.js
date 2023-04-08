@@ -1,24 +1,40 @@
 "use strict";
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
     }
-    return to.concat(ar || Array.prototype.slice.call(from));
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConsoleInstance = void 0;
+var util = __importStar(require("../utils"));
 //* intercept console.log
-{
+if (typeof console !== 'undefined') {
     var log_1 = console.log.bind(console);
     console.log = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        log_1('My Console!!!');
+        var input = Array.prototype.slice.call(args);
+        // log(args)
         log_1.apply(void 0, args);
     };
 }
@@ -48,11 +64,35 @@ var ConsoleInstance = /** @class */ (function () {
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        if (this.enabled) {
-            console.log.apply(console, __spreadArray(__spreadArray([this.name + ':'], args, false), [this.suffix], false));
+        if (!this.enabled)
+            return;
+        // TODO: Add conditions
+        var logOut = true; //TODO get condition from args
+        if (logOut) {
+            console.log(this._getLog.apply(this, args));
         }
+    };
+    ConsoleInstance.prototype._getLog = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var log = '';
+        for (var i = 0; i < args.length; i++) {
+            var arg = args[i];
+            if (typeof arg === 'object') {
+                var collectionStringOptipons = {
+                    indent: this.settings.indent,
+                    indentString: this.settings.indentString,
+                };
+                log += util.parser.collectionToString(arg);
+            }
+            else {
+                log += arg;
+            }
+        }
+        return log;
     };
     return ConsoleInstance;
 }());
 exports.ConsoleInstance = ConsoleInstance;
-console.log('hello console handler');

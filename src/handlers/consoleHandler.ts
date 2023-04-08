@@ -1,5 +1,5 @@
 import * as util from '../utils';
-
+import * as color from './colorHandler';
 
 interface IConsoleInstance {
 	name: string;
@@ -21,7 +21,6 @@ if (typeof console !== 'undefined') {
 		log(...args)
 	}
 }
-
 
 export class ConsoleInstance implements IConsoleInstance {
 	name: string;
@@ -50,7 +49,7 @@ export class ConsoleInstance implements IConsoleInstance {
 		this.conditions = conditions;
 	}
 	
-	log(...args: any[]) {
+	public log(...args: any[]) {
 		if (!this.enabled) return;
 		// TODO: Add conditions
 
@@ -65,12 +64,11 @@ export class ConsoleInstance implements IConsoleInstance {
 		for (let i = 0; i < args.length; i++) {
 			const arg = args[i];
 			if (typeof arg === 'object') {
-				if (Array.isArray(arg)) {
-					//TODO Parse array
-				}
-				else {
-					log += util.collectionToString(arg);
-				}
+				const collectionStringOptipons: util.parser.ICollectionToStringOptions = {
+					indent: this.settings.indent,
+					indentString: this.settings.indentString,
+				};
+				log += util.parser.collectionToString(arg);
 			} 
 			else {
 				log += arg;

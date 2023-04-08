@@ -1,1 +1,1 @@
-export { collectionToString } from './parser';
+export * as parser from './parser';
