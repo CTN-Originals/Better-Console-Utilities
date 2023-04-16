@@ -2,6 +2,8 @@
 import * as handler from './handlers';
 import * as test from './test';
 
+export * from './handlers';
+
 test.test();
 
 exports = {
@@ -10,7 +12,6 @@ exports = {
 // console.log(color.tags.fg.red + 'Hello world!');
 
 const cons = new handler.betterConsole.ConsoleInstance('');
-cons.log(handler.color.styles)
 
 // console.log('hello world');
 // console.log('hello world2');

@@ -41,7 +41,7 @@ export class ConsoleInstance implements IConsoleInstance {
 	* @param {String} settings.indentString Indentation string of the console instance
 	* @param {Object} conditions Conditions for the console instance
 	*/
-	constructor(name: string, enabled: boolean = true, suffix: string = '', settings: {indent: number, indentString: string} = {indent: 2, indentString: ' - '}, conditions: any = {}) {
+	constructor(name: string, enabled: boolean = true, suffix: string = '', settings: {indent: number, indentString: string} = {indent: 2, indentString: '-'}, conditions: any = {}) {
 		this.name = name;
 		this.enabled = enabled;
 		this.suffix = suffix;
@@ -68,8 +68,8 @@ export class ConsoleInstance implements IConsoleInstance {
 					indent: this.settings.indent,
 					indentString: this.settings.indentString,
 				};
-				log += util.parser.collectionToString(arg);
-			} 
+				log += util.parser.collectionToString(arg, collectionStringOptipons);
+			}
 			else {
 				log += arg;
 			}
