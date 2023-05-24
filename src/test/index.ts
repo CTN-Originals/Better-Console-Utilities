@@ -5,35 +5,40 @@ const obj: { [key: string]: string|object } = {
 	name: 'First object test',
 	enabled: 'true',
 	suffix: 'suffix',
-	data: {
-		name: 'John Doe',
-		age: '20',
-		work: 'developer',
-		hobbies: [
-			[
-				'music', 
-				'piano', 
-				'guitar', 
-				'drums'
-			], 
-			{
-				game: 'gta5',
-				platform: 'pc',
-				year: '2013',
-				hours: '1000',
-				online: 'true',
-				party: 'false',
-				friends: [
-					'John Doe',
-					'Anny mole',
-					'Bob the builder',
-					'Jill the killer',
-					'Jack the ripper',
-				]
-			},
-			'movies'
-		],
-	},
+	arr: [
+		'first',
+		'second',
+		'third',
+	]
+	// data: {
+	// 	name: 'John Doe',
+	// 	age: '20',
+	// 	work: 'developer',
+	// 	hobbies: [
+	// 		[
+	// 			'music', 
+	// 			'piano', 
+	// 			'guitar', 
+	// 			'drums'
+	// 		], 
+	// 		{
+	// 			game: 'gta5',
+	// 			platform: 'pc',
+	// 			year: '2013',
+	// 			hours: '1000',
+	// 			online: 'true',
+	// 			party: 'false',
+	// 			friends: [
+	// 				'John Doe',
+	// 				'Anny mole',
+	// 				'Bob the builder',
+	// 				'Jill the killer',
+	// 				'Jack the ripper',
+	// 			]
+	// 		},
+	// 		'movies'
+	// 	],
+	// },
 }
 
 const cons = new ConsoleInstance('test');

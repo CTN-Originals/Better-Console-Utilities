@@ -43,38 +43,91 @@ const DefaultCollectionToStringOptions: ICollectionToStringOptions = {
 
 class MessageObject {
 	public Tag: string;
-	public Type: string;
 	public Indent: number;
 	public IndentString: string;
 
-	public Content: string;
+	public Content: MessageContent[];
 	public Depth: number;
-
 	public Parent: MessageObject | null;
-	public Children: MessageObject[];
 
-	public Color: string;
-	public BackgroundColor: string;
-	public Style: string;
+	public Color: string; //TODO
+	public BackgroundColor: string; //TODO
+	public Style: string; //TODO
 
 	/**
 	 * @param {MessageObject} obj
 	*/
 	constructor(obj: Partial<MessageObject> = {}) {
-		this.Tag = obj.Tag ?? 'value';
-		this.Type = obj.Type ?? 'string';
+		this.Tag = obj.Tag ?? 'key-value'; //TODO
 		this.Indent = obj.Indent ?? 2;
 		this.IndentString = obj.IndentString ?? ' ';
 		
-		this.Content = obj.Content ?? '';
 		this.Depth = obj.Depth ?? 0;
-
 		this.Parent = obj.Parent ?? null;
-		this.Children = [];
+		this.Content = [];
 
 		this.Color = obj.Color ?? '';
 		this.BackgroundColor = obj.BackgroundColor ?? '';
 		this.Style = obj.Style ?? '';
+	}
+
+	public get ToString(): string {
+		let out = '';
+		for (const content of this.Content) {
+			// console.log(content)
+			if (content.Key && content.Type != 'array') {
+				out += `${content.Key}: `;
+			}
+			if (['object', 'array'].includes(content.Type)) {
+				if (content.Type === 'array') {
+					out += '[';
+					for (const value in content.Value) {
+						const v = content.Value[value];
+						if (content.Value instanceof MessageContent) {
+							out += content.Value;
+						}
+						else if (content.Value instanceof MessageObject) {
+							console.log(content.Value);
+							out += content.Value.ToString;
+						}
+						out += `${value}, `;
+					}
+					out += ']';
+					continue;
+				}
+				if (content.Value instanceof MessageObject) {
+					out += content.Value.ToString;
+				}
+				else {
+					for (const key in content.Value) {
+						const value = content.Value[key];
+						if (content.Type === 'array') {
+							out += `${value}`;
+							continue;
+						}
+						out += `${key}: ${value}`;
+					}
+				}
+			}
+			else {
+				out += content.Value;
+			}
+			out += '\n';
+		}
+
+		return out;
+	}
+}
+
+class MessageContent {
+	public Type: string;
+	public Key: string | null;
+	public Value: any;
+
+	constructor(obj: Partial<MessageContent> = {}) {
+		this.Type = obj.Type ?? 'string';
+		this.Key = obj.Key ?? '';
+		this.Value = obj.Value ?? '';
 	}
 }
 
@@ -100,22 +153,16 @@ export function collectionToString(input: any, options: Partial<ICollectionToStr
 	// const outputLines: string[] = formatCollectionToArray(input, safeOptions);
 	// const output: string = applyIndentation(outputLines, safeOptions);
 
-	for (const child of msgObject.Children) {
-		console.log(child);
-		const childKeys = Object.keys(child);
-		const childValues = Object.values(child);
-		for (let i = 0 ; i < childKeys.length ; i++) {
-			console.log(`${childKeys[i]}: ${childValues[i]}`);
-			// for (const child2 of child.Children) {
-			// 	console.log(child2);
-			// 	const childKeys = Object.keys(child2);
-			// 	const childValues = Object.values(child2);
-			// 	for (let i = 0 ; i < childKeys.length ; i++) {
-			// 		console.log(`${childKeys[i]}: ${childValues[i]}`);
-			// 	}
-			// }
-		}
-	}
+	console.log(msgObject.ToString);
+	// const content: Partial<MessageContent>  = msgObject.Content;
+	// for (const field in content) {
+	// 	console.log(field + ': ' + content[field as keyof MessageContent]);
+	// 	// const childKeys = Object.keys(content[field]);
+	// 	// const childValues = Object.values(field);
+	// 	// for (let i = 0 ; i < childKeys.length ; i++) {
+	// 	// 	console.log(`${childKeys[i]}: ${childValues[i]}`);
+	// 	// }
+	// }
 
 	return '';
 }
@@ -133,85 +180,93 @@ function collectionToMessageObject(collection: any, options: Required<ICollectio
 		const value = collection[key];
 
 		if (typeof value === 'object') {
-			const child = collectionToMessageObject(value, options, msgObject);
-			msgObject.Children.push(child);
+			const valueContent = collectionToMessageObject(value, options, msgObject);
+			msgObject.Content.push(new MessageContent({Type: typeOfValue(value), Key: key, Value: valueContent}));
 		}
 		else {
-			const child = new MessageObject({
-				Type: typeof value,
-				Indent: options.indent,
-				IndentString: options.indentString,
-				Depth: msgObject.Depth + 1,
-				Content: value,
-				Parent: msgObject,
-			});
-			msgObject.Children.push(child);
+			msgObject.Content.push(new MessageContent({Type: typeOfValue(value), Key: key, Value: value}));
+			// console.log(valueContent.Content.Value);
 		}
 	}
 
 	return msgObject;
 }
 
-
-
-
-
-
-const specialChar: string = '◘';
-const objBrackets: [string, string] = [`{${specialChar}`, `${specialChar}}`]; //* ◘ is a placeholder for the indentation to avoid the indentation being applied the user log message
-const arrBrackets: [string, string] = [`[${specialChar}`, `${specialChar}]`]; //* ◘ is a placeholder for the indentation to avoid the indentation being applied the user log message
-
-function formatCollectionToArray(input: any, options: Required<ICollectionToStringOptions>): string[] {
-	const output: any = [];
-	let brackets: [string, string] = objBrackets;
-	for (const key in input) {
-		const value = input[key];
-
-		if (Array.isArray(value)) {
-			brackets = arrBrackets;
+//* Returns the type of the value as a string and also returns 'array' for arrays
+function typeOfValue(value: any): string {
+	if (typeof value == 'object') {
+		if (value instanceof MessageObject) {
+			return 'MessageObject';
 		}
-		else {
-			brackets = objBrackets; 
+		else if (Array.isArray(value)) {
+			return 'array';
 		}
-
-		if (typeof value === 'object') {
-			output.push(`${(Array.isArray(input)) ? '' : key + ': '}${brackets[0]}`);
-			output.push(`${collectionToString(value, options)}`);
-			output.push(`${brackets[1]}`);
-		}
-		else {
-			output.push(`${(Array.isArray(input)) ? '' : key + ': '}${value}`);
-		}
+		return 'object';
+		
 	}
-	return output;
+	else {
+		return typeof value
+	}
 }
 
-function applyIndentation(input: string[], options: Required<ICollectionToStringOptions>): string {
-	let output = '';
-	// let currentIndent = options.currentIndent;
-	const incIndentString = [objBrackets[0], arrBrackets[0]];
-	const decIndentString = [objBrackets[1], arrBrackets[1]];
 
-	for (const l of input) {
-		console.log(options.currentIndent)
-		let line: string = l;
-		let lineOut: string = '';
-		lineOut += getIndent(options) + line + '\n';
-		for (const str of incIndentString) {
-			if (line.includes(str)) {
-				options.currentIndent++;
-			}
-		}
-		for (const str of decIndentString) {
-			if (line.includes(str)) {
-				options.currentIndent--;
-			}
-		}
-		output += options.currentIndent + '| ' + lineOut.replace(specialChar, '');
-	}
 
-	return output;
-}
+
+// const specialChar: string = '◘';
+// const objBrackets: [string, string] = [`{${specialChar}`, `${specialChar}}`]; //* ◘ is a placeholder for the indentation to avoid the indentation being applied the user log message
+// const arrBrackets: [string, string] = [`[${specialChar}`, `${specialChar}]`]; //* ◘ is a placeholder for the indentation to avoid the indentation being applied the user log message
+
+// function formatCollectionToArray(input: any, options: Required<ICollectionToStringOptions>): string[] {
+// 	const output: any = [];
+// 	let brackets: [string, string] = objBrackets;
+// 	for (const key in input) {
+// 		const value = input[key];
+
+// 		if (Array.isArray(value)) {
+// 			brackets = arrBrackets;
+// 		}
+// 		else {
+// 			brackets = objBrackets; 
+// 		}
+
+// 		if (typeof value === 'object') {
+// 			output.push(`${(Array.isArray(input)) ? '' : key + ': '}${brackets[0]}`);
+// 			output.push(`${collectionToString(value, options)}`);
+// 			output.push(`${brackets[1]}`);
+// 		}
+// 		else {
+// 			output.push(`${(Array.isArray(input)) ? '' : key + ': '}${value}`);
+// 		}
+// 	}
+// 	return output;
+// }
+
+// function applyIndentation(input: string[], options: Required<ICollectionToStringOptions>): string {
+// 	let output = '';
+// 	// let currentIndent = options.currentIndent;
+// 	const incIndentString = [objBrackets[0], arrBrackets[0]];
+// 	const decIndentString = [objBrackets[1], arrBrackets[1]];
+
+// 	for (const l of input) {
+// 		console.log(options.currentIndent)
+// 		let line: string = l;
+// 		let lineOut: string = '';
+// 		lineOut += getIndent(options) + line + '\n';
+// 		for (const str of incIndentString) {
+// 			if (line.includes(str)) {
+// 				options.currentIndent++;
+// 			}
+// 		}
+// 		for (const str of decIndentString) {
+// 			if (line.includes(str)) {
+// 				options.currentIndent--;
+// 			}
+// 		}
+// 		output += options.currentIndent + '| ' + lineOut.replace(specialChar, '');
+// 	}
+
+// 	return output;
+// }
 
 // function objectToString(input: any, options: ICollectionToStringOptionsDefault): string[] {
 // 	const output: any = [];
@@ -258,7 +313,7 @@ function applyIndentation(input: string[], options: Required<ICollectionToString
 // 	return output;
 // }
 
-function getIndent(options: Required<ICollectionToStringOptions>, currentIndent: number = -1): string {
-	return options.indentString.repeat(options.indent * ((currentIndent >= 0) ? currentIndent : options.currentIndent));
-}
+// function getIndent(options: Required<ICollectionToStringOptions>, currentIndent: number = -1): string {
+// 	return options.indentString.repeat(options.indent * ((currentIndent >= 0) ? currentIndent : options.currentIndent));
+// }
 
