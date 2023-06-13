@@ -39,8 +39,6 @@ const DefaultCollectionToStringOptions: ICollectionToStringOptions = {
 // 	}
 // }
 
-
-
 class MessageObject {
 	public Tag: string;
 	public Indent: number;
@@ -72,47 +70,31 @@ class MessageObject {
 	}
 
 	public get ToString(): string {
-		let out = '';
-		for (const content of this.Content) {
-			// console.log(content)
-			if (content.Key && content.Type != 'array') {
-				out += `${content.Key}: `;
-			}
-			if (['object', 'array'].includes(content.Type)) {
-				if (content.Type === 'array') {
-					out += '[';
-					for (const value in content.Value) {
-						const v = content.Value[value];
-						if (content.Value instanceof MessageContent) {
-							out += content.Value;
-						}
-						else if (content.Value instanceof MessageObject) {
-							console.log(content.Value);
-							out += content.Value.ToString;
-						}
-						out += `${value}, `;
-					}
-					out += ']';
-					continue;
-				}
-				if (content.Value instanceof MessageObject) {
-					out += content.Value.ToString;
-				}
-				else {
-					for (const key in content.Value) {
-						const value = content.Value[key];
-						if (content.Type === 'array') {
-							out += `${value}`;
-							continue;
-						}
-						out += `${key}: ${value}`;
-					}
+		let out: string = '';
+		// console.log(this.Content);
+
+		for (const key in this.Content) {
+			const value = this.Content[key];
+			const valueType = typeOfValue(value);
+			// console.log(valueType)
+			console.log(value)
+			if (value.Type == 'array') {
+				//* if value type is array, the value is a MessageObject
+				const msgObj: MessageObject = value.Value;
+				const contentArray: MessageContent[] = msgObj.Content;
+				//TODO check type of the value
+				//! asumes a string, will not work with any object like type
+				for (let i = 0; i < contentArray.length; i++) {
+					const content: MessageContent = contentArray[i];
+					out += '\n' + content.Value;
 				}
 			}
 			else {
-				out += content.Value;
+				out += '\n' + value.Value;
 			}
-			out += '\n';
+			if (valueType == 'MessageContent') {
+				const msgContent: MessageContent = value;
+			}
 		}
 
 		return out;
@@ -148,25 +130,12 @@ export function collectionToString(input: any, options: Partial<ICollectionToStr
 	//* Type assertion to assert that mergedOptions is no longer partial
 	//* and all its properties are defined
 	const safeOptions: Required<ICollectionToStringOptions> = mergedOptions as Required<ICollectionToStringOptions>;
-
 	const msgObject: MessageObject = collectionToMessageObject(input, safeOptions);
-	// const outputLines: string[] = formatCollectionToArray(input, safeOptions);
-	// const output: string = applyIndentation(outputLines, safeOptions);
 
 	console.log(msgObject.ToString);
-	// const content: Partial<MessageContent>  = msgObject.Content;
-	// for (const field in content) {
-	// 	console.log(field + ': ' + content[field as keyof MessageContent]);
-	// 	// const childKeys = Object.keys(content[field]);
-	// 	// const childValues = Object.values(field);
-	// 	// for (let i = 0 ; i < childKeys.length ; i++) {
-	// 	// 	console.log(`${childKeys[i]}: ${childValues[i]}`);
-	// 	// }
-	// }
 
 	return '';
 }
-
 
 function collectionToMessageObject(collection: any, options: Required<ICollectionToStringOptions>, parent: MessageObject | null = null): MessageObject {
 	const msgObject: MessageObject = new MessageObject({
@@ -197,6 +166,9 @@ function typeOfValue(value: any): string {
 	if (typeof value == 'object') {
 		if (value instanceof MessageObject) {
 			return 'MessageObject';
+		}
+		else if (value instanceof MessageContent) {
+			return 'MessageContent';
 		}
 		else if (Array.isArray(value)) {
 			return 'array';

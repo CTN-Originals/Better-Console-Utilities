@@ -45,6 +45,7 @@ const cons = new ConsoleInstance('test');
 export function test() {
 	// cons.log('hello testing world');
 	cons.log(obj);
+	// cons.log('Hello Worlds');
 	// testColors();
 }
 
