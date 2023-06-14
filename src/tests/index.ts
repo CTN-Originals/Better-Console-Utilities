@@ -1,14 +1,14 @@
 import { ConsoleInstance } from '../handlers/consoleHandler';
 import * as handler from '../handlers';
 
-const obj: { [key: string]: string|object } = {
+const obj: { [key: string]: any } = {
 	name: 'First object test',
-	enabled: 'true',
-	suffix: 'suffix',
+	enabled: true,
+	suffix: '_stuff',
 	arr: [
 		'first',
 		'second',
-		'third',
+		['third.1', 'third.2'],
 	]
 	// data: {
 	// 	name: 'John Doe',

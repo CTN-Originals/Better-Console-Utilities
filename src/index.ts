@@ -1,6 +1,6 @@
 // import * as color from './handlers/colorHandler';
 import * as handler from './handlers';
-import * as test from './test';
+import * as test from './tests';
 
 export * from './handlers';
 

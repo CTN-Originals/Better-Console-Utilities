@@ -73,27 +73,22 @@ class MessageObject {
 		let out: string = '';
 		// console.log(this.Content);
 
-		for (const key in this.Content) {
-			const value = this.Content[key];
-			const valueType = typeOfValue(value);
-			// console.log(valueType)
-			console.log(value)
-			if (value.Type == 'array') {
+		for (let i = 0; i < this.Content.length; i++) {
+			const contentObj = this.Content[i];
+			const valueType = typeOfValue(contentObj.Value);
+			// console.log(contentObj)
+			// console.log(contentObj.Type + ' | ' + valueType)
+
+			if (contentObj.Type === 'array') {
 				//* if value type is array, the value is a MessageObject
-				const msgObj: MessageObject = value.Value;
-				const contentArray: MessageContent[] = msgObj.Content;
-				//TODO check type of the value
-				//! asumes a string, will not work with any object like type
-				for (let i = 0; i < contentArray.length; i++) {
-					const content: MessageContent = contentArray[i];
-					out += '\n' + content.Value;
-				}
+				const msgObj: MessageObject = contentObj.Value;
+				out += msgObj.ToString;
 			}
 			else {
-				out += '\n' + value.Value;
+				out += '\n' + contentObj.Value;
 			}
-			if (valueType == 'MessageContent') {
-				const msgContent: MessageContent = value;
+			if (valueType === 'MessageContent') {
+				
 			}
 		}
 
@@ -132,9 +127,9 @@ export function collectionToString(input: any, options: Partial<ICollectionToStr
 	const safeOptions: Required<ICollectionToStringOptions> = mergedOptions as Required<ICollectionToStringOptions>;
 	const msgObject: MessageObject = collectionToMessageObject(input, safeOptions);
 
-	console.log(msgObject.ToString);
+	// console.log(msgObject.ToString);
 
-	return '';
+	return msgObject.ToString;
 }
 
 function collectionToMessageObject(collection: any, options: Required<ICollectionToStringOptions>, parent: MessageObject | null = null): MessageObject {
