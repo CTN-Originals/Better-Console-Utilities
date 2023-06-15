@@ -1,50 +1,52 @@
 import { ConsoleInstance } from '../handlers/consoleHandler';
 import * as handler from '../handlers';
+import {
+	ICollectionToStringOptions
+} from '../utils/parser'
 
-const obj: { [key: string]: any } = {
+export const simpleObject: { [key: string]: any } = {
+	name: 'greetings',
+	enabled: true,
+	suffix: '_company',
+};
+
+export const simpleArray: string[] = [
+	'first',
+	'second',
+	'third'
+];
+
+export const nestObject: { [key: string]: any } = {
 	name: 'First object test',
 	enabled: true,
 	suffix: '_stuff',
-	arr: [
+	list: [
 		'first',
 		'second',
-		['third.1', 'third.2'],
-	]
-	// data: {
-	// 	name: 'John Doe',
-	// 	age: '20',
-	// 	work: 'developer',
-	// 	hobbies: [
-	// 		[
-	// 			'music', 
-	// 			'piano', 
-	// 			'guitar', 
-	// 			'drums'
-	// 		], 
-	// 		{
-	// 			game: 'gta5',
-	// 			platform: 'pc',
-	// 			year: '2013',
-	// 			hours: '1000',
-	// 			online: 'true',
-	// 			party: 'false',
-	// 			friends: [
-	// 				'John Doe',
-	// 				'Anny mole',
-	// 				'Bob the builder',
-	// 				'Jill the killer',
-	// 				'Jack the ripper',
-	// 			]
-	// 		},
-	// 		'movies'
-	// 	],
-	// },
+		'third'
+	],
+	obj: {
+		name: 'John Doe',
+		age: '20',
+		work: 'developer'
+	}
+};
+
+export const DefaultCollectionToStringOptions: ICollectionToStringOptions = {
+	indent: 2,
+	indentString: ' ',
+	currentIndent: 0,
+	brackets: true, //TODO
+	color: true, //TODO
+	autoColor: true, //TODO
 }
 
 const cons = new ConsoleInstance('test');
 export function test() {
 	// cons.log('hello testing world');
-	cons.log(obj);
+	cons.log(simpleObject);
+	cons.log(simpleArray);
+	cons.log(nestObject);
 	// cons.log('Hello Worlds');
 	// testColors();
 }

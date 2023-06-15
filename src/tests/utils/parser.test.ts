@@ -1,46 +1,11 @@
 import * as parser from '../../utils/parser';
+import {
+	simpleObject,
+	simpleArray,
+	nestObject,
+	DefaultCollectionToStringOptions
+} from '../index'
 
-
-//#region inputs
-
-const simpleObject: { [key: string]: any } = {
-	name: 'greetings',
-	enabled: true,
-	suffix: '_company',
-};
-
-const simpleArray: string[] = [
-	'first',
-	'second',
-	'third'
-];
-
-const nestObject: { [key: string]: any } = {
-	name: 'First object test',
-	enabled: true,
-	suffix: '_stuff',
-	list: [
-		'first',
-		'second',
-		'third'
-	],
-	obj: {
-		name: 'John Doe',
-		age: '20',
-		work: 'developer'
-	}
-};
-
-const DefaultCollectionToStringOptions: parser.ICollectionToStringOptions = {
-	indent: 2,
-	indentString: ' ',
-	currentIndent: 0,
-	brackets: true, //TODO
-	color: true, //TODO
-	autoColor: true, //TODO
-}
-
-//#endregion
 
 describe('output', () => {
 	const simpleObjectOutput = parser.collectionToString(simpleObject, DefaultCollectionToStringOptions);
@@ -78,10 +43,8 @@ describe('output', () => {
 	});
 
 	describe('simple array', () => {
-		describe('keys', () => {
-			it('does not contain keys', () => {
-				expect(simpleArrayOutput.includes(':')).toBe(false);
-			});
+		it('does not contain keys', () => {
+			expect(simpleArrayOutput.includes(':')).toBe(false);
 		});
 		describe('values', () => {
 			it('contains first', () => {
@@ -108,11 +71,11 @@ describe('output', () => {
 				expect(nestObjectOutput.includes('suffix:')).toBe(true);
 			});
 			describe('collection keys', () => {
-				it('contains list', () => {
+				it('contains list: [', () => {
 					expect(nestObjectOutput.includes('list:')).toBe(true);
 					expect(nestObjectOutput.includes('list: [')).toBe(true);
 				});
-				it('contains obj', () => {
+				it('contains obj: {', () => {
 					expect(nestObjectOutput.includes('obj:')).toBe(true);
 					expect(nestObjectOutput.includes('obj: {')).toBe(true);
 				});
@@ -129,24 +92,34 @@ describe('output', () => {
 				expect(nestObjectOutput.includes('_stuff')).toBe(true);
 			});
 			describe('collection values', () => {
-				it('contains first', () => {
-					expect(nestObjectOutput.includes('first')).toBe(true);
-				});
-				it('contains second', () => {
-					expect(nestObjectOutput.includes('second')).toBe(true);
-				});
-				it('contains third', () => {
-					expect(nestObjectOutput.includes('third')).toBe(true);
-				});
-				it('contains John Doe', () => {
-					expect(nestObjectOutput.includes('John Doe')).toBe(true);
-				});
-				it('contains 20', () => {
-					expect(nestObjectOutput.includes('20')).toBe(true);
-				});
-				it('contains developer', () => {
-					expect(nestObjectOutput.includes('developer')).toBe(true);
-				});
+				describe('array', () => {
+					it('array does not contain keys', () => {
+						expect(nestObjectOutput.split(/[0-9]+: /g).length).toBeLessThan(2);
+					});
+					it('contains first(,)', () => {
+						expect(nestObjectOutput.includes('first')).toBe(true);
+						expect(nestObjectOutput.includes('first,')).toBe(true);
+					});
+					it('contains second(,)', () => {
+						expect(nestObjectOutput.includes('second')).toBe(true);
+						expect(nestObjectOutput.includes('second,')).toBe(true);
+					});
+					it('contains third(!,)', () => {
+						expect(nestObjectOutput.includes('third')).toBe(true);
+						expect(nestObjectOutput.includes('third,')).toBe(false);
+					});
+				})
+				describe('object', () => {
+					it('contains John Doe', () => {
+						expect(nestObjectOutput.includes('John Doe')).toBe(true);
+					});
+					it('contains 20', () => {
+						expect(nestObjectOutput.includes('20')).toBe(true);
+					});
+					it('contains developer', () => {
+						expect(nestObjectOutput.includes('developer')).toBe(true);
+					});
+				})
 			});
 		});
 	})
