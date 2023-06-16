@@ -20,32 +20,51 @@ export const nestObject: { [key: string]: any } = {
 	name: 'First object test',
 	enabled: true,
 	suffix: '_stuff',
+	obj: {
+		name: 'John Doe',
+		age: '20',
+		work: 'developer',
+		hobbies: [
+			{
+				name: 'programming',
+				active: true,
+				years: 5
+			},
+			{
+				name: 'gaming',
+				years: 10,
+				favorite: true,
+				games: {
+					name: 'osu',
+					genre: 'rhythm',
+					years: 7,
+				}
+			}
+		]
+	},
 	list: [
 		'first',
 		'second',
 		'third'
-	],
-	obj: {
-		name: 'John Doe',
-		age: '20',
-		work: 'developer'
-	}
+	]
 };
 
 export const DefaultCollectionToStringOptions: ICollectionToStringOptions = {
-	indent: 2,
-	indentString: ' ',
+	indent: 1,
+	indentString: '  ',
 	currentIndent: 0,
 	brackets: true, //TODO
 	color: true, //TODO
 	autoColor: true, //TODO
 }
 
-const cons = new ConsoleInstance('test');
+const cons = new ConsoleInstance('test', true, '', {indent: DefaultCollectionToStringOptions.indent ?? 2, indentString: DefaultCollectionToStringOptions.indentString ?? ' '}, {});
 export function test() {
 	// cons.log('hello testing world');
-	cons.log(simpleObject);
-	cons.log(simpleArray);
+	// cons.log(simpleObject);
+	console.log(' ')
+	// cons.log(simpleArray);
+	console.log(' ')
 	cons.log(nestObject);
 	// cons.log('Hello Worlds');
 	// testColors();
