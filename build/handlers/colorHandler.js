@@ -41,6 +41,8 @@ var colorCodes = {
     dim: [2, 22],
     italic: [3, 23],
     underline: [4, 24],
+    blink: [5, 25],
+    flash: [6, 26],
     inverse: [7, 27],
     hidden: [8, 28],
     strikethrough: [9, 29],
@@ -93,6 +95,8 @@ Object.keys(colorCodes).forEach(function (key) {
     var style = exports.styles[key] = [];
     style.open = '\u001b[' + val[0] + 'm';
     style.close = '\u001b[' + val[1] + 'm';
+    style.full = style.open + key + ' --' + style.close;
+    style.string = ('\\u001b[' + val[0] + 'm ') + style.full + ' \\u001b[' + val[1] + 'm';
 });
 //#endregion
 var AutoColorStringData = {};
