@@ -111,4 +111,35 @@ export const tags: IColorData = {
 	});
 //#endregion
 
+
+//#region Methods
+
+export function hexToRgb(hex: string): {R: number, G: number, B: number} {
+	const regex = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
+	const result = regex.exec(hex);
+	
+	if (!result) {
+		return {R: 0, G: 0, B: 0}; //? Invalid input, return null or throw an error
+	}
+	
+	const red = parseInt(result[1], 16);
+	const green = parseInt(result[2], 16);
+	const blue = parseInt(result[3], 16);
+	
+	return {R: red, G: green, B: blue};
+}
+
+export function getColorCodePrefix(hex: string): string {
+	//? credits to new_duck - twitch viewer
+	//* `\x1b[38;2;${255};${100};${0}m` 
+	const color = hexToRgb(hex);
+	return `\x1b[38;2;${color.R};${color.G};${color.B}m`
+}
+
+export function getColoredString(input: string, color: string): string {
+	return `${getColorCodePrefix(color)}${input}${tags.style.reset}`
+}
+
+//#endregion
+
 const AutoColorStringData = {}
