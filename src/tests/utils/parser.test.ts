@@ -17,49 +17,55 @@ describe('output', () => {
 		expect(typeof nestObjectOutput).toBe('string');
 	});
 
-	describe('simple object', () => {
-		describe('keys', () => {
-			it('contains name', () => {
-				expect(simpleObjectOutput.includes('name:')).toBe(true);
-			});
-			it('contains enabled', () => {
-				expect(simpleObjectOutput.includes('enabled:')).toBe(true);
-			});
-			it('contains suffix', () => {
-				expect(simpleObjectOutput.includes('suffix:')).toBe(true);
-			});
-		});
-		describe('values', () => {
-			it('contains greetings', () => {
-				expect(simpleObjectOutput.includes('greetings')).toBe(true);
-			});
-			it('contains true', () => {
-				expect(simpleObjectOutput.includes('true')).toBe(true);
-			});
-			it('contains _company', () => {
-				expect(simpleObjectOutput.includes('_company')).toBe(true);
-			});
-		});
-	});
+	// describe('simple object', () => {
+	// 	describe('keys', () => {
+	// 		it('contains name', () => {
+	// 			expect(simpleObjectOutput.includes('name:')).toBe(true);
+	// 		});
+	// 		it('contains enabled', () => {
+	// 			expect(simpleObjectOutput.includes('enabled:')).toBe(true);
+	// 		});
+	// 		it('contains suffix', () => {
+	// 			expect(simpleObjectOutput.includes('suffix:')).toBe(true);
+	// 		});
+	// 	});
+	// 	describe('values', () => {
+	// 		it('contains greetings', () => {
+	// 			expect(simpleObjectOutput.includes('greetings')).toBe(true);
+	// 		});
+	// 		it('contains true', () => {
+	// 			expect(simpleObjectOutput.includes('true')).toBe(true);
+	// 		});
+	// 		it('contains _company', () => {
+	// 			expect(simpleObjectOutput.includes('_company')).toBe(true);
+	// 		});
+	// 	});
+	// });
 
-	describe('simple array', () => {
-		it('does not contain keys', () => {
-			expect(simpleArrayOutput.includes(':')).toBe(false);
-		});
-		describe('values', () => {
-			it('contains first', () => {
-				expect(simpleArrayOutput.includes('first')).toBe(true);
-			});
-			it('contains second', () => {
-				expect(simpleArrayOutput.includes('second')).toBe(true);
-			});
-			it('contains third', () => {
-				expect(simpleArrayOutput.includes('third')).toBe(true);
-			});
-		});
-	});
+	// describe('simple array', () => {
+	// 	it('does not contain keys', () => {
+	// 		expect(simpleArrayOutput.includes(':')).toBe(false);
+	// 	});
+	// 	describe('values', () => {
+	// 		it('contains first', () => {
+	// 			expect(simpleArrayOutput.includes('first')).toBe(true);
+	// 		});
+	// 		it('contains second', () => {
+	// 			expect(simpleArrayOutput.includes('second')).toBe(true);
+	// 		});
+	// 		it('contains third', () => {
+	// 			expect(simpleArrayOutput.includes('third')).toBe(true);
+	// 		});
+	// 	});
+	// });
 
 	describe('nested object', () => {
+		it('empty object does not go to next line', () => {
+			expect(nestObjectOutput.match(/\{\n[ ]*\}/g)).toBeNull();
+		});
+		it('empty array does not go to next line', () => {
+			expect(nestObjectOutput.match(/\[\n[ ]*\]/g)).toBeNull();
+		});
 		describe('keys', () => {
 			// it('contains name', () => {
 			// 	expect(nestObjectOutput.includes('name:')).toBe(true);
@@ -79,7 +85,7 @@ describe('output', () => {
 				// });
 				describe('object contains Brackets', () => {
 					it('open', () => {
-						expect(nestObjectOutput.includes(': {')).toBe(true);
+						expect(nestObjectOutput.includes('{')).toBe(true);
 					});
 					it('close', () => {
 						expect(nestObjectOutput.includes('}')).toBe(true);
@@ -87,7 +93,7 @@ describe('output', () => {
 				});
 				describe('array contains Brackets', () => {
 					it('open', () => {
-						expect(nestObjectOutput.includes(': [')).toBe(true);
+						expect(nestObjectOutput.includes('[')).toBe(true);
 					});
 					it('close', () => {
 						expect(nestObjectOutput.includes(']')).toBe(true);

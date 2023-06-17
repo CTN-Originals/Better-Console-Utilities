@@ -1,3 +1,7 @@
+import {
+	getColorCodePrefix
+} from '../handlers/colorHandler';
+
 export interface ICollectionToStringOptions {
 	indent?:		number;  //? indentation level
 	indentString?:	string;  //? indentation string
@@ -54,10 +58,13 @@ class MessageObject {
 
 	public get ToString(): string {
 		let out: string[] = [];
-		const addLine = (input: string, depth: number = this.Depth) => {
+		const addLine = (input: string, isLastItem: boolean = false, depth: number = this.Depth) => {
 			if (depth < 0) { depth = 0; }
 			let line = `${getIndent(depth)}${input}`;
-			out.push(line);
+			if (!isLastItem) {
+				line += ', ';
+			}
+			out.push(`${line}`);
 		}
 		const getIndent = (depth: number = this.Depth): string => {
 			return this.IndentString.repeat(this.IndentCount * depth);
@@ -66,6 +73,7 @@ class MessageObject {
 		for (let i = 0; i < this.Content.length; i++) {
 			const contentObj = this.Content[i];
 			const contentInstance: string[] = [];
+			const isLastItem = (i === this.Content.length - 1);
 
 			if (contentObj.IsCollection) {
 				const msgObj: MessageObject = contentObj.Value;
@@ -73,38 +81,49 @@ class MessageObject {
 				const brackets = msgObj.Holder?.Brackets;
 				
 				if (holder && brackets) {
-					addLine(`${msgObj.ToString}`, 0); //? depth=0 because indent is already applied to the content
+					addLine(`${msgObj.ToString}`, isLastItem, 0); //? depth=0 because indent is already applied to the content
 				}
 				else {
-					addLine(`${msgObj.ToString}`);
+					addLine(`${msgObj.ToString}`, isLastItem);
 				}
 			}
 			else {
 				if (this.Holder?.Type === 'array') {
-					addLine(`${contentObj.Value}`);
+					addLine(`${contentObj.Value}`, isLastItem);
 				}
 				else {
-					addLine(`${contentObj.Key}: ${contentObj.Value}`);
+					addLine(`${contentObj.Key}: ${contentObj.Value}`, isLastItem);
 				}
 			}
 		}
 
 		// console.log(this.Holder)
-		if (this.Holder) {
-			if (this.Holder.IsCollection) {
-				let head: string = `${getIndent(this.Depth - 1)}`;
-				if (this.Holder.Key !== 'BASE') { head += `${this.Holder.Key}: `; }
-				//TODO Check if the key is an index of an array
-				
-				const brackets = this.Holder.Brackets;
-				if (brackets) {
+		if (this.Holder && this.Holder.IsCollection) {
+			let head: string = `${getIndent(this.Depth - 1)}`;
+			if (this.Holder.Key !== 'BASE') {
+				if (this.Holder.Key.match(/[0-9]+/g) !== null) {
+					if (this.Holder.Value instanceof MessageObject && this.Holder.Value.Holder !== null && this.Holder.Value.Holder.Type === 'array') {
+						head += `${this.Holder.Key}: `;
+					}
+				}
+				else {
+					head += `${this.Holder.Key}: `; 
+				}
+			}
+			
+			const brackets = this.Holder.Brackets;
+			if (brackets) {
+				if (this.Content.length > 0) {
 					head += `${brackets[0]}`;
 					out.unshift(head);
 					out.push(`${getIndent(this.Depth - 1)}${brackets[1]}`);
 				}
 				else {
-					out.unshift(head);
+					out.unshift(`${head}${brackets[0]}${brackets[1]}`);
 				}
+			}
+			else {
+				out.unshift(head);
 			}
 		}
 		return out.join(`\n`);

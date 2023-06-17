@@ -1,8 +1,9 @@
 import { ConsoleInstance } from '../handlers/consoleHandler';
 import * as handler from '../handlers';
 import {
-	ICollectionToStringOptions
+	ICollectionToStringOptions, collectionToString
 } from '../utils/parser'
+import { getColorCodePrefix } from '../handlers/colorHandler';
 
 export const simpleObject: { [key: string]: any } = {
 	name: 'greetings',
@@ -46,7 +47,9 @@ export const nestObject: { [key: string]: any } = {
 		'first',
 		'second',
 		'third'
-	]
+	],
+	emptyObj: {},
+	emptyList: [],
 };
 
 export const DefaultCollectionToStringOptions: ICollectionToStringOptions = {
@@ -66,13 +69,22 @@ export function test() {
 	// cons.log(simpleArray);
 	console.log(' ')
 	cons.log(nestObject);
+	// const str = collectionToString(nestObject, DefaultCollectionToStringOptions);
+	// console.log(str);
+	// console.log(str.match(/\{\n[ ]*\}/g));
+	// console.log(str.match(/\[\n[ ]*\]/g));
+	// console.log(JSON.stringify(simpleObject))
+	// console.log(testColors)
 	// cons.log('Hello Worlds');
-	// testColors();
+	testColors();
 }
 
 function testColors() {
 	// for (const style in handler.color.styles) {
 	// 	console.log(handler.color.styles[style].full);
 	// }
-	console.log(`\x1b[38;2;${255};${100};${0}m I am orange!!`) //? credits to new_duck - twitch viewer
+	// console.log(`\x1b[38;2;${255};${100};${0}m I am orange!!`) //? credits to new_duck - twitch viewer
+	console.log(getColorCodePrefix('#00FFFF') + ' i am cyan')
+	console.log(getColorCodePrefix('#aa00FF') + ' i am purple')
+	console.log(getColorCodePrefix('orange') + ' i am orange')
 }
