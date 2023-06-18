@@ -1,73 +1,49 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.test = exports.DefaultCollectionToStringOptions = exports.nestObject = exports.simpleArray = exports.simpleObject = void 0;
+exports.test = void 0;
 var consoleHandler_1 = require("../handlers/consoleHandler");
-exports.simpleObject = {
-    name: 'greetings',
-    enabled: true,
-    suffix: '_company',
-};
-exports.simpleArray = [
-    'first',
-    'second',
-    'third'
-];
-exports.nestObject = {
-    name: 'First object test',
-    enabled: true,
-    suffix: '_stuff',
-    obj: {
-        name: 'John Doe',
-        age: '20',
-        work: 'developer',
-        hobbies: [
-            {
-                name: 'programming',
-                active: true,
-                years: 5
-            },
-            {
-                name: 'gaming',
-                years: 10,
-                favorite: true,
-                games: {
-                    name: 'osu',
-                    genre: 'rhythm',
-                    years: 7,
-                }
-            }
-        ]
-    },
-    list: [
-        'first',
-        'second',
-        'third'
-    ]
-};
-exports.DefaultCollectionToStringOptions = {
-    indent: 1,
-    indentString: '  ',
-    currentIndent: 0,
-    brackets: true,
-    color: true,
-    autoColor: true, //TODO
-};
-var cons = new consoleHandler_1.ConsoleInstance('test', true, '', { indent: (_a = exports.DefaultCollectionToStringOptions.indent) !== null && _a !== void 0 ? _a : 2, indentString: (_b = exports.DefaultCollectionToStringOptions.indentString) !== null && _b !== void 0 ? _b : ' ' }, {});
+var colorHandler_1 = require("../handlers/colorHandler");
+var parserTests = __importStar(require("./utils/parserTestData"));
+var cons = new consoleHandler_1.ConsoleInstance('test', true, '', { indent: (_a = parserTests.DefaultCollectionToStringOptions.indent) !== null && _a !== void 0 ? _a : 2, indentString: (_b = parserTests.DefaultCollectionToStringOptions.indentString) !== null && _b !== void 0 ? _b : ' ' }, {});
 function test() {
     // cons.log('hello testing world');
-    // cons.log(simpleObject);
+    cons.log(parserTests.simpleObject);
     console.log(' ');
-    // cons.log(simpleArray);
+    cons.log(parserTests.simpleArray);
     console.log(' ');
-    cons.log(exports.nestObject);
-    // cons.log('Hello Worlds');
+    cons.log(parserTests.nestObject);
+    // cons.log('simpleObject: ', simpleObject, 'simpleArray: ', simpleArray, 'nestObject: ', nestObject);
+    // const str = collectionToString(nestObject, DefaultCollectionToStringOptions);
+    // console.log(str);
     // testColors();
 }
 exports.test = test;
 function testColors() {
-    // for (const style in handler.color.styles) {
-    // 	console.log(handler.color.styles[style].full);
-    // }
-    console.log("\u001B[38;2;".concat(255, ";").concat(100, ";").concat(0, "m I am orange!!")); //? credits to new_duck - twitch viewer
+    console.log((0, colorHandler_1.getColorCodePrefix)('#00FFFF') + ' i am cyan');
+    console.log((0, colorHandler_1.getColorCodePrefix)('#aa00FF') + ' i am purple');
+    console.log((0, colorHandler_1.getColorCodePrefix)('orange') + ' i am orange');
 }

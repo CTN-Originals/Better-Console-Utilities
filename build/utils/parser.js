@@ -41,15 +41,19 @@ var MessageObject = /** @class */ (function () {
     Object.defineProperty(MessageObject.prototype, "ToString", {
         get: function () {
             var _this = this;
-            var _a, _b;
+            var _a, _b, _c;
             var out = [];
-            var addLine = function (input, depth) {
+            var addLine = function (input, isLastItem, depth) {
+                if (isLastItem === void 0) { isLastItem = false; }
                 if (depth === void 0) { depth = _this.Depth; }
                 if (depth < 0) {
                     depth = 0;
                 }
                 var line = "".concat(getIndent(depth)).concat(input);
-                out.push(line);
+                if (!isLastItem) {
+                    line += ', ';
+                }
+                out.push("".concat(line));
             };
             var getIndent = function (depth) {
                 if (depth === void 0) { depth = _this.Depth; }
@@ -57,44 +61,53 @@ var MessageObject = /** @class */ (function () {
             };
             for (var i = 0; i < this.Content.length; i++) {
                 var contentObj = this.Content[i];
-                var contentInstance = [];
+                var isLastItem = (i === this.Content.length - 1);
                 if (contentObj.IsCollection) {
                     var msgObj = contentObj.Value;
                     var holder = msgObj.Holder;
                     var brackets = (_a = msgObj.Holder) === null || _a === void 0 ? void 0 : _a.Brackets;
                     if (holder && brackets) {
-                        addLine("".concat(msgObj.ToString), 0); //? depth=0 because indent is already applied to the content
+                        addLine("".concat(msgObj.ToString), isLastItem, 0); //? depth=0 because indent is already applied to the content
                     }
                     else {
-                        addLine("".concat(msgObj.ToString));
+                        addLine("".concat(msgObj.ToString), isLastItem);
                     }
                 }
                 else {
                     if (((_b = this.Holder) === null || _b === void 0 ? void 0 : _b.Type) === 'array') {
-                        addLine("".concat(contentObj.Value));
+                        addLine("".concat(contentObj.Value), isLastItem);
                     }
                     else {
-                        addLine("".concat(contentObj.Key, ": ").concat(contentObj.Value));
+                        addLine("".concat(contentObj.Key, ": ").concat(contentObj.Value), isLastItem);
                     }
                 }
             }
             // console.log(this.Holder)
-            if (this.Holder) {
-                if (this.Holder.IsCollection) {
-                    var head = "".concat(getIndent(this.Depth - 1));
-                    if (this.Holder.Key !== 'BASE') {
+            if (this.Holder && this.Holder.IsCollection) {
+                var head = "".concat(getIndent(this.Depth - 1));
+                if (this.Holder.Key !== 'BASE') {
+                    //? If the key is not a number and is a MessageObject that is not an array, add the key
+                    if (this.Holder.Key.match(/[0-9]+/g) !== null && ((_c = this.Holder.Value.Holder) === null || _c === void 0 ? void 0 : _c.Type) !== 'array') {
+                        //? do nothing? 
+                        //TODO Reverse this to exclude this if statement
+                    }
+                    else {
                         head += "".concat(this.Holder.Key, ": ");
                     }
-                    //TODO Check if the key is an index of an array
-                    var brackets = this.Holder.Brackets;
-                    if (brackets) {
+                }
+                var brackets = this.Holder.Brackets;
+                if (brackets) {
+                    if (this.Content.length > 0) {
                         head += "".concat(brackets[0]);
                         out.unshift(head);
                         out.push("".concat(getIndent(this.Depth - 1)).concat(brackets[1]));
                     }
                     else {
-                        out.unshift(head);
+                        out.unshift("".concat(head).concat(brackets[0]).concat(brackets[1]));
                     }
+                }
+                else {
+                    out.unshift(head);
                 }
             }
             return out.join("\n");
@@ -109,9 +122,9 @@ var MessageContent = /** @class */ (function () {
         if (obj === void 0) { obj = {}; }
         var _a, _b, _c;
         this.Type = (_a = obj.Type) !== null && _a !== void 0 ? _a : 'string';
-        this.IsCollection = ['object', 'array'].includes(this.Type);
         this.Key = (_b = obj.Key) !== null && _b !== void 0 ? _b : '';
         this.Value = (_c = obj.Value) !== null && _c !== void 0 ? _c : '';
+        this.IsCollection = ['object', 'array'].includes(this.Type);
         this._breackets = (this.IsCollection) ? (this.Type === 'object') ? ['{', '}'] : ['[', ']'] : null;
     }
     Object.defineProperty(MessageContent.prototype, "Brackets", {
@@ -139,10 +152,10 @@ function collectionToString(input, options) {
     var safeOptions = mergedOptions;
     var holder = new MessageContent({
         Type: typeOfValue(input),
-        Key: 'BASE'
+        Key: 'BASE',
+        IsCollection: ['object', 'array'].includes(input)
     });
     var msgObject = collectionToMessageObject(input, safeOptions, null, holder);
-    holder.IsCollection = ['object', 'array'].includes(msgObject.Type);
     holder.Value = msgObject;
     return msgObject.ToString;
 }
@@ -151,6 +164,7 @@ function collectionToMessageObject(collection, options, parent, holder) {
     if (parent === void 0) { parent = null; }
     if (holder === void 0) { holder = null; }
     var msgObject = new MessageObject({
+        Type: typeOfValue(collection),
         Parent: parent,
         Holder: holder !== null && holder !== void 0 ? holder : null,
         Depth: (parent) ? parent.Depth + 1 : 1,
@@ -159,15 +173,15 @@ function collectionToMessageObject(collection, options, parent, holder) {
     });
     for (var key in collection) {
         var value = collection[key];
-        msgObject.Type = typeOfValue(value);
-        if (['object', 'array'].includes(msgObject.Type)) {
+        var type = typeOfValue(value);
+        if (['object', 'array'].includes(type)) {
             var valueContent = collectionToMessageObject(value, options, msgObject, value);
-            var content = new MessageContent({ Type: msgObject.Type, Key: key, Value: valueContent });
+            var content = new MessageContent({ Type: type, Key: key, Value: valueContent });
             valueContent.Holder = content;
             msgObject.Content.push(content);
         }
         else {
-            msgObject.Content.push(new MessageContent({ Type: msgObject.Type, Key: key, Value: value }));
+            msgObject.Content.push(new MessageContent({ Type: type, Key: key, Value: value }));
         }
     }
     return msgObject;
