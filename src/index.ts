@@ -1,10 +1,12 @@
 // import * as color from './handlers/colorHandler';
 import * as handler from './handlers';
-import * as test from './tests';
-
 export * from './handlers';
 
-test.test();
+//#region DEV
+	//! COMMENT BEFORE RELEASE
+	// import * as test from './tests';
+	// test.test();
+//#endregion
 
 exports = {
 	ConsoleInstance: handler.betterConsole.ConsoleInstance,
