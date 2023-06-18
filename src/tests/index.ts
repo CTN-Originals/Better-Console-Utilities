@@ -1,8 +1,7 @@
 import * as handler from '../handlers';
 import { ConsoleInstance } from '../handlers/consoleHandler';
 import { getColorCodePrefix } from '../handlers/colorHandler';
-import * as parserTests from './utils/parserTestData';
-
+import * as parserTests from './parserTestData';
 
 const cons = new ConsoleInstance('test', true, '', {indent: parserTests.DefaultCollectionToStringOptions.indent ?? 2, indentString: parserTests.DefaultCollectionToStringOptions.indentString ?? ' '}, {});
 export function test() {

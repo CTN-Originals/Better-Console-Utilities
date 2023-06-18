@@ -1,11 +1,10 @@
-import * as parser from '../../utils/parser';
+import * as parser from '../../src/utils/parser';
 import {
 	simpleObject,
 	simpleArray,
 	nestObject,
 	DefaultCollectionToStringOptions
-} from './parserTestData'
-
+} from '../../src/tests/parserTestData'
 
 describe('output', () => {
 	const simpleObjectOutput = parser.collectionToString(simpleObject, DefaultCollectionToStringOptions);

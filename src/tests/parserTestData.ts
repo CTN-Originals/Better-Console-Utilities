@@ -1,4 +1,4 @@
-import { ICollectionToStringOptions } from '../../utils/parser'
+import { ICollectionToStringOptions } from '../utils/parser'
 
 export const simpleObject: { [key: string]: any } = {
 	name: 'Hello World',

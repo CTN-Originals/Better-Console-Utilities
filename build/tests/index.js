@@ -27,7 +27,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.test = void 0;
 var consoleHandler_1 = require("../handlers/consoleHandler");
 var colorHandler_1 = require("../handlers/colorHandler");
-var parserTests = __importStar(require("./utils/parserTestData"));
+var parserTests = __importStar(require("./parserTestData"));
 var cons = new consoleHandler_1.ConsoleInstance('test', true, '', { indent: (_a = parserTests.DefaultCollectionToStringOptions.indent) !== null && _a !== void 0 ? _a : 2, indentString: (_b = parserTests.DefaultCollectionToStringOptions.indentString) !== null && _b !== void 0 ? _b : ' ' }, {});
 function test() {
     // cons.log('hello testing world');
