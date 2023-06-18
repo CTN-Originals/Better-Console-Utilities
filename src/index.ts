@@ -3,7 +3,7 @@ import * as handler from './handlers';
 export * from './handlers';
 
 //#region DEV
-	//! COMMENT BEFORE RELEASE
+	//! COMMENT BEFORE BUIL
 	// import * as test from './tests';
 	// test.test();
 //#endregion
