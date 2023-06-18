@@ -1,6 +1,6 @@
 // import * as color from './handlers/colorHandler';
 import * as handler from './handlers';
-import * as test from './test';
+import * as test from './tests';
 
 export * from './handlers';
 
@@ -12,6 +12,9 @@ exports = {
 // console.log(color.tags.fg.red + 'Hello world!');
 
 const cons = new handler.betterConsole.ConsoleInstance('');
+
+//* Wait 10 minutes before exiting
+setTimeout(() => {}, 1000 * 60 * 10); // 10 minutes
 
 // console.log('hello world');
 // console.log('hello world2');

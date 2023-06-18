@@ -18,6 +18,10 @@ if (typeof console !== 'undefined') {
 	console.log = (...args) => {
 		const input = Array.prototype.slice.call(args)
 		// log(args)
+
+		//TODO add better (false log) detection
+		//! doesnt log valid empty messages
+		if (args.length == 1 && args[0] == '') return;
 		log(...args)
 	}
 }

@@ -1,9 +1,43 @@
+export interface Color {
+	R: number;
+	G: number;
+	B: number;
+}
 interface IColorData {
 	[name: string]: {[key: string]: string};
 }
 interface IColorCodes {
 	[key: string]: number[];
 }
+
+export const colors: Record<string, Color> = {
+	black: { R: 0, G: 0, B: 0 },
+	white: { R: 255, G: 255, B: 255 },
+
+	red: { R: 255, G: 0, B: 0 },
+	green: { R: 0, G: 255, B: 0 },
+	blue: { R: 0, G: 0, B: 255 },
+
+	yellow: { R: 255, G: 255, B: 0 },
+	cyan: { R: 0, G: 255, B: 255 },
+	magenta: { R: 255, G: 0, B: 255 },
+	gray: { R: 128, G: 128, B: 128 },
+	orange: { R: 255, G: 165, B: 0 },
+	pink: { R: 255, G: 192, B: 203 },
+	purple: { R: 128, G: 0, B: 128 },
+	
+	lime: { R: 0, G: 255, B: 0 },
+	teal: { R: 0, G: 128, B: 128 },
+	lavender: { R: 230, G: 230, B: 250 },
+	brown: { R: 165, G: 42, B: 42 },
+	beige: { R: 245, G: 245, B: 220 },
+	maroon: { R: 128, G: 0, B: 0 },
+	mint: { R: 62, G: 180, B: 137 },
+	olive: { R: 128, G: 128, B: 0 },
+	coral: { R: 255, G: 127, B: 80 },
+	navy: { R: 0, G: 0, B: 128 },
+	grey: { R: 128, G: 128, B: 128 }
+};
 
 export const tags: IColorData = {
 	style: {
@@ -37,7 +71,8 @@ export const tags: IColorData = {
     },
 }
 
-// #region  Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
+//! Do we need this? Ill keep it for now because it might be useful
+//#region  Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
 	//? Source: https://www.npmjs.com/package/colors?activeTab=code
 	export const styles: any = {};
 	const colorCodes: IColorCodes = {
@@ -109,6 +144,43 @@ export const tags: IColorData = {
 		style.full = style.open + key + ' --' + style.close;
 		style.string = ('\\u001b[' + val[0] + 'm ') + style.full + ' \\u001b[' + val[1] + 'm';
 	});
+//#endregion
+
+//#region Methods
+
+/** 
+ * @param {string} input The color. supports: hex (#123ABC), named colors (see src\handlers\colorHandler.ts colors)
+ * @returns {Color} The RGB value of the color
+*/
+export function hexToRgb(input: string): {R: number, G: number, B: number} {
+	if (input in colors) {
+		return colors[input];
+	}
+
+	const regex = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
+	const result = regex.exec(input);
+	
+	if (!result) {
+		return {R: 0, G: 0, B: 0}; //? Invalid input, return null or throw an error
+	}
+	
+	const red = parseInt(result[1], 16);
+	const green = parseInt(result[2], 16);
+	const blue = parseInt(result[3], 16);
+	
+	return {R: red, G: green, B: blue};
+}
+
+export function getColorCodePrefix(hex: string): string {
+	//? credits to new_duck - twitch viewer
+	const color = hexToRgb(hex);
+	return `\x1b[38;2;${color.R};${color.G};${color.B}m`
+}
+
+export function getColoredString(input: string, color: string): string {
+	return `${getColorCodePrefix(color)}${input}${tags.style.reset}`
+}
+
 //#endregion
 
 const AutoColorStringData = {}

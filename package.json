@@ -1,13 +1,14 @@
 {
 	"name": "better-console-utilities",
-	"version": "1.0.7",
+	"version": "1.0.8",
 	"description": "This node.js module provides a better way of handling the build-in console for node.js and also adds custom colors with auto colorization and custom color tags.",
 	"main": "src/index.ts",
 	"scripts": {
 		"start": "npm run build && node build/index.js",
 		"start:dev": "npx nodemon",
 		"build": "rimraf ./build && tsc",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "jest",
+		"test:watch": "jest --watch"
 	},
 	"exports": {
 		".": "./build/index.js"
@@ -43,9 +44,11 @@
 	},
 	"homepage": "https://github.com/CTN-Originals/Better-Console-Utilities#readme",
 	"devDependencies": {
+		"@types/jest": "^29.5.2",
 		"@types/node": "^18.15.11",
 		"nodemon": "^2.0.22",
 		"rimraf": "^4.4.1",
+		"ts-jest": "^29.1.0",
 		"ts-node": "^10.9.1",
 		"typescript": "^5.0.3"
 	}

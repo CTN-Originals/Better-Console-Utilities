@@ -35,6 +35,10 @@ if (typeof console !== 'undefined') {
         }
         var input = Array.prototype.slice.call(args);
         // log(args)
+        //TODO add better (false log) detection
+        //! doesnt log valid empty messages
+        if (args.length == 1 && args[0] == '')
+            return;
         log_1.apply(void 0, args);
     };
 }
@@ -51,7 +55,7 @@ var ConsoleInstance = /** @class */ (function () {
     function ConsoleInstance(name, enabled, suffix, settings, conditions) {
         if (enabled === void 0) { enabled = true; }
         if (suffix === void 0) { suffix = ''; }
-        if (settings === void 0) { settings = { indent: 2, indentString: ' - ' }; }
+        if (settings === void 0) { settings = { indent: 2, indentString: '-' }; }
         if (conditions === void 0) { conditions = {}; }
         this.name = name;
         this.enabled = enabled;
@@ -85,7 +89,7 @@ var ConsoleInstance = /** @class */ (function () {
                     indent: this.settings.indent,
                     indentString: this.settings.indentString,
                 };
-                log += util.parser.collectionToString(arg);
+                log += util.parser.collectionToString(arg, collectionStringOptipons);
             }
             else {
                 log += arg;
