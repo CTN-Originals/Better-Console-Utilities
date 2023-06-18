@@ -1,8 +1,8 @@
 {
 	"name": "better-console-utilities",
-	"version": "1.0.8",
+	"version": "1.0.9",
 	"description": "This node.js module provides a better way of handling the build-in console for node.js and also adds custom colors with auto colorization and custom color tags.",
-	"main": "src/index.ts",
+	"main": "build/index.js",
 	"scripts": {
 		"start": "npm run build && node build/index.js",
 		"start:dev": "npx nodemon",
@@ -13,6 +13,12 @@
 	"exports": {
 		".": "./build/index.js"
 	},
+	"files": [
+		"build",
+		"README.md",
+		"LICENSE",
+		"package.json"
+	],
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/CTN-Originals/Better-Console-Utilities.git"
