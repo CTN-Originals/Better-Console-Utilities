@@ -4,7 +4,7 @@ import {
 	simpleArray,
 	nestObject,
 	DefaultCollectionToStringOptions
-} from '../index'
+} from './parserTestData'
 
 
 describe('output', () => {

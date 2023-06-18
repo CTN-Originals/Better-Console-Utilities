@@ -13,9 +13,11 @@ interface IColorCodes {
 export const colors: Record<string, Color> = {
 	black: { R: 0, G: 0, B: 0 },
 	white: { R: 255, G: 255, B: 255 },
+
 	red: { R: 255, G: 0, B: 0 },
 	green: { R: 0, G: 255, B: 0 },
 	blue: { R: 0, G: 0, B: 255 },
+
 	yellow: { R: 255, G: 255, B: 0 },
 	cyan: { R: 0, G: 255, B: 255 },
 	magenta: { R: 255, G: 0, B: 255 },
@@ -23,6 +25,7 @@ export const colors: Record<string, Color> = {
 	orange: { R: 255, G: 165, B: 0 },
 	pink: { R: 255, G: 192, B: 203 },
 	purple: { R: 128, G: 0, B: 128 },
+	
 	lime: { R: 0, G: 255, B: 0 },
 	teal: { R: 0, G: 128, B: 128 },
 	lavender: { R: 230, G: 230, B: 250 },
@@ -68,7 +71,8 @@ export const tags: IColorData = {
     },
 }
 
-// #region  Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
+//! Do we need this? Ill keep it for now because it might be useful
+//#region  Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
 	//? Source: https://www.npmjs.com/package/colors?activeTab=code
 	export const styles: any = {};
 	const colorCodes: IColorCodes = {
@@ -142,12 +146,11 @@ export const tags: IColorData = {
 	});
 //#endregion
 
-
 //#region Methods
 
 /** 
- * Converts a hex color code to rgb
  * @param {string} input The color. supports: hex (#123ABC), named colors (see src\handlers\colorHandler.ts colors)
+ * @returns {Color} The RGB value of the color
 */
 export function hexToRgb(input: string): {R: number, G: number, B: number} {
 	if (input in colors) {
