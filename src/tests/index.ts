@@ -6,9 +6,10 @@ import {
 import { getColorCodePrefix } from '../handlers/colorHandler';
 
 export const simpleObject: { [key: string]: any } = {
-	name: 'greetings',
-	enabled: true,
-	suffix: '_company',
+	name: 'Hello World',
+	active: true,
+	count: 8,
+	status: 'good',
 };
 
 export const simpleArray: string[] = [
@@ -40,8 +41,8 @@ export const nestObject: { [key: string]: any } = {
 					genre: 'rhythm',
 					years: 7,
 				}
-			}
-		]
+			},
+		],
 	},
 	list: [
 		'first',
@@ -50,6 +51,7 @@ export const nestObject: { [key: string]: any } = {
 	],
 	emptyObj: {},
 	emptyList: [],
+	end: {a:1},
 };
 
 export const DefaultCollectionToStringOptions: ICollectionToStringOptions = {
@@ -64,11 +66,12 @@ export const DefaultCollectionToStringOptions: ICollectionToStringOptions = {
 const cons = new ConsoleInstance('test', true, '', {indent: DefaultCollectionToStringOptions.indent ?? 2, indentString: DefaultCollectionToStringOptions.indentString ?? ' '}, {});
 export function test() {
 	// cons.log('hello testing world');
-	// cons.log(simpleObject);
+	cons.log(simpleObject);
 	console.log(' ')
-	// cons.log(simpleArray);
+	cons.log(simpleArray);
 	console.log(' ')
 	cons.log(nestObject);
+	// cons.log('simpleObject: ', simpleObject, 'simpleArray: ', simpleArray, 'nestObject: ', nestObject);
 	// const str = collectionToString(nestObject, DefaultCollectionToStringOptions);
 	// console.log(str);
 	// console.log(str.match(/\{\n[ ]*\}/g));
@@ -76,7 +79,7 @@ export function test() {
 	// console.log(JSON.stringify(simpleObject))
 	// console.log(testColors)
 	// cons.log('Hello Worlds');
-	testColors();
+	// testColors();
 }
 
 function testColors() {

@@ -67,22 +67,7 @@ describe('output', () => {
 			expect(nestObjectOutput.match(/\[\n[ ]*\]/g)).toBeNull();
 		});
 		describe('keys', () => {
-			// it('contains name', () => {
-			// 	expect(nestObjectOutput.includes('name:')).toBe(true);
-			// });
-			// it('contains enabled', () => {
-			// 	expect(nestObjectOutput.includes('enabled:')).toBe(true);
-			// });
-			// it('contains suffix', () => {
-			// 	expect(nestObjectOutput.includes('suffix:')).toBe(true);
-			// });
 			describe('collection keys', () => {
-				// it('contains obj', () => {
-				// 	expect(nestObjectOutput.includes('obj:')).toBe(true);
-				// });
-				// it('contains list', () => {
-				// 	expect(nestObjectOutput.includes('list:')).toBe(true);
-				// });
 				describe('object contains Brackets', () => {
 					it('open', () => {
 						expect(nestObjectOutput.includes('{')).toBe(true);
@@ -102,46 +87,11 @@ describe('output', () => {
 			});
 		});
 		describe('values', () => {
-			// it('contains First object test', () => {
-			// 	expect(nestObjectOutput.includes('First object test')).toBe(true);
-			// });
-			// it('contains true', () => {
-			// 	expect(nestObjectOutput.includes('true')).toBe(true);
-			// });
-			// it('contains _stuff', () => {
-			// 	expect(nestObjectOutput.includes('_stuff')).toBe(true);
-			// });
 			describe('collection values', () => {
-				// describe('object', () => {
-				// 	it('contains John Doe(,)', () => {
-				// 		expect(nestObjectOutput.includes('John Doe')).toBe(true);
-				// 		// expect(nestObjectOutput.includes('John Doe,')).toBe(true);
-				// 	});
-				// 	it('contains 20(,)', () => {
-				// 		expect(nestObjectOutput.includes('20')).toBe(true);
-				// 		// expect(nestObjectOutput.includes('20,')).toBe(true);
-				// 	});
-				// 	it('contains developer(!,)', () => {
-				// 		expect(nestObjectOutput.includes('developer')).toBe(true);
-				// 		// expect(nestObjectOutput.includes('developer,')).toBe(false);
-				// 	});
-				// })
 				describe('array', () => {
 					it('array does not contain keys', () => {
-						expect(nestObjectOutput.split(/[0-9]+: [^\{]/g).length).toBeLessThan(2);
+						expect(nestObjectOutput.split(/[0-9]+\:/g).length).toBeLessThan(2);
 					});
-					// it('contains first(,)', () => {
-					// 	expect(nestObjectOutput.includes('first')).toBe(true);
-					// 	// expect(nestObjectOutput.includes('first,')).toBe(true);
-					// });
-					// it('contains second(,)', () => {
-					// 	expect(nestObjectOutput.includes('second')).toBe(true);
-					// 	// expect(nestObjectOutput.includes('second,')).toBe(true);
-					// });
-					// it('contains third(!,)', () => {
-					// 	expect(nestObjectOutput.includes('third')).toBe(true);
-					// 	// expect(nestObjectOutput.includes('third,')).toBe(false);
-					// });
 				});
 			});
 		});

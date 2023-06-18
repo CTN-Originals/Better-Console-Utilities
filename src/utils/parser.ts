@@ -72,7 +72,6 @@ class MessageObject {
 		
 		for (let i = 0; i < this.Content.length; i++) {
 			const contentObj = this.Content[i];
-			const contentInstance: string[] = [];
 			const isLastItem = (i === this.Content.length - 1);
 
 			if (contentObj.IsCollection) {
@@ -101,13 +100,13 @@ class MessageObject {
 		if (this.Holder && this.Holder.IsCollection) {
 			let head: string = `${getIndent(this.Depth - 1)}`;
 			if (this.Holder.Key !== 'BASE') {
-				if (this.Holder.Key.match(/[0-9]+/g) !== null) {
-					if (this.Holder.Value instanceof MessageObject && this.Holder.Value.Holder !== null && this.Holder.Value.Holder.Type === 'array') {
-						head += `${this.Holder.Key}: `;
-					}
+				//? If the key is not a number and is a MessageObject that is not an array, add the key
+				if (this.Holder.Key.match(/[0-9]+/g) !== null && this.Holder.Value.Holder?.Type !== 'array') {
+					//? do nothing? 
+					//TODO Reverse this to exclude this if statement
 				}
 				else {
-					head += `${this.Holder.Key}: `; 
+					head += `${this.Holder.Key}: `;
 				}
 			}
 			
@@ -139,10 +138,10 @@ class MessageContent {
 
 	constructor(obj: Partial<MessageContent> = {}) {
 		this.Type = obj.Type ?? 'string';
-		this.IsCollection = ['object', 'array'].includes(this.Type);
 		this.Key = obj.Key ?? '';
 		this.Value = obj.Value ?? '';
 		
+		this.IsCollection = ['object', 'array'].includes(this.Type);
 		this._breackets = (this.IsCollection) ? (this.Type === 'object') ? ['{', '}'] : ['[', ']'] : null;
 	}
 
@@ -169,17 +168,19 @@ export function collectionToString(input: any, options: Partial<ICollectionToStr
 
 	const holder: MessageContent = new MessageContent({
 		Type: typeOfValue(input),
-		Key: 'BASE'
+		Key: 'BASE',
+		IsCollection: ['object', 'array'].includes(input)
 	});
 	const msgObject: MessageObject = collectionToMessageObject(input, safeOptions, null, holder);
-	holder.IsCollection = ['object', 'array'].includes(msgObject.Type);
 	holder.Value = msgObject;
+
 
 	return msgObject.ToString;
 }
 
 function collectionToMessageObject(collection: any, options: Required<ICollectionToStringOptions>, parent: MessageObject | null = null, holder: MessageContent | null = null): MessageObject {
 	const msgObject: MessageObject = new MessageObject({
+		Type: typeOfValue(collection),
 		Parent: parent,
 		Holder: holder ?? null,
 		Depth: (parent) ? parent.Depth + 1 : 1,
@@ -189,16 +190,16 @@ function collectionToMessageObject(collection: any, options: Required<ICollectio
 
 	for (const key in collection) {
 		const value = collection[key];
-		msgObject.Type = typeOfValue(value);
+		const type = typeOfValue(value);
 
-		if (['object', 'array'].includes(msgObject.Type)) {
+		if (['object', 'array'].includes(type)) {
 			const valueContent = collectionToMessageObject(value, options, msgObject, value);
-			const content = new MessageContent({Type: msgObject.Type, Key: key, Value: valueContent});
+			const content = new MessageContent({Type: type, Key: key, Value: valueContent});
 			valueContent.Holder = content;
 			msgObject.Content.push(content);
 		}
 		else {
-			msgObject.Content.push(new MessageContent({Type: msgObject.Type, Key: key, Value: value}));
+			msgObject.Content.push(new MessageContent({Type: type, Key: key, Value: value}));
 		}
 	}
 
