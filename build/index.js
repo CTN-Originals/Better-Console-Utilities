@@ -28,9 +28,12 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // import * as color from './handlers/colorHandler';
 var handler = __importStar(require("./handlers"));
-var test = __importStar(require("./tests"));
 __exportStar(require("./handlers"), exports);
-test.test();
+//#region DEV
+//! COMMENT BEFORE BUIL
+// import * as test from './tests';
+// test.test();
+//#endregion
 exports = {
     ConsoleInstance: handler.betterConsole.ConsoleInstance,
 };
