@@ -4,6 +4,6 @@ module.exports = {
 	testMatch: ['**/tests/**/*.test.ts'],
 	collectCoverage: false,
 	coverageReporters: ['lcov', 'text-summary'],
-	roots: ['<rootDir>/tests', '<rootDir>/src'],
+	roots: ['<rootDir>/src/', '<rootDir>/tests/'],
 	testPathIgnorePatterns: ['/node_modules/', '/dist/', '/build/', '/coverage/', '/.vscode/'],
 };
