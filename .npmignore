@@ -4,6 +4,7 @@ src
 tests
 .vscode
 node_modules
+archive
 
 # files
 tsconfig.json

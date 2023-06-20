@@ -2,6 +2,7 @@
 .vscode
 **private.**
 **_**
+archive
 
 # TypeScript
 *.csv

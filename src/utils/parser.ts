@@ -21,7 +21,7 @@ const DefaultCollectionToStringOptions: ICollectionToStringOptions = {
 	autoColor: true, //TODO
 }
 
-class MessageObject {
+export class MessageObject {
 	public Type: string; //? The type of the object
 
 	public Content: MessageContent[]; //? An array of content
@@ -129,7 +129,7 @@ class MessageObject {
 	}
 }
 
-class MessageContent {
+export class MessageContent {
 	public Type: string;
 	public IsCollection: boolean;
 	public Key: string;
@@ -173,7 +173,6 @@ export function collectionToString(input: any, options: Partial<ICollectionToStr
 	});
 	const msgObject: MessageObject = collectionToMessageObject(input, safeOptions, null, holder);
 	holder.Value = msgObject;
-
 
 	return msgObject.ToString;
 }
