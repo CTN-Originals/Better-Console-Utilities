@@ -13,7 +13,7 @@ interface IConsoleInstance {
 }
 
 //* intercept console.log
-if (typeof console !== 'undefined') {
+if (console != null) {
 	const log = console.log.bind(console)
 	console.log = (...args) => {
 		const input = Array.prototype.slice.call(args)
