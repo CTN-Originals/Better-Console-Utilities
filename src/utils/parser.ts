@@ -177,8 +177,13 @@ export function collectionToString(input: any, options: Partial<ICollectionToStr
 	const msgObject: MessageObject = collectionToMessageObject(input, safeOptions, null, holder);
 	holder.Value = msgObject;
 
+	// console.log(msgObject)
+
 	return msgObject.ToString;
 }
+
+
+const recursionStorage: any[] = []; //? Stores all the objects that have been accessed to check for recursion
 
 export function collectionToMessageObject(collection: any, options: Required<ICollectionToStringOptions>, parent: MessageObject | null = null, holder: MessageContent | null = null): MessageObject {
 	const msgObject: MessageObject = new MessageObject({
@@ -189,6 +194,19 @@ export function collectionToMessageObject(collection: any, options: Required<ICo
 		IndentCount: options.indent,
 		IndentString: options.indentString,
 	});
+	
+	recursionStorage.push(collection); 
+	//? Check for recursion
+	//? If the object is the same as a previous object in the stack
+	//* Credits to: Shaw(4984) - discord - Game Dev League
+	for (let i = recursionStorage.length - 2; i >= 0; i--) {
+		const element = recursionStorage[i];
+		if (Object.is(collection, element)) {
+			console.error('Recursion detected');
+			msgObject.Content.push(new MessageContent({Type: 'recursion', Key: 'recursion', Value: '<recursion detected>'}));
+			return msgObject;
+		}
+	}
 
 	for (const key in collection) {
 		const value = collection[key];
@@ -204,6 +222,8 @@ export function collectionToMessageObject(collection: any, options: Required<ICo
 			msgObject.Content.push(new MessageContent({Type: type, Key: key, Value: value}));
 		}
 	}
+
+	recursionStorage.pop();
 
 	return msgObject;
 }
