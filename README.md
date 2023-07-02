@@ -4,7 +4,7 @@ This node.js module provides a better way of handling the build-in console for n
 ## How to install
 You can install this module through npm:
 ```bash
-$ npm install better-console-utilities
+npm install better-console-utilities
 ```
 
 ## How to use
@@ -42,5 +42,5 @@ This prints the object in a JSON format. This also works with arrays.
 
 ---
 
-### More Coming Soon
+### More Documentation Coming Soon
 ...
