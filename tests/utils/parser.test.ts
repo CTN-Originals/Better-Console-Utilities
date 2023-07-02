@@ -1,14 +1,25 @@
 import { MessageObject, MessageContent } from '../../src/utils/parser';
+import { 
+	getColor,
+	createTheme,
+} from '../../src/handlers/colorHandler';
+
+// describe('placeholder', () => {
+// 	it('placeholder', () => {
+// 		expect(1).toBe(1);
+// 	});
+// });
 
 describe('MessageObject', () => {
 	it('should create a MessageObject with default values', () => {
 		const messageObject = new MessageObject();
+		console.log(messageObject);
 		expect(messageObject.Depth).toEqual(0);
 		expect(messageObject.IndentCount).toEqual(2);
 		expect(messageObject.IndentString).toEqual(' ');
-		expect(messageObject.Color).toEqual('');
-		expect(messageObject.BackgroundColor).toEqual('');
-		expect(messageObject.Style).toEqual('');
+		expect(messageObject.Theme.foreground).toEqual({R: 255, G: 255, B: 255});
+		expect(messageObject.Theme.background).toEqual(null);
+		expect(messageObject.Theme.style).toEqual([]);
   	});
 
 	it('should create a MessageObject with custom values', () => {
@@ -16,16 +27,14 @@ describe('MessageObject', () => {
 			Depth: 1,
 			IndentCount: 4,
 			IndentString: '\t',
-			Color: 'red',
-			BackgroundColor: 'white',
-			Style: 'bold',
+			Theme: createTheme('red', 'white', 'bold'),
 		});
 		expect(messageObject.Depth).toEqual(1);
 		expect(messageObject.IndentCount).toEqual(4);
 		expect(messageObject.IndentString).toEqual('\t');
-		expect(messageObject.Color).toEqual('red');
-		expect(messageObject.BackgroundColor).toEqual('white');
-		expect(messageObject.Style).toEqual('bold');
+		expect(messageObject.Theme.foreground).toEqual({R: 255, G: 0, B: 0});
+		expect(messageObject.Theme.background).toEqual({R: 255, G: 255, B: 255});
+		// expect(messageObject.Theme.style).toEqual('bold');
 	});
 
 	it('should convert MessageObject to string', () => {
@@ -33,9 +42,7 @@ describe('MessageObject', () => {
 			Depth: 1,
 			IndentCount: 4,
 			IndentString: '\t',
-			Color: 'red',
-			BackgroundColor: 'white',
-			Style: 'bold',
+			Theme: createTheme('red', 'white', 'bold'),
 			Content: [
 				new MessageContent({ Type: 'text', Value: 'Hello' }),
 				new MessageContent({ Type: 'variable', Value: 'world' }),

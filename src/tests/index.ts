@@ -1,16 +1,21 @@
-import * as handler from '../handlers';
+// import * as handler from '../handlers';
 import { ConsoleInstance } from '../handlers/consoleHandler';
 import { getColorCodePrefix } from '../handlers/colorHandler';
 import * as parserTests from './parserTestData';
+import { defaultColorProfile } from '../handlers/colorHandler';
 
-const cons = new ConsoleInstance('test', true, '', {indent: parserTests.DefaultCollectionToStringOptions.indent ?? 2, indentString: parserTests.DefaultCollectionToStringOptions.indentString ?? ' '}, {});
+const cons = new ConsoleInstance('test', true, '', {indent: 2, indentString: ' '}, {})
+// const cons = new ConsoleInstance('test', true, '', {indent: parserTests.DefaultCollectionToStringOptions.indent ?? 2, indentString: parserTests.DefaultCollectionToStringOptions.indentString ?? ' '}, {});
 export function test() {
+	cons.log(defaultColorProfile);
+	console.log(defaultColorProfile);
+	// console.log(defaultColorProfile.typeThemes.string.overrides)
 	// cons.log('hello testing world');
-	cons.log(parserTests.simpleObject);
-	console.log(' ')
-	cons.log(parserTests.simpleArray);
-	console.log(' ')
-	cons.log(parserTests.nestObject);
+	// cons.log(parserTests.simpleObject);
+	// console.log(' ')
+	// cons.log(parserTests.simpleArray);
+	// console.log(' ')
+	// cons.log(parserTests.nestObject);
 	// cons.log('simpleObject: ', simpleObject, 'simpleArray: ', simpleArray, 'nestObject: ', nestObject);
 	// const str = collectionToString(nestObject, DefaultCollectionToStringOptions);
 	// console.log(str);

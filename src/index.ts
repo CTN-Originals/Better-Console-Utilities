@@ -1,22 +1,29 @@
 // import * as color from './handlers/colorHandler';
 import * as handler from './handlers';
-export * from './handlers';
+import * as utils from './utils';
 
 //#region DEV
 	//!! COMMENT BEFORE BUILD 
-	// import * as test from './tests';
-	// test.test();
+	import * as test from './tests';
+	test.test();
+	setTimeout(() => {}, 1000 * 60 * 10); // 10 minutes
 //#endregion
+
 
 exports = {
 	ConsoleInstance: handler.betterConsole.ConsoleInstance,
 }
+
+//#region Core
+
+//#endregion
+
 // console.log(color.tags.fg.red + 'Hello world!');
 
 const cons = new handler.betterConsole.ConsoleInstance('');
 
 //* Wait 10 minutes before exiting
-setTimeout(() => {}, 1000 * 60 * 10); // 10 minutes
+
 
 // console.log('hello world');
 // console.log('hello world2');

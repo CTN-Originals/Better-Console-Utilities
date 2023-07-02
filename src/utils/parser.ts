@@ -1,5 +1,8 @@
 import {
-	getColorCodePrefix
+	getColor,
+	getColorCodePrefix,
+	createTheme,
+	Theme
 } from '../handlers/colorHandler';
 
 export interface ICollectionToStringOptions {
@@ -33,9 +36,7 @@ export class MessageObject {
 	public IndentCount: number; //? The number of indent characters to apply * depth
 	public IndentString: string; //? the string to use for each indent
 
-	public Color: string; //TODO
-	public BackgroundColor: string; //TODO
-	public Style: string; //TODO
+	public Theme: Theme; //? The theme to use for coloring
 
 	/**
 	 * @param {MessageObject} obj
@@ -51,9 +52,8 @@ export class MessageObject {
 		this.IndentCount = obj.IndentCount ?? 2;
 		this.IndentString = obj.IndentString ?? ' ';
 
-		this.Color = obj.Color ?? '';
-		this.BackgroundColor = obj.BackgroundColor ?? '';
-		this.Style = obj.Style ?? '';
+		this.Theme = obj.Theme ?? createTheme('white', null, null);
+		//TODO Setting for punctuation (e.g. quotes around strings)
 	}
 
 	public get ToString(): string {
@@ -62,7 +62,7 @@ export class MessageObject {
 			if (depth < 0) { depth = 0; }
 			let line = `${getIndent(depth)}${input}`;
 			if (!isLastItem) {
-				line += ', ';
+				line += ',';
 			}
 			out.push(`${line}`);
 		}
@@ -89,6 +89,9 @@ export class MessageObject {
 			else {
 				if (this.Holder?.Type === 'array') {
 					addLine(`${contentObj.Value}`, isLastItem);
+				}
+				else if (contentObj.Type === 'null') {
+					addLine(`${contentObj.Key}: ${contentObj.Value}null`, isLastItem);
 				}
 				else {
 					addLine(`${contentObj.Key}: ${contentObj.Value}`, isLastItem);
@@ -177,7 +180,7 @@ export function collectionToString(input: any, options: Partial<ICollectionToStr
 	return msgObject.ToString;
 }
 
-function collectionToMessageObject(collection: any, options: Required<ICollectionToStringOptions>, parent: MessageObject | null = null, holder: MessageContent | null = null): MessageObject {
+export function collectionToMessageObject(collection: any, options: Required<ICollectionToStringOptions>, parent: MessageObject | null = null, holder: MessageContent | null = null): MessageObject {
 	const msgObject: MessageObject = new MessageObject({
 		Type: typeOfValue(collection),
 		Parent: parent,
@@ -208,16 +211,16 @@ function collectionToMessageObject(collection: any, options: Required<ICollectio
 //? Returns the type of the value as a string and also returns 'array' for arrays
 function typeOfValue(value: any): string {
 	if (typeof value == 'object') {
-		if (value instanceof MessageObject) {
-			return 'MessageObject';
-		}
-		else if (value instanceof MessageContent) {
-			return 'MessageContent';
-		}
-		else if (Array.isArray(value)) {
+		if (Array.isArray(value)) {
 			return 'array';
 		}
-		return 'object';
+		else if (value === null) {
+			return 'null';
+		}
+		else {
+			return 'object';
+		}
+		
 	}
 	else {
 		return typeof value
