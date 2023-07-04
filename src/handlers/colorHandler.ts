@@ -173,29 +173,29 @@ export class ColorProfile {
 
 export const defaultColorProfile = new ColorProfile('default', {
 	name: "default",
-	theme: {
-		foreground: '#ffffff',
-		background: 'pink',
-		style: 'bold'
-	},
+	theme: new Theme('#ffffff', null, 'reset'),
 	typeThemes: {
 		string: {
-			default: {
-				foreground: '#ff9900',
-				background: '#181818',
-				style: 'underscore'
-			},
+			default: new Theme('#C4785B', null, 'reset'),
 			overrides: [
-				{
-					target: 'ctn', 
-					theme: {
-						foreground: colors.blue,
-						background: colors.cyan,
-						style: ['bold', 'underscore']
-					},
-				}
+				{ target: 'ctn', theme: new Theme(colors.blue, colors.cyan, ['bold', 'underscore']) }
 			]
 		},
+		number: { default: new Theme('#B5CEA8') },
+		boolean: { default: new Theme('#569CD6') },
+		object: {
+			default: new Theme('#9CDCFE'),
+			key: new Theme('#569CD6', null, 'bold'),
+			value: { typeOverride: true, theme: new Theme('#9CDCFE') },
+			brackets: new Theme('#eaeaea'),
+			punctuation: new Theme('#cacaca'),
+		},
+		array: {
+			default: new Theme('#9CDCFE'),
+			value: { typeOverride: true, theme: new Theme('#9CDCFE') },
+			brackets: new Theme('#eaeaea'),
+			punctuation: new Theme('#cacaca'),
+		}
 	}
 } as unknown as ColorProfile);
 
