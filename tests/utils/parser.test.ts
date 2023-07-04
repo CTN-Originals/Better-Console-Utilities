@@ -1,7 +1,9 @@
 import { MessageObject, MessageContent } from '../../src/utils/parser';
 import { 
+	IColor,
+	Theme,
 	getColor,
-	createTheme,
+	styles,
 } from '../../src/handlers/colorHandler';
 
 // describe('placeholder', () => {
@@ -13,7 +15,7 @@ import {
 describe('MessageObject', () => {
 	it('should create a MessageObject with default values', () => {
 		const messageObject = new MessageObject();
-		console.log(messageObject);
+		// console.log(messageObject);
 		expect(messageObject.Depth).toEqual(0);
 		expect(messageObject.IndentCount).toEqual(2);
 		expect(messageObject.IndentString).toEqual(' ');
@@ -27,7 +29,7 @@ describe('MessageObject', () => {
 			Depth: 1,
 			IndentCount: 4,
 			IndentString: '\t',
-			Theme: createTheme('red', 'white', 'bold'),
+			Theme: new Theme('red', 'white', 'bold'),
 		});
 		expect(messageObject.Depth).toEqual(1);
 		expect(messageObject.IndentCount).toEqual(4);
@@ -37,18 +39,14 @@ describe('MessageObject', () => {
 		// expect(messageObject.Theme.style).toEqual('bold');
 	});
 
-	it('should convert MessageObject to string', () => {
-		const messageObject = new MessageObject({
-			Depth: 1,
-			IndentCount: 4,
-			IndentString: '\t',
-			Theme: createTheme('red', 'white', 'bold'),
-			Content: [
-				new MessageContent({ Type: 'text', Value: 'Hello' }),
-				new MessageContent({ Type: 'variable', Value: 'world' }),
-			],
-		});
-	})
+	// it('should create a MessageObject with custom Theme value', () => {
+	// 	const messageObject = new MessageObject({
+	// 		Depth: 1,
+	// 		IndentCount: 4,
+	// 		IndentString: '_|',
+	// 		Theme: new Theme('red', 'white', ['bold', 'underscore'])
+	// 	});
+	// })
 });
 
 // import * as parser from '../../src/utils/parser';
