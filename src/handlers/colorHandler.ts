@@ -4,6 +4,7 @@ export interface IColor {
 	B: number;
 }
 
+//#region Static Definitions
 //? This function is used to keep intellisence working when referencing the colors object
 function asColors<T extends Record<string, IColor>>(arg: T): T { return arg; }
 export const colors = asColors({
@@ -42,16 +43,6 @@ export const colors = asColors({
 	grey: { R: 128, G: 128, B: 128 },
 	//#endregion
 });
-
-/** 
- * @param {IColor} color The color to set transparency on
- * @returns {void}
- * @description Sets the transparent color (the background color of the console)
-*/
-export function setTransparency(color: IColor): void {
-	colors.transparent = {R: color.R, G: color.G, B: color.B};
-}
-
 function asStyles<T extends Record<string, string>>(arg: T): T { return arg; }
 export const styles = asStyles({
 	reset: "\x1b[0m",
@@ -62,45 +53,27 @@ export const styles = asStyles({
 	inverse: "\x1b[7m",
 	hidden: "\x1b[8m",
 });
+//#endregion
 
-export interface IThemeParameters {
-	/** @param {IColor|string} foreground The foreground color */
-	foreground: IColor|string; //? color or hex
-	/** @param {IColor|string|null} background The background color */
-	background: IColor|string|null; //? color or hex
-	/** @param {string|string[]|null} style The style or styles */
-	style: string|string[]|null; //? style or styles
-}
+//#region Theme Class
 export class Theme {
 	public foreground: IColor|string; //? color or hex
-	public background: IColor|string|null; //? color or hex
 	public background: IColor|string|null|undefined; //? color or hex
 	public style: string[]; //? style or styles
 
 	/** 
-	 * @param {IThemeParameters} input
-	 * @param {IColor} input.foreground The foreground color
-	 * @param {IColor} input.background The background color
-	 * @param {string[]} input.style The style or styles
 	 * @param {IColor|string} foreground The foreground color
 	 * @param {IColor|string|null} background The background color
 	 * @param {string|string[]|null} style The style or styles
 	 * @returns {Theme} The theme
 	*/
-	constructor(input: IThemeParameters = {foreground: 'white', background: null, style: null}) {
-		this.foreground = input.foreground;
-		this.background = input.background;
 	constructor(foreground: IColor|string = '#ffffff', background?: IColor|string|null, style?: string|string[]|null) {
 		this.foreground = foreground;
 		this.background = background ?? null;
 		this.style = [];
-		if (Array.isArray(input.style)) {
-			this.style = input.style;
 		if (Array.isArray(style)) {
 			this.style = style;
 		}
-		else if (typeof input.style === "string") {
-			this.style.push(input.style);
 		else if (typeof style === "string") {
 			this.style.push(style);
 		}
@@ -125,40 +98,9 @@ export class Theme {
 		}
 	}
 }
+//#endregion
 
-// string: {
-// 	default: IThemeParameters|Theme,
-// 	overrides: [{ target: string, theme: IThemeParameters|Theme }] //? Overrides for specific strings e.g. "string": { "true": { foreground: "red" } }
-// };
-// number: {
-// 	default: IThemeParameters|Theme,
-// };
-// boolean: {
-// 	default: IThemeParameters|Theme,
-// };
-// object: {
-// 	default: IThemeParameters|Theme,
-// 	key: IThemeParameters|Theme,
-// 	value: { typeOverride: boolean, theme: IThemeParameters|Theme },
-// 	brackets: IThemeParameters|Theme,
-// 	punctuation: IThemeParameters|Theme,
-// };
-// array: {
-// 	default: IThemeParameters|Theme,
-// 	value: { typeOverride: boolean, theme: IThemeParameters|Theme },
-// 	brackets: IThemeParameters|Theme,
-// 	punctuation: IThemeParameters|Theme,
-// };
-// }
-
-export interface ITypeThemes {
-	[key: string]: {
-		[key: string]: Theme | 
-		{[key: string]: string | Theme}[] |
-		{[key: string]: boolean | Theme};
-	}
-}
-
+//#region ColorProfile Classes
 export class Typethemes { 
 
 	public string: {
@@ -222,11 +164,12 @@ export class ColorProfile {
 	
 	constructor(name: string, input: Partial<ColorProfile>) {
 		this.name = name;
-		this.theme = new Theme(input.theme);
+		this.theme = new Theme(input.theme?.foreground, input.theme?.background, input.theme?.style);
 		
 		this.typeThemes = (input.typeThemes) ? new Typethemes(input.typeThemes) : new Typethemes();
 	}
 }
+//#endregion
 
 export const defaultColorProfile = new ColorProfile('default', {
 	name: "default",
@@ -281,36 +224,12 @@ export function getColor(input: string): {R: number, G: number, B: number} {
 	
 	return {R: red, G: green, B: blue};
 }
-export function createTheme(foreground: IColor|string, background: IColor|string|null, style: string|string[]|null): Theme {
-	if (typeof foreground === "string") { foreground = getColor(foreground); }
-	if (typeof background === "string") { background = getColor(background); }
-	if (Array.isArray(style)) {
-		for (let i = 0; i < style.length; i++) {
-			if (Object.keys(styles).includes(style[i])) {
-				style[i] = styles[style[i] as keyof typeof styles];
-			}
-			else if (Object.values(styles).includes(style[i])) {
-				continue;
-			}
-			else {
-				console.warn(`Invalid style input: ${style[i]}`);
-				style.splice(i, 1);
-			}
-		}
-	}
-	return new Theme({
-		foreground: foreground,
-		background: background,
-		style: style
-	});
-}
 
 export function getColorCodePrefix(hex: string): string {
 	//? credits to new_duck - twitch viewer
 	const color = getColor(hex);
 	return `\x1b[38;2;${color.R};${color.G};${color.B}m`
 }
-
 export function getColoredString(input: string, color: string): string {
 	return `${getColorCodePrefix(color)}${input}${styles.reset}`
 }

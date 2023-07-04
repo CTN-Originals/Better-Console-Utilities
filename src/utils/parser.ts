@@ -1,7 +1,6 @@
 import {
 	getColor,
 	getColorCodePrefix,
-	createTheme,
 	Theme
 } from '../handlers/colorHandler';
 
