@@ -52,7 +52,7 @@ export class MessageObject {
 		this.IndentCount = obj.IndentCount ?? 2;
 		this.IndentString = obj.IndentString ?? ' ';
 
-		this.Theme = obj.Theme ?? createTheme('white', null, null);
+		this.Theme = obj.Theme ?? new Theme('#FFFFFF');
 		//TODO Setting for punctuation (e.g. quotes around strings)
 	}
 

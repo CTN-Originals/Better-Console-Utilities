@@ -74,6 +74,7 @@ export interface IThemeParameters {
 export class Theme {
 	public foreground: IColor|string; //? color or hex
 	public background: IColor|string|null; //? color or hex
+	public background: IColor|string|null|undefined; //? color or hex
 	public style: string[]; //? style or styles
 
 	/** 
@@ -81,16 +82,27 @@ export class Theme {
 	 * @param {IColor} input.foreground The foreground color
 	 * @param {IColor} input.background The background color
 	 * @param {string[]} input.style The style or styles
+	 * @param {IColor|string} foreground The foreground color
+	 * @param {IColor|string|null} background The background color
+	 * @param {string|string[]|null} style The style or styles
+	 * @returns {Theme} The theme
 	*/
 	constructor(input: IThemeParameters = {foreground: 'white', background: null, style: null}) {
 		this.foreground = input.foreground;
 		this.background = input.background;
+	constructor(foreground: IColor|string = '#ffffff', background?: IColor|string|null, style?: string|string[]|null) {
+		this.foreground = foreground;
+		this.background = background ?? null;
 		this.style = [];
 		if (Array.isArray(input.style)) {
 			this.style = input.style;
+		if (Array.isArray(style)) {
+			this.style = style;
 		}
 		else if (typeof input.style === "string") {
 			this.style.push(input.style);
+		else if (typeof style === "string") {
+			this.style.push(style);
 		}
 
 		this.validate();
