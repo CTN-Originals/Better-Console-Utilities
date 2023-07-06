@@ -1,6 +1,6 @@
 // import * as handler from '../handlers';
 import { ConsoleInstance } from '../handlers/consoleHandler';
-import { getColorCodePrefix } from '../handlers/colorHandler';
+import { Theme, getColorCodePrefix, getColoredString, getThemedString } from '../handlers/colorHandler';
 import * as parserTests from './parserTestData';
 import { defaultColorProfile } from '../handlers/colorHandler';
 
@@ -10,8 +10,29 @@ const cons = new ConsoleInstance('test', true, '', {indent: 2, indentString: ' '
 export function test() {
 
 	//#region Color Handler Tests
-	cons.log(defaultColorProfile);
-	console.log(defaultColorProfile);
+	cons.log(parserTests.simpleObject);
+	console.log(' ');
+	cons.log(parserTests.simpleArray);
+	console.log(' ');
+	cons.log(parserTests.nestObject);
+	console.log(' ');
+	console.log(parserTests.nestObject);
+	console.log(defaultColorProfile)
+	console.log(' ')
+	//#endregion
+
+	//#region Style Tests
+	// const theme = new Theme('#ffffff', null, 'bold');
+	// console.log(getThemedString('hello world', theme));
+	// theme.addStyle('blink', 'underscore', 'inverse');
+	// console.log(getThemedString('hello world', theme));
+	// theme.removeStyle('blink', 'inverse');
+	// console.log(getThemedString('hello world', theme));
+	// theme.removeStyle('underscore');
+	// console.log(getThemedString('hello world', theme));
+	// console.log(' ')
+	// console.log(theme)
+	// console.log(theme.style)
 	//#endregion
 
 	//#region Recursion test
@@ -42,3 +63,28 @@ function testColors() {
 	console.log(getColorCodePrefix('#aa00FF') + ' i am purple')
 	console.log(getColorCodePrefix('orange') + ' i am orange')
 }
+
+
+// function sleep(ms: number) {
+// 	return new Promise(resolve => setTimeout(resolve, ms));
+// }
+
+// async function animate() {
+// 	const colors = ['\x1b[31m', '\x1b[32m', '\x1b[33m', '\x1b[34m', '\x1b[35m', '\x1b[36m'];
+// 	let colorIndex = 0;
+// 	let direction = 1;
+// 	let position = 0;
+// 	while (true) {
+// 		const color = colors[colorIndex];
+// 		const spaces = ' '.repeat(position) + color + '█' + '\x1b[0m';
+// 		console.log(spaces);
+// 		await sleep(50);
+// 		position += direction;
+// 		if (position === 20 || position === 0) {
+// 			direction *= -1;
+// 			colorIndex = (colorIndex + 1) % colors.length;
+// 		}
+// 	}
+// }
+
+// animate();

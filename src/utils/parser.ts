@@ -1,7 +1,8 @@
 import {
+	Theme,
 	getColor,
 	getColorCodePrefix,
-	Theme
+	getThemedString,
 } from '../handlers/colorHandler';
 
 export interface ICollectionToStringOptions {
@@ -13,7 +14,6 @@ export interface ICollectionToStringOptions {
 	color?:			boolean; //? colors the output
 	autoColor?:		boolean; //? colors the values automatically based on their type
 }
-
 const DefaultCollectionToStringOptions: ICollectionToStringOptions = {
 	indent: 2,
 	indentString: ' ',
@@ -51,7 +51,7 @@ export class MessageObject {
 		this.IndentCount = obj.IndentCount ?? 2;
 		this.IndentString = obj.IndentString ?? ' ';
 
-		this.Theme = obj.Theme ?? new Theme('#FFFFFF');
+		this.Theme = obj.Theme ?? new Theme();
 		//TODO Setting for punctuation (e.g. quotes around strings)
 	}
 
@@ -66,6 +66,8 @@ export class MessageObject {
 			out.push(`${line}`);
 		}
 		const getIndent = (depth: number = this.Depth): string => {
+			// const bg = this.Theme.background.seturate(0.5 + (0.5 * (depth / 10)));
+			// return getThemedString(this.IndentString.repeat(this.IndentCount * depth), new Theme(null, bg, null))
 			return this.IndentString.repeat(this.IndentCount * depth);
 		}
 		

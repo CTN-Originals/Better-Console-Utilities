@@ -1,4 +1,10 @@
 import { ICollectionToStringOptions } from '../../src/utils/parser'
+import { 
+	Theme,
+	Color,
+	getColor,
+	getColorCodePrefix,
+} from '../handlers/colorHandler';
 
 export const simpleObject: { [key: string]: any } = {
 	name: 'Hello World',
@@ -13,8 +19,11 @@ export const simpleArray: string[] = [
 	'third'
 ];
 
+const color = new Color('#000080').seturate(0.1);
+
 export const nestObject: { [key: string]: any } = {
-	name: 'First object test',
+	// name: `${getColorCodePrefix(color, false)}First object test ${color.asHex}`,
+	name: `First object test`,
 	enabled: true,
 	suffix: '_stuff',
 	obj: {
@@ -32,9 +41,9 @@ export const nestObject: { [key: string]: any } = {
 				years: 10,
 				favorite: true,
 				games: {
-					name: 'osu',
-					genre: 'rhythm',
-					years: 7,
+					name: 'rocket league',
+					genre: 'skill based',
+					years: 8,
 				}
 			},
 		],

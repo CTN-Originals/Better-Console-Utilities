@@ -1,46 +1,80 @@
-export interface IColor {
-	R: number;
-	G: number;
-	B: number;
+export class Color {
+	public R: number;
+	public G: number;
+	public B: number;
+	
+	constructor(input: { R: number, G: number, B: number });
+	constructor(r: number, g: number, b: number);
+	constructor(hex: string);
+	constructor(inputOrR: { R: number, G: number, B: number } | number | string, g?: number, b?: number) {
+		if (typeof inputOrR === "number") {
+			this.R = inputOrR;
+			this.G = g!;
+			this.B = b!;
+		} 
+		else if (typeof inputOrR === "string") {
+			const rgb = getColor(inputOrR);
+			this.R = rgb.R;
+			this.G = rgb.G;
+			this.B = rgb.B;
+		}
+		else {
+			this.R = inputOrR.R;
+			this.G = inputOrR.G;
+			this.B = inputOrR.B;
+		}
+	}
+
+	public get asArray(): number[] { return [this.R, this.G, this.B]; }
+	public get asHex(): string {
+		return `#${this.R.toString(16).padStart(2, '0')}${this.G.toString(16).padStart(2, '0')}${this.B.toString(16).padStart(2, '0')}`;
+	}
+	
+	public seturate(amount: number): Color {
+		const r = Math.round(Math.min(Math.max(0, this.R * amount), 255));
+		const g = Math.round(Math.min(Math.max(0, this.G * amount), 255));
+		const b = Math.round(Math.min(Math.max(0, this.B * amount), 255));
+		return new Color(r, g, b);
+	}
 }
 
 //#region Static Definitions
 //? This function is used to keep intellisence working when referencing the colors object
-function asColors<T extends Record<string, IColor>>(arg: T): T { return arg; }
+function asColors<T extends Record<string, Color>>(arg: T): T { return arg; }
 export const colors = asColors({
-	transparent: { R: 0, G: 0, B: 0 },
+	transparent: new Color({ R: -1, G: -1, B: -1 }),
 
-	black: { R: 0, G: 0, B: 0 },
-	white: { R: 255, G: 255, B: 255 },
+	black: new Color({ R: 0, G: 0, B: 0 }),
+	white: new Color({ R: 255, G: 255, B: 255 }),
 
 	//#region Primary
-	red: { R: 255, G: 0, B: 0 },
-	green: { R: 0, G: 255, B: 0 },
-	blue: { R: 0, G: 0, B: 255 },
+	red: new Color({ R: 255, G: 0, B: 0 }),
+	green: new Color({ R: 0, G: 255, B: 0 }),
+	blue: new Color({ R: 0, G: 0, B: 255 }),
 	//#endregion
 
 	//#region Secondary
-	yellow: { R: 255, G: 255, B: 0 },
-	cyan: { R: 0, G: 255, B: 255 },
-	magenta: { R: 255, G: 0, B: 255 },
-	gray: { R: 128, G: 128, B: 128 },
-	orange: { R: 255, G: 165, B: 0 },
-	pink: { R: 255, G: 192, B: 203 },
-	purple: { R: 128, G: 0, B: 128 },
+	yellow: new Color({ R: 255, G: 255, B: 0 }),
+	cyan: new Color({ R: 0, G: 255, B: 255 }),
+	magenta: new Color({ R: 255, G: 0, B: 255 }),
+	gray: new Color({ R: 128, G: 128, B: 128 }),
+	orange: new Color({ R: 255, G: 165, B: 0 }),
+	pink: new Color({ R: 255, G: 192, B: 203 }),
+	purple: new Color({ R: 128, G: 0, B: 128 }),
 	//#endregion
 	
 	//#region Extended
-	lime: { R: 0, G: 255, B: 0 },
-	teal: { R: 0, G: 128, B: 128 },
-	lavender: { R: 230, G: 230, B: 250 },
-	brown: { R: 165, G: 42, B: 42 },
-	beige: { R: 245, G: 245, B: 220 },
-	maroon: { R: 128, G: 0, B: 0 },
-	mint: { R: 62, G: 180, B: 137 },
-	olive: { R: 128, G: 128, B: 0 },
-	coral: { R: 255, G: 127, B: 80 },
-	navy: { R: 0, G: 0, B: 128 },
-	grey: { R: 128, G: 128, B: 128 },
+	lime: new Color({ R: 0, G: 255, B: 0 }),
+	teal: new Color({ R: 0, G: 128, B: 128 }),
+	lavender: new Color({ R: 230, G: 230, B: 250 }),
+	brown: new Color({ R: 165, G: 42, B: 42 }),
+	beige: new Color({ R: 245, G: 245, B: 220 }),
+	maroon: new Color({ R: 128, G: 0, B: 0 }),
+	mint: new Color({ R: 62, G: 180, B: 137 }),
+	olive: new Color({ R: 128, G: 128, B: 0 }),
+	coral: new Color({ R: 255, G: 127, B: 80 }),
+	navy: new Color({ R: 0, G: 0, B: 128 }),
+	grey: new Color({ R: 128, G: 128, B: 128 }),
 	//#endregion
 });
 function asStyles<T extends Record<string, string>>(arg: T): T { return arg; }
@@ -57,46 +91,43 @@ export const styles = asStyles({
 
 //#region Theme Class
 export class Theme {
-	public foreground: IColor|string; //? color or hex
-	public background: IColor|string|null|undefined; //? color or hex
-	public style: string[]; //? style or styles
+	public foreground: Color; //? color or hex
+	public background: Color; //? color or hex
+	private _style: string[]; //? style or styles
 
 	/** 
-	 * @param {IColor|string} foreground The foreground color
-	 * @param {IColor|string|null} background The background color
+	 * @param {Color|string|null} foreground The foreground color
+	 * @param {Color|string|null} background The background color
 	 * @param {string|string[]|null} style The style or styles
 	 * @returns {Theme} The theme
 	*/
-	constructor(foreground: IColor|string = '#ffffff', background?: IColor|string|null, style?: string|string[]|null) {
-		this.foreground = foreground;
-		this.background = background ?? null;
-		this.style = [];
-		if (Array.isArray(style)) {
-			this.style = style;
-		}
-		else if (typeof style === "string") {
-			this.style.push(style);
-		}
+	constructor(foreground: Color|string|null = colors.transparent, background?: Color|string|null, style?: string|string[]|null) {
+        this.foreground = (foreground instanceof Color) ? foreground : (foreground) ? getColor(foreground) : colors.transparent;
+        this.background = (background instanceof Color) ? background : (background) ? getColor(background) : colors.transparent;
+        this._style = (Array.isArray(style)) ? style : (style) ? [style] : [];
 
+        this.validate();
+    }
 		this.validate();
 	}
-
-	private validate() {
-		if (typeof this.foreground === "string") { this.foreground = getColor(this.foreground); }
-		if (typeof this.background === "string") { this.background = getColor(this.background); }
-		for (let i = 0; i < this.style.length; i++) {
-			if (Object.keys(styles).includes(this.style[i])) {
-				this.style[i] = styles[this.style[i] as keyof typeof styles];
-			}
-			else if (Object.values(styles).includes(this.style[i])) {
-				continue;
-			}
-			else {
-				console.warn(`Invalid style input: ${this.style[i]}`);
-				this.style.splice(i, 1);
 			}
 		}
 	}
+
+    private validate() {
+        for (let i = 0; i < this._style.length; i++) {
+            if (Object.keys(styles).includes(this._style[i])) {
+                this._style[i] = styles[this._style[i] as keyof typeof styles];
+            }
+            else if (Object.values(styles).includes(this._style[i])) {
+                continue;
+            }
+            else {
+                console.warn(`Invalid style input: ${this._style[i]}`);
+                this._style.splice(i, 1);
+            }
+        }
+    }
 }
 //#endregion
 
@@ -123,6 +154,10 @@ export class Typethemes {
 		punctuation: Theme,
 	};
 
+	/** 
+	 * @param {Partial<Typethemes>} input The color profile
+	 * @param {Theme} fallbackTheme The theme to use if a theme is not provided
+	*/
 	constructor(input: Partial<Typethemes> = {}, fallbackTheme: Theme = new Theme()) {
 		this.string = {
 			default: (input.string?.default instanceof Theme) ? input.string?.default : fallbackTheme,
@@ -156,7 +191,6 @@ export class Typethemes {
 		};
 	}
 }
-
 export class ColorProfile {
 	public name: string;
 	public theme: Theme;
@@ -201,37 +235,50 @@ export const defaultColorProfile = new ColorProfile('default', {
 
 //#region Methods
 
-/** 
- * @param {string} input The color. supports: hex (#123ABC) or named colors (red, blue, etc.)
- * @returns {IColor} The RGB value of the color
-*/
-export function getColor(input: string): {R: number, G: number, B: number} {
-	if (input in colors) {
-		return colors[input as keyof typeof colors];
-	}
+	//#region Getters
+		/** 
+		 * @param {string} input The color. supports: hex (#123ABC) or named colors (red, blue, etc.)
+		 * @returns {Color} The RGB value of the color
+		*/
+		export function getColor(input: string): Color {
+			if (input in colors) {
+				return colors[input as keyof typeof colors];
+			}
 
-	const regex = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
-	const result = regex.exec(input);
-	
-	if (!result) {
-		console.warn(`Invalid color input: ${input}`);
-		return {R: 0, G: 0, B: 0}; //? Invalid input, return null or throw an error
-	}
-	
-	const red = parseInt(result[1], 16);
-	const green = parseInt(result[2], 16);
-	const blue = parseInt(result[3], 16);
-	
-	return {R: red, G: green, B: blue};
-}
+			const regex = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
+			const result = regex.exec(input);
+			
+			if (!result) {
+				console.warn(`Invalid color input: ${input}`);
+				return colors.transparent; //? Invalid input, return null or throw an error
+			}
+			
+			const red = parseInt(result[1], 16);
+			const green = parseInt(result[2], 16);
+			const blue = parseInt(result[3], 16);
+			
+			return new Color(red, green, blue);
+		}
 
-export function getColorCodePrefix(hex: string): string {
-	//? credits to new_duck - twitch viewer
-	const color = getColor(hex);
-	return `\x1b[38;2;${color.R};${color.G};${color.B}m`
-}
-export function getColoredString(input: string, color: string): string {
-	return `${getColorCodePrefix(color)}${input}${styles.reset}`
-}
+		export function getColorCodePrefix(color: Color|string, fgColor: boolean = true): string {
+			//? credits to new_duck - twitch viewer
+			if (typeof color === 'string') color = getColor(color);
+			
+			var flag =  `\x1b[38;2;`
+			if (!fgColor) flag = `\x1b[48;2;`
+				
+			return `${flag}${color.R};${color.G};${color.B}m`
+		}
+		export function getColoredString(input: string, color: string): string {
+			return `${getColorCodePrefix(color)}${input}${styles.reset}`
+		}
+		export function getThemedString(input: string, theme: Theme): string {
+			const fg = (theme.foreground != null) ? getColorCodePrefix(theme.foreground) : '';
+			const bg = (theme.background != null) ? getColorCodePrefix(theme.background, false) : '';
+			const style = (theme.style.length > 0) ? theme.style.join('') : '';
+			if (fg === '' && bg === '' && style === '') return input;
+			return `${fg}${bg}${style}${input}${styles.reset}`
+		}
+	//#endregion
 
 //#endregion
