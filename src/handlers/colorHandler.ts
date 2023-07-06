@@ -108,8 +108,33 @@ export class Theme {
 
         this.validate();
     }
+
+    get style(): string[] {
+        return this._style;
+    }
+
+    set style(value: string|string[]) {
+        this._style = (Array.isArray(value)) ? value : [value];
+        this.validate();
+    }
+
+	/** 
+	 * @param {...string} style The style or styles names to add (e.g. 'bold', 'underscore', etc.)
+	*/
+	public addStyle(...style: string[]) {
+		this._style.push(...style);
 		this.validate();
 	}
+	/** 
+	 * @param {...string} style The style or styles names to remove (e.g. 'bold', 'underscore', etc.)
+	*/
+	public removeStyle(...style: string[]) {
+		for (const s of style) {
+			const styleFlag = styles[s as keyof typeof styles];
+			console.log(style)
+			const index = this._style.findIndex((e) => e === styleFlag);
+			if (index !== -1) {
+				this._style.splice(index, 1);
 			}
 		}
 	}
