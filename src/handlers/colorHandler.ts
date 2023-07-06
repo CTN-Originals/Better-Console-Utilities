@@ -109,11 +109,11 @@ export class Theme {
         this.validate();
     }
 
-    get style(): string[] {
+    public get style(): string[] {
         return this._style;
     }
 
-    set style(value: string|string[]) {
+    public set style(value: string|string[]) {
         this._style = (Array.isArray(value)) ? value : [value];
         this.validate();
     }
@@ -137,6 +137,18 @@ export class Theme {
 				this._style.splice(index, 1);
 			}
 		}
+	}
+
+	/** 
+	 * @param {string} input The string to apply the theme to
+	 * @returns {string} The themed string (e.g. \x1b[38;2;255;0;0m$Hello World\x1b[0m)
+	*/
+	public getThemedString(input: string): string {
+		const fg = (this.foreground != null && this.foreground != colors.transparent) ? getColorCodePrefix(this.foreground) : '';
+		const bg = (this.background != null && this.background != colors.transparent) ? getColorCodePrefix(this.background, false) : '';
+		const style = (this.style.length > 0) ? this.style.join('') : '';
+		if (fg === '' && bg === '' && style === '') return input;
+		return `${fg}${bg}${style}${input}${styles.reset}`
 	}
 
     private validate() {
