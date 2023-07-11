@@ -1,5 +1,8 @@
 import {
 	Theme,
+	ThemeProfile,
+	TypeThemes,
+	defaultColorProfile,
 	getColor,
 	getColorCodePrefix,
 	getThemedString,
@@ -35,7 +38,7 @@ export class MessageObject {
 	public IndentCount: number; //? The number of indent characters to apply * depth
 	public IndentString: string; //? the string to use for each indent
 
-	public Theme: Theme; //? The theme to use for coloring
+	public Theme: ThemeProfile; //? The theme to use for coloring
 
 	/**
 	 * @param {MessageObject} obj
@@ -51,25 +54,33 @@ export class MessageObject {
 		this.IndentCount = obj.IndentCount ?? 2;
 		this.IndentString = obj.IndentString ?? ' ';
 
-		this.Theme = obj.Theme ?? new Theme();
+		this.Theme = obj.Theme ?? defaultColorProfile;
 		//TODO Setting for punctuation (e.g. quotes around strings)
+
+		// console.log(this._getTypeTheme('object', 'value'));
 	}
 
-	public get ToString(): string {
+	public get ToString(): string {0
 		let out: string[] = [];
 		const addLine = (input: string, isLastItem: boolean = false, depth: number = this.Depth) => {
 			if (depth < 0) { depth = 0; }
 			let line = `${getIndent(depth)}${input}`;
 			if (!isLastItem) {
-				line += ',';
+				line += colorize(',', 'object', 'punctuation');
 			}
 			out.push(`${line}`);
 		}
 		const getIndent = (depth: number = this.Depth): string => {
-			// const bg = this.Theme.background.seturate(0.5 + (0.5 * (depth / 10)));
-			// return getThemedString(this.IndentString.repeat(this.IndentCount * depth), new Theme(null, bg, null))
 			return this.IndentString.repeat(this.IndentCount * depth);
 		}
+
+		const colorize = (input: string, type?: string, identifier?: string): string => {
+			const theme = this._getTypeTheme(type, identifier);
+			// addLine(`(${type}, ${identifier}, ${theme.getColorNames().foreground})`);
+			let out = theme.getThemedString(input);
+			
+			return out;
+		};
 		
 		for (let i = 0; i < this.Content.length; i++) {
 			const contentObj = this.Content[i];
@@ -79,23 +90,20 @@ export class MessageObject {
 				const msgObj: MessageObject = contentObj.Value;
 				const holder = msgObj.Holder;
 				const brackets = msgObj.Holder?.Brackets;
-				
-				if (holder && brackets) {
-					addLine(`${msgObj.ToString}`, isLastItem, 0); //? depth=0 because indent is already applied to the content
-				}
-				else {
-					addLine(`${msgObj.ToString}`, isLastItem);
-				}
+
+				// addLine(`${this._getTypeTheme(msgObj.Type, 'key').getThemedString(msgObj.ToString)}`, isLastItem, (holder && brackets) ? 0 : this.Depth); //? depth=0 because indent is already applied to the content
+				addLine(`${colorize(msgObj.ToString, msgObj.Type, 'key')}`, isLastItem, (holder && brackets) ? 0 : this.Depth); //? depth=0 because indent is already applied to the content
 			}
 			else {
 				if (this.Holder?.Type === 'array') {
-					addLine(`${contentObj.Value}`, isLastItem);
-				}
-				else if (contentObj.Type === 'null') {
-					addLine(`${contentObj.Key}: ${contentObj.Value}null`, isLastItem);
+					// addLine(`${this._getTypeTheme(contentObj.Type, 'value').getThemedString(contentObj.Value)}`, isLastItem);
+
+					addLine(`${colorize(contentObj.Value, contentObj.Type, 'value')}`, isLastItem);
 				}
 				else {
-					addLine(`${contentObj.Key}: ${contentObj.Value}`, isLastItem);
+					// addLine(`${this._getTypeTheme(contentObj.Type, 'key').getThemedString(contentObj.Key)}: ${this._getTypeTheme(contentObj.Type, 'value').getThemedString(contentObj.Value)}` + ((contentObj.Type === 'null') ? `<null>` : ''), isLastItem);
+					
+					addLine(`${colorize(contentObj.Key, 'object', 'key')}${colorize(':', 'object', 'punctuation')} ${colorize(contentObj.Value, contentObj.Type, 'value')}` + ((contentObj.Type === 'null') ? `<null>` : ''), isLastItem);
 				}
 			}
 		}
@@ -110,12 +118,17 @@ export class MessageObject {
 					//TODO Reverse this to exclude this if statement
 				}
 				else {
-					head += `${this.Holder.Key}: `;
+					// head += `${this._getTypeTheme(this.Type, 'key').getThemedString(this.Holder.Key)}: `;
+					head += `${colorize(this.Holder.Key, 'object', 'key')}${colorize(':', 'object', 'punctuation')} `;
 				}
 			}
 			
 			const brackets = this.Holder.Brackets;
 			if (brackets) {
+				for (let i = 0; i < brackets.length; i++) {
+					// brackets[i] = this._getTypeTheme(this.Type, 'value').getThemedString(brackets[i]);
+					brackets[i] = colorize(brackets[i], this.Holder.Type, 'brackets');
+				}
 				if (this.Content.length > 0) {
 					head += `${brackets[0]}`;
 					out.unshift(head);
@@ -130,6 +143,39 @@ export class MessageObject {
 			}
 		}
 		return out.join(`\n`);
+	}
+
+	/** 
+	 * @param {string} type the type of the object
+	 * @param {string} identifier the identifier of the object (only applies to collections)
+	 * @returns {Theme} the theme to use for the object
+	*/
+	private _getTypeTheme(type?: string, identifier?: string): Theme {
+		const theme = (type) ? this.Theme.typeThemes[type as keyof TypeThemes] : this.Theme.default;
+		// console.log(type, identifier)
+		if (theme) {
+			if (theme instanceof Theme) {
+				// console.log('returning instance of theme')
+				return theme;
+			}
+			else if (identifier) {
+				const keys = Object.keys(theme);
+				for (let i = 0; i < keys.length; i++) {
+					const key = keys[i];
+					if (key === identifier) {
+						const field = theme[key as keyof typeof theme];
+						// console.log(field);
+						return (field instanceof Theme) ? field : field['theme' as keyof typeof field];
+					}
+				}
+				if (theme[identifier as keyof typeof theme] instanceof Theme) {
+					return theme[identifier as keyof typeof theme];
+				}
+				else { return theme.default; }
+			}
+		}
+		// console.log('returning default theme')
+		return this.Theme.default;
 	}
 }
 
@@ -178,7 +224,7 @@ export function collectionToString(input: any, options: Partial<ICollectionToStr
 	const msgObject: MessageObject = collectionToMessageObject(input, safeOptions, null, holder);
 	holder.Value = msgObject;
 
-	// console.log(msgObject)
+	console.log(msgObject)
 
 	return msgObject.ToString;
 }

@@ -151,6 +151,39 @@ export class Theme {
 		return `${fg}${bg}${style}${input}${styles.reset}`
 	}
 
+	public getColorNames(): { foreground: string, background: string } {
+		const keys = Object.keys(colors);
+		let fg = '';
+		let bg = '';
+		for (const key of keys) {
+			if (colors[key as keyof typeof colors] === this.foreground) {
+				fg = key;
+			}
+			else if (colors[key as keyof typeof colors] === this.background) {
+				bg = key;
+			}
+		}
+
+		if (fg === '') fg = this.foreground.asHex;
+		if (bg === '') bg = this.background.asHex;
+
+		return { foreground: fg, background: bg };
+	}
+
+	public get themeFlags(): string {
+		let out = '';
+		if (this.foreground != null && this.foreground != colors.transparent) {
+			out += getColorCodePrefix(this.foreground);
+		}
+		if (this.background != null && this.background != colors.transparent) {
+			out += getColorCodePrefix(this.background, false);
+		}
+		if (this.style.length > 0) {
+			out += this.style.join('');
+		}
+		return out;
+	}
+
     private validate() {
         for (let i = 0; i < this._style.length; i++) {
             if (Object.keys(styles).includes(this._style[i])) {
@@ -169,7 +202,7 @@ export class Theme {
 //#endregion
 
 //#region ColorProfile Classes
-export class Typethemes { 
+export class TypeThemes { 
 
 	public string: {
 		default: Theme,
@@ -192,10 +225,10 @@ export class Typethemes {
 	};
 
 	/** 
-	 * @param {Partial<Typethemes>} input The color profile
+	 * @param {Partial<TypeThemes>} input The color profile
 	 * @param {Theme} fallbackTheme The theme to use if a theme is not provided
 	*/
-	constructor(input: Partial<Typethemes> = {}, fallbackTheme: Theme = new Theme()) {
+	constructor(input: Partial<TypeThemes> = {}, fallbackTheme: Theme = new Theme()) {
 		this.string = {
 			default: (input.string?.default instanceof Theme) ? input.string?.default : fallbackTheme,
 			overrides: input.string?.overrides.map((e) => {
@@ -228,26 +261,26 @@ export class Typethemes {
 		};
 	}
 }
-export class ColorProfile {
+export class ThemeProfile {
 	public name: string;
-	public theme: Theme;
-	public typeThemes: Typethemes;
+	public default: Theme;
+	public typeThemes: TypeThemes;
 	
-	constructor(name: string, input: Partial<ColorProfile>) {
+	constructor(name: string, input: Partial<ThemeProfile>) {
 		this.name = name;
-		this.theme = new Theme(input.theme?.foreground, input.theme?.background, input.theme?.style);
+		this.default = new Theme(input.default?.foreground, input.default?.background, input.default?.style);
 		
-		this.typeThemes = (input.typeThemes) ? new Typethemes(input.typeThemes) : new Typethemes();
+		this.typeThemes = (input.typeThemes) ? new TypeThemes(input.typeThemes) : new TypeThemes();
 	}
 }
 //#endregion
 
-export const defaultColorProfile = new ColorProfile('default', {
+export const defaultColorProfile = new ThemeProfile('default', {
 	name: "default",
-	theme: new Theme('#ffffff', null, 'reset'),
+	default: new Theme('#ffffff', null),
 	typeThemes: {
 		string: {
-			default: new Theme('#C4785B', null, 'reset'),
+			default: new Theme('#C4785B', null),
 			overrides: [
 				{ target: 'ctn', theme: new Theme(colors.blue, colors.cyan, ['bold', 'underscore']) }
 			]
@@ -258,17 +291,17 @@ export const defaultColorProfile = new ColorProfile('default', {
 			default: new Theme('#9CDCFE'),
 			key: new Theme('#569CD6', null, 'bold'),
 			value: { typeOverride: true, theme: new Theme('#9CDCFE') },
-			brackets: new Theme('#eaeaea'),
-			punctuation: new Theme('#cacaca'),
+			brackets: new Theme('#aaaaaa'),
+			punctuation: new Theme('#808080'),
 		},
 		array: {
 			default: new Theme('#9CDCFE'),
 			value: { typeOverride: true, theme: new Theme('#9CDCFE') },
-			brackets: new Theme('#eaeaea'),
-			punctuation: new Theme('#cacaca'),
+			brackets: new Theme('#aaaaaa'),
+			punctuation: new Theme('#808080'),
 		}
 	}
-} as unknown as ColorProfile);
+} as unknown as ThemeProfile);
 
 //#region Methods
 
