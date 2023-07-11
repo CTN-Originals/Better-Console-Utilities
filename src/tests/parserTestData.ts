@@ -50,8 +50,8 @@ export const nestObject: { [key: string]: any } = {
 	},
 	list: [
 		'first',
+		'ctn',
 		'second',
-		'third'
 	],
 	emptyObj: {},
 	emptyList: [],

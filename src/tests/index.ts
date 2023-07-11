@@ -16,9 +16,9 @@ export function test() {
 	console.log(' ');
 	cons.log(parserTests.nestObject);
 	console.log(' ');
-	console.log(parserTests.nestObject);
-	console.log(defaultColorProfile)
-	console.log(' ')
+	// console.log(parserTests.nestObject);
+	// console.log(defaultColorProfile)
+	// console.log(' ')
 	//#endregion
 
 	//#region Style Tests
