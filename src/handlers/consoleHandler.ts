@@ -1,4 +1,4 @@
-import * as util from '../utils';
+import * as utils from '../utils';
 import * as color from './colorHandler';
 
 interface IConsoleInstance {
@@ -67,16 +67,16 @@ export class ConsoleInstance implements IConsoleInstance {
 		let log = '';
 		for (let i = 0; i < args.length; i++) {
 			const arg = args[i];
-			if (typeof arg === 'object') {
-				const collectionStringOptipons: util.parser.ICollectionToStringOptions = {
-					indent: this.settings.indent,
-					indentString: this.settings.indentString,
-				};
-				log += util.parser.collectionToString(arg, collectionStringOptipons);
-			}
-			else {
-				log += arg;
-			}
+			const collectionStringOptipons: utils.parser.ICollectionToStringOptions = {
+				indent: this.settings.indent,
+				indentString: this.settings.indentString,
+			};
+			log += utils.parser.parseInput(arg, collectionStringOptipons).ToString;
+			// if (typeof arg === 'object') {
+			// }
+			// else {
+			// 	log += arg;
+			// }
 		}
 		return log;
 	}

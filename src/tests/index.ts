@@ -7,15 +7,31 @@ import { defaultColorProfile } from '../handlers/colorHandler';
 
 const cons = new ConsoleInstance('test', true, '', {indent: 2, indentString: ' '}, {})
 // const cons = new ConsoleInstance('test', true, '', {indent: parserTests.DefaultCollectionToStringOptions.indent ?? 2, indentString: parserTests.DefaultCollectionToStringOptions.indentString ?? ' '}, {});
-export function test() {
+export async function test() {
 
 	//#region Color Handler Tests
-	cons.log(parserTests.simpleObject);
-	console.log(' ');
-	cons.log(parserTests.simpleArray);
-	console.log(' ');
+	// console.groupCollapsed('Simple Object');
+	// cons.log(parserTests.simpleObject);
+	// console.groupEnd();
+
+	// console.groupCollapsed('Simple Array');
+	// cons.log(parserTests.simpleArray);
+	// console.groupEnd();
+
+	// console.group('Nested Object');
 	cons.log(parserTests.nestObject);
-	console.log(' ');
+	console.log(' ')
+	// console.groupEnd();
+	cons.log(JSON.stringify(parserTests.nestObject));
+	console.log(' ')
+
+	cons.log('abc');
+	console.log(' ')
+	cons.log(123);
+	console.log(' ')
+	cons.log('abc', 123);
+	console.log(' ')
+	// cons.log(defaultColorProfile);
 	// console.log(parserTests.nestObject);
 	// console.log(defaultColorProfile)
 	// console.log(' ')

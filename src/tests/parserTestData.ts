@@ -11,6 +11,12 @@ export const simpleObject: { [key: string]: any } = {
 	active: true,
 	count: 8,
 	status: 'good',
+	list: [
+		'first',
+		'second',
+		'ctn',
+		12345,
+	],
 };
 
 export const simpleArray: string[] = [
@@ -30,6 +36,7 @@ export const nestObject: { [key: string]: any } = {
 		name: 'John Doe',
 		age: '20',
 		work: 'developer',
+		bio: 'I am a person who likes to write code and play games. \nI have a dog named "Doggo" who is a good boy. \nI am currently working on a website for my community.',
 		hobbies: [
 			{
 				name: 'programming',
@@ -50,8 +57,9 @@ export const nestObject: { [key: string]: any } = {
 	},
 	list: [
 		'first',
-		'ctn',
 		'second',
+		'ctn',
+		12345,
 	],
 	emptyObj: {},
 	emptyList: [],
