@@ -1,3 +1,8 @@
+import {
+	replaceAll,
+} from '../utils';
+
+
 export class Color {
 	public R: number;
 	public G: number;
@@ -37,7 +42,6 @@ export class Color {
 		return new Color(r, g, b);
 	}
 }
-
 //#region Static Definitions
 //? This function is used to keep intellisence working when referencing the colors object
 function asColors<T extends Record<string, Color>>(arg: T): T { return arg; }
@@ -204,10 +208,7 @@ export class Theme {
 //#region ColorProfile Classes
 export class TypeThemes { 
 
-	public string: {
-		default: Theme,
-		overrides: {target: string, theme: Theme}[]
-	};
+	public string: { default: Theme };
 	public number: { default: Theme };
 	public boolean: { default: Theme };
 	public object: {
@@ -229,15 +230,7 @@ export class TypeThemes {
 	 * @param {Theme} fallbackTheme The theme to use if a theme is not provided
 	*/
 	constructor(input: Partial<TypeThemes> = {}, fallbackTheme: Theme = new Theme()) {
-		this.string = {
-			default: (input.string?.default instanceof Theme) ? input.string?.default : fallbackTheme,
-			overrides: input.string?.overrides.map((e) => {
-				return {
-					target: e.target,
-					theme: (e.theme instanceof Theme) ? e.theme : fallbackTheme
-				}
-			}) ?? [],
-		};
+		this.string = { default: (input.string?.default instanceof Theme) ? input.string?.default : fallbackTheme };
 		this.number = { default: (input.number?.default instanceof Theme) ? input.number?.default : fallbackTheme};
 		this.boolean = { default: (input.boolean?.default instanceof Theme) ? input.boolean?.default : fallbackTheme};
 		this.object = {
@@ -261,16 +254,70 @@ export class TypeThemes {
 		};
 	}
 }
+export class ThemeOverride {
+	public target: string|string[]|RegExp|RegExp[];
+	public theme: Theme;
+
+	/** 
+	 * @param {string|RegExp} target The target string or regex
+	 * @param {Theme} theme The theme to apply if the target is matched
+	*/
+	constructor(target: string|RegExp, theme: Theme = new Theme()) {
+		this.target = target;
+		this.theme = theme;
+	}
+
+	public apply(input: string, resetTheme: Theme = new Theme('#ffffff')): string {
+		if (Array.isArray(this.target)) {
+			for (const target of this.target) {
+				input = this.apply(input);
+			}
+			return input;
+		}
+		if (this.target instanceof RegExp) {
+			const match = input.match(this.target);
+			if (match != null) {
+				console.log(match);
+				for (const m of match) {
+					input = input.replace(m, this.getThemedString(m, resetTheme));
+				}
+				return input;
+			}
+		}
+		else {
+			// console.log(input);
+			if (input.includes(this.target)) {
+				return replaceAll(input, this.target, this.getThemedString(this.target, resetTheme));
+			}
+		}
+
+		return input;
+	}
+
+	public getThemedString(input: string, resetTheme: Theme = new Theme('#ffffff')): string {
+		return this.theme.themeFlags + input + resetTheme.themeFlags;
+	}
+}
+
 export class ThemeProfile {
 	public name: string;
 	public default: Theme;
 	public typeThemes: TypeThemes;
+	public overrides: ThemeOverride[];
 	
 	constructor(name: string, input: Partial<ThemeProfile>) {
 		this.name = name;
 		this.default = new Theme(input.default?.foreground, input.default?.background, input.default?.style);
 		
 		this.typeThemes = (input.typeThemes) ? new TypeThemes(input.typeThemes) : new TypeThemes();
+		this.overrides = (input.overrides) ? input.overrides : [];
+	}
+
+	public applyOverrides(input: string): string {
+		for (const override of this.overrides) {
+			input = override.apply(input);
+		}
+		return input;
 	}
 }
 //#endregion
@@ -279,12 +326,7 @@ export const defaultColorProfile = new ThemeProfile('default', {
 	name: "default",
 	default: new Theme('#ffffff', null),
 	typeThemes: {
-		string: {
-			default: new Theme('#C4785B', null),
-			overrides: [
-				{ target: 'ctn', theme: new Theme(colors.blue, colors.cyan, ['bold', 'underscore']) }
-			]
-		},
+		string: { default: new Theme('#C4785B', null) },
 		number: { default: new Theme('#B5CEA8') },
 		boolean: { default: new Theme('#569CD6') },
 		object: {
@@ -300,7 +342,14 @@ export const defaultColorProfile = new ThemeProfile('default', {
 			brackets: new Theme('#aaaaaa'),
 			punctuation: new Theme('#808080'),
 		}
-	}
+	},
+	overrides: [
+		new ThemeOverride(/[0-9]*/g, new Theme('#B5CEA8')),
+		new ThemeOverride(/ ctn /gi, new Theme('green', 'cyan')),
+		new ThemeOverride('abc', new Theme('#00ff00')),
+		new ThemeOverride('name', new Theme('#ff0000')),
+		new ThemeOverride(/(['"`])(?:\\\1|.)*?\1/g, new Theme('#C4785B')),
+	]
 } as unknown as ThemeProfile);
 
 //#region Methods

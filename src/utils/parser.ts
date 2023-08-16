@@ -105,7 +105,7 @@ export class MessageObject {
 					addLine(`${colorize(contentObj.Key, 'object', 'key')}${colorize(':', 'object', 'punctuation')} ${colorize(contentObj.Value, contentObj.Type, 'value')}` + ((contentObj.Type === 'null') ? `<null>` : ''), isLastItem);
 				}
 				else {
-					addLine(`${colorize(contentObj.Value)}` + ((contentObj.Type === 'null') ? `<null>` : ''), isLastItem);
+					addLine(`${defaultColorProfile.applyOverrides(colorize(contentObj.Value))}`, isLastItem);
 				}
 			}
 		}

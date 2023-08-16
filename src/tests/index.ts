@@ -19,18 +19,20 @@ export async function test() {
 	// console.groupEnd();
 
 	// console.group('Nested Object');
-	cons.log(parserTests.nestObject);
-	console.log(' ')
+	// cons.log(parserTests.nestObject);
+	// console.log(' ')
 	// console.groupEnd();
+
 	cons.log(JSON.stringify(parserTests.nestObject));
 	console.log(' ')
+	// cons.log(testColors);
 
-	cons.log('abc');
-	console.log(' ')
-	cons.log(123);
-	console.log(' ')
-	cons.log('abc', 123);
-	console.log(' ')
+	// cons.log('abc');
+	// console.log(' ')
+	// cons.log(123);
+	// console.log(' ')
+	// cons.log('abc', 123);
+	// console.log(' ')
 	// cons.log(defaultColorProfile);
 	// console.log(parserTests.nestObject);
 	// console.log(defaultColorProfile)
