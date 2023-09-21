@@ -2,6 +2,9 @@ import {
 	replaceAll,
 } from '../utils';
 
+const colorFlagRegex = new RegExp(/\x1b\[38;2(?<rbg>(;\d{1,3}){3})m/g); //? Matches \x1b[38;2;255;255;255m colors
+const styleFlagRegex = new RegExp(/\x1b\[\d{1}m/g); //? Matches \x1b[0m styles
+const anyFlagRegex = new RegExp(/\x1b\[((3|4)8|\d{1})(;2(;\d{1,3}){3})?m/g); //? Matches all flags
 
 export class Color {
 	public R: number;
@@ -268,30 +271,109 @@ export class ThemeOverride {
 	}
 
 	public apply(input: string, resetTheme: Theme = new Theme('#ffffff')): string {
+		//! 
+			//TODO Sudo code with comments to explain every single step
+		//! 
+
+		//? if target is an array, run apply on each element
 		if (Array.isArray(this.target)) {
 			for (const target of this.target) {
 				input = this.apply(input);
 			}
 			return input;
 		}
-		if (this.target instanceof RegExp) {
-			const match = input.match(this.target);
-			if (match != null) {
-				console.log(match);
-				for (const m of match) {
-					input = input.replace(m, this.getThemedString(m, resetTheme));
+		
+		let rawInput = input;
+
+		//? remove flag from input
+		const flagMatchList: any[] = []
+		const matchList = input.match(anyFlagRegex);
+		// matchList?.push(...input.match(styleFlagRegex) ?? []);
+		if (matchList !== null) {
+			// console.log(matchList)
+			for (let match of matchList) {
+				if (!match) { continue; }
+				match = match.replace('[', '\\[');
+				const reg = new RegExp(match);
+				const exec = reg.exec(input);
+				if (!exec) { continue; }
+
+				if (flagMatchList.find((e) => e.index === exec.index)) { 
+					//? Array of matches includes a match with the same index, overwrite it
+					const index = flagMatchList.findIndex((e) => e.index === exec.index); 
 				}
-				return input;
+				else {
+					flagMatchList.push(exec);
+				}
+				// input = input.replace(exec[0], '');
+			}
+			// input = input.replace(colorFlagRegex, '');
+			// input = input.replace(styleFlagRegex, '');
+			input = input.replace(anyFlagRegex, '');
+		}
+		let out = input;
+				
+		//? if target is a regex
+		if (this.target instanceof RegExp) {
+			const match = out.match(this.target);
+			if (match != null) {
+				let matchOut = out;
+				for (const m of match) {
+					// console.log('if target == RegExp: ' + m + ' | ' + this.target);
+					matchOut = matchOut.replace(m, this.getThemedString(m, resetTheme));
+				}
+				out = matchOut;
 			}
 		}
 		else {
-			// console.log(input);
+			// console.log('else: ' + input);
 			if (input.includes(this.target)) {
-				return replaceAll(input, this.target, this.getThemedString(this.target, resetTheme));
+				const position = [input.indexOf(this.target), input.indexOf(this.target) + this.target.length];
+				out =  replaceAll(input, this.target, this.getThemedString(this.target, resetTheme));
 			}
 		}
+		if (out === input) { 
+			//? no matches, return input
+			// console.log('no matches')
+			// console.log([out + ' | ' + input, rawInput])
+			// console.log(' ')
+			return rawInput;
+		}
 
-		return input;
+		console.log(flagMatchList)
+		console.log(rawInput.split('\x1b'))
+
+		//? add the flag back to the input
+		console.log('\n---- Before ----\n', out, '\n')
+
+		const preConstruct = [];
+		const usedFlags = [];
+		
+		let positionIndex = 0;
+		for (let i = 0; i < flagMatchList.length; i++) {
+			let match = flagMatchList[i];
+			
+			const flag = match[0];
+			const index = match.index + 1; //TODO
+			if (flagMatchList[i - 1] && index <= flagMatchList[i - 1].index) {
+				positionIndex += flag.length + 1; //TODO
+				// positionIndex += indexAdition;
+				// console.log(`skipping: index: ${match?.index} | currentIndex: ${positionIndex} | out: ${out}`, match)
+				continue;
+			}
+			// console.log(`index: ${index} | currentIndex: ${positionIndex} | out: ${out}`, [flag])
+			
+			preConstruct.push(out.slice(0, index + positionIndex) + flag + out.slice(index + positionIndex))
+			usedFlags.push({ index: index, flag: flag });
+
+			out = out.slice(0, index + positionIndex) + flag + out.slice(index + positionIndex);
+			positionIndex += flag.length; //TODO
+			// positionIndex = out.split('\x1b').length;
+		}
+		// console.log(preConstruct)
+		console.log('---- After ----\n', out, preConstruct, usedFlags, '\n')
+
+		return out;
 	}
 
 	public getThemedString(input: string, resetTheme: Theme = new Theme('#ffffff')): string {
@@ -315,6 +397,7 @@ export class ThemeProfile {
 
 	public applyOverrides(input: string): string {
 		for (const override of this.overrides) {
+			//TODO: apply all overrides but find a way to merge the results
 			input = override.apply(input);
 		}
 		return input;
@@ -344,11 +427,13 @@ export const defaultColorProfile = new ThemeProfile('default', {
 		}
 	},
 	overrides: [
-		new ThemeOverride(/[0-9]*/g, new Theme('#B5CEA8')),
-		new ThemeOverride(/ ctn /gi, new Theme('green', 'cyan')),
-		new ThemeOverride('abc', new Theme('#00ff00')),
-		new ThemeOverride('name', new Theme('#ff0000')),
 		new ThemeOverride(/(['"`])(?:\\\1|.)*?\1/g, new Theme('#C4785B')),
+		new ThemeOverride(/[0-9]+/g, new Theme('#B5CEA8')),
+		new ThemeOverride(/ctn/gi, new Theme('#00FFFF', '#008000')),
+		new ThemeOverride('name', new Theme('#ff0000')),
+		new ThemeOverride('red', new Theme('#ff0000')),
+		new ThemeOverride('green', new Theme('#00ff00')),
+		new ThemeOverride('blue', new Theme('#0000ff')),
 	]
 } as unknown as ThemeProfile);
 

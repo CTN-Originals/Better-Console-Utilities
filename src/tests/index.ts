@@ -23,8 +23,11 @@ export async function test() {
 	// console.log(' ')
 	// console.groupEnd();
 
-	cons.log(JSON.stringify(parserTests.nestObject));
-	console.log(' ')
+	// cons.log(JSON.stringify(parserTests.nestObject));
+	// console.log(' ')
+	// cons.log('"string" red "green" ... nothing blue normal ctn');
+	// cons.log('"string" red');
+	cons.log('green normal blue');
 	// cons.log(testColors);
 
 	// cons.log('abc');
@@ -106,3 +109,55 @@ function testColors() {
 // }
 
 // animate();
+
+
+// let out = input;
+// // const flagRegex = new RegExp(/\x1b\[((3|4)8|\d{1})(;2(;\d{1,3}){3})?m/g);
+// const flagMatchList: any[] = []
+		
+// //? remove flag from input
+// // const matchList = input.match(colorFlagRegex);
+// // if (matchList !== null) {
+// // 	console.log(matchList)
+// // 	for (let match of matchList) {
+// // 		if (!match) { continue; }
+// // 		match = match.replace('[', '\\[');
+// // 		const reg = new RegExp(match);
+// // 		const exec = reg.exec(input);
+// // 		if (!exec) { continue; }
+// // 		flagMatchList.push(exec);
+// // 		// input = input.replace(exec[0], '');
+// // 	}
+// // 	input = input.replace(colorFlagRegex, '');
+// // 	// input = input.replace(styleFlagRegex, '');
+// // }
+// // console.log(flagMatchList)
+
+
+// console.log('\n---- Before ----\n', out, '\n')
+
+	// //? add the flag back to the input
+	// let positionIndex = 0;
+	// let logTable: {data: any, out: string, flag: string[]}[] = [];
+	// for (let i = 0; i < flagMatchList.length; i++) {
+	// 	let match = flagMatchList[i];
+	// 	if (
+	// 		!match || 
+	// 		(flagMatchList[i + 1] && match.index >= flagMatchList[i + 1].index) ||
+	// 		(flagMatchList[i - 1] && match.index <= flagMatchList[i - 1].index)
+	// 	)
+	// 	{ continue; }
+
+	// 	const flag = match[0];
+	// 	const index = match.index;
+	// 	// out = out.slice(0, index) + flag + out.slice(index);
+	// 	console.log(`index: ${index} | currentIndex: ${positionIndex} | out: ${out}`, [flag])
+	// 	// console.log(`out: ${out}`, [flag])
+	// 	// logTable.push({data: { index: index, currentIndex: positionIndex}, out: out, flag: [flag]})
+		
+	// 	out = out.slice(0, index + positionIndex) + flag + out.slice(index + positionIndex);
+	// 	positionIndex += flag.length;
+	// }
+	// console.table(logTable.map((e) => e.data));
+
+// console.log('\n---- After ----\n', out, '\n')

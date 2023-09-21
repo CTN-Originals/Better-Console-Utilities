@@ -106,6 +106,7 @@ export class MessageObject {
 				}
 				else {
 					addLine(`${defaultColorProfile.applyOverrides(colorize(contentObj.Value))}`, isLastItem);
+					// addLine(`${colorize(contentObj.Value)}`, isLastItem);
 				}
 			}
 		}
