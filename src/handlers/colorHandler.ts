@@ -2,7 +2,7 @@ import {
 	replaceAll,
 } from '../utils';
 
-const colorFlagRegex = new RegExp(/\x1b\[38;2(?<rbg>(;\d{1,3}){3})m/g); //? Matches \x1b[38;2;255;255;255m colors
+const colorFlagRegex = new RegExp(/\x1b\[(3|4)8;2(?<rbg>(;\d{1,3}){3})m/g); //? Matches \x1b[38;2;255;255;255m colors
 const styleFlagRegex = new RegExp(/\x1b\[\d{1}m/g); //? Matches \x1b[0m styles
 const anyFlagRegex = new RegExp(/\x1b\[((3|4)8|\d{1})(;2(;\d{1,3}){3})?m/g); //? Matches all flags
 
@@ -270,7 +270,14 @@ export class ThemeOverride {
 		this.theme = theme;
 	}
 
+	/** 
+	 * @param {string} input The string to apply the theme to
+	 * @param {Theme} resetTheme The theme to use to reset the theme
+	 * @returns {string} The themed string (e.g. \x1b[38;2;255;0;0m$Hello World\x1b[0m)
+	*/
 	public apply(input: string, resetTheme: Theme = new Theme('#ffffff')): string {
+		//* This function should stay simple and return something with enough information to reconstruct the string with the theme applied
+
 		//? if target is an array, run apply on each element
 		if (Array.isArray(this.target)) {
 			for (const target of this.target) {
@@ -279,7 +286,20 @@ export class ThemeOverride {
 			return input;
 		}
 
-		//TODO write a colorized string parser and constructor
+		//TODO: decide between constructing a universal array structure here or leaving that to the parser function and just returning the string with the theme applied here
+		//* will be handled by the parser function
+
+		const matchList: string[] = [];
+
+		//- if target is a regex
+			//> find all matches
+			//| for each match
+				//> push match into matchList
+		//- else
+			//> find all matches
+			//> push match into matchList
+		//| for each match in matchList
+			//> replace match with the theme applied
 
 		return input;
 	}
@@ -402,13 +422,38 @@ export const defaultColorProfile = new ThemeProfile('default', {
 		}
 	//#endregion
 
+	//#region Constructors and Parsers
+		//() apply themes from an universal array structure
+			//| for each match in parsedString
+				//> add the flag to the string and put it in the output string variable
+			//< returns the themed string
+		//() parse a themed string into an universal array structure
+			//> match any theme flag with regex
+			//? choose between multiple color themes at the same position and length 
+			//- if there is more then one of the same type of flag (color or style) at the same position (before a string)
+				//> keep the most recent one and remove the others
+			//| for each match
+				//> make an array item
+				//> put any flag in the item until a non-theme flag is found
+				//> apply the reset flag to the end of the array
+				//> make a new array for the next match
+			//| for each array item
+				//- if there are duplicate flag types
+					//> remove the duplicates and keep the last one of each type
+			//< returns the universal array structure
+		//() combine the two functions above into one
+			//> call the parser function
+			//> call the constructor function
+			//< returns the themed string
+	//#endregion
+
 //#endregion
 
 
 //#region .apply() arcived
-//! 
-	//TODO Sudo code with comments to explain every single step
-//! 
+// //! 
+// 	//TODO Sudo code with comments to explain every single step
+// //! 
 // //? if target is an array, run apply on each element
 // if (Array.isArray(this.target)) {
 // 	for (const target of this.target) {
