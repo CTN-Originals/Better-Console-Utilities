@@ -12,6 +12,14 @@ export function tryParseJSON(input: any) {
 	}
 }
 
-export function replaceAll(str: string, find: string, replace: string) {
-	return str.replace(new RegExp(find, 'g'), replace);
+export function replaceAll(str: string, find: string|string[], replace: string) {
+	if (Array.isArray(find)) {
+		find.forEach((f) => {
+			str = str.replace(new RegExp(f, 'g'), replace);
+		});
+		return str;
+	}
+	else {
+		return str.replace(new RegExp(find, 'g'), replace);
+	}
 }

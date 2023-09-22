@@ -286,10 +286,9 @@ export class ThemeOverride {
 			return input;
 		}
 
-		//TODO: decide between constructing a universal array structure here or leaving that to the parser function and just returning the string with the theme applied here
-		//* will be handled by the parser function
+		let out = removeThemeFlags(input);
 
-		const matchList: string[] = [];
+		
 
 		//- if target is a regex
 			//> find all matches
@@ -300,6 +299,45 @@ export class ThemeOverride {
 			//> push match into matchList
 		//| for each match in matchList
 			//> replace match with the theme applied
+
+		//!! NEW PLAN 
+		//! find all matches, then put them into an array along with information about the length and position of the match in the string
+		//! then give it to the theme constructor and let it do the rest
+
+		//? array structure
+		/*
+			< [
+				- {
+					> index: number,
+					> length: number,
+					> match: string,
+					> theme: Theme
+				- },
+				| ...
+			< ]
+		*/
+		//* maybe make a class for this?
+
+		const matchList: string[] = [];
+		const match = out.match(this.target);
+		if (this.target instanceof RegExp) {
+			if (match != null) {
+				matchList.push(...match);
+			}
+		}
+		else {
+			if (out.includes(this.target)) {
+				if (match != null) {
+					matchList.push(...match);
+				}
+			}
+		}
+		
+		if (matchList.length === 0) { return input; }
+		console.log(matchList)
+		for (const match of matchList) {
+			input = replaceAll(input, match, this.theme.getThemedString(match));
+		}
 
 		return input;
 	}
@@ -325,18 +363,10 @@ export class ThemeProfile {
 
 	public applyOverrides(input: string): string {
 		for (let i = 0; i < this.overrides.length; i++) {
-			// if (i === this.overrides.length - 1) {
-			// 	//? last override, reset theme
-			// 	input = this.overrides[i].apply(input, this.default);
-			// 	break;
-			// }
 			const override = this.overrides[i];
 			input = override.apply(input, this.default);
 		}
-		// for (const override of this.overrides) {
-		// 	//TODO: apply all overrides but find a way to merge the results
-		// 	input = override.apply(input);
-		// }
+		console.log(replaceAll(input, '\x1b', '\n'))
 		return input;
 	}
 }
@@ -445,6 +475,15 @@ export const defaultColorProfile = new ThemeProfile('default', {
 			//> call the parser function
 			//> call the constructor function
 			//< returns the themed string
+		//() remove the theme flags from a string
+			//> match any theme flag with regex
+			//| for each match
+				//> remove the flag from the string
+			//< returns the string
+
+		export function removeThemeFlags(input: string): string {
+			return input.replace(anyFlagRegex, '');
+		}
 	//#endregion
 
 //#endregion
