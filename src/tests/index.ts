@@ -23,10 +23,11 @@ export async function test() {
 	// console.log(' ')
 	// console.groupEnd();
 
-	// cons.log(JSON.stringify(parserTests.nestObject));
+	// console.log(JSON.stringify(parserTests.nestObject));
+	// console.log(parserTests.nestObject);
 	// console.log(' ')
-	cons.log('"string red green someStr" ... nothing blue normal ctn');
-	// cons.log('"string" red');
+	// cons.log('"string red green red someStr" ... nothing blue normal ctn');
+	cons.log('"string red" red');
 	// cons.log('green normal blue green');
 	// cons.log(testColors);
 
@@ -37,7 +38,7 @@ export async function test() {
 	// cons.log('abc', 123);
 	// console.log(' ')
 	// cons.log(defaultColorProfile);
-	// console.log(parserTests.nestObject);
+	// cons.log(parserTests.nestObject);
 	// console.log(defaultColorProfile)
 	// console.log(' ')
 	//#endregion

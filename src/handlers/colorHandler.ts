@@ -257,6 +257,26 @@ export class TypeThemes {
 		};
 	}
 }
+
+class ThemeOverrideMatch {
+	public target: string; //? The actual flag string (e.g. "hello world" to apply string color)
+	public rawString: string; //? The entire string
+	public override: ThemeOverride; //? The theme override that was used to capture the flag
+
+	public index: number; //? The index of the flag (position in the string)
+	public length: number; //? The length of the flag (how many characters it is)
+	//?? a field for sub captures (e.g. another theme flag inside the current one theme flag)
+
+	constructor(input: ThemeOverrideMatch) {
+		this.target = input.target;
+		this.rawString = input.rawString;
+		this.override = input.override;
+
+		this.index = input.index;
+		this.length = input.length;
+	}
+}
+
 export class ThemeOverride {
 	public target: string|string[]|RegExp|RegExp[];
 	public theme: Theme;
@@ -275,71 +295,54 @@ export class ThemeOverride {
 	 * @param {Theme} resetTheme The theme to use to reset the theme
 	 * @returns {string} The themed string (e.g. \x1b[38;2;255;0;0m$Hello World\x1b[0m)
 	*/
-	public apply(input: string, resetTheme: Theme = new Theme('#ffffff')): string {
+	public matchTargetInstances(input: string, resetTheme: Theme = new Theme('#ffffff'), targetOverride: string|RegExp|null = null): ThemeOverrideMatch[] {
 		//* This function should stay simple and return something with enough information to reconstruct the string with the theme applied
+
+		const matchInstances: ThemeOverrideMatch[] = [];
 
 		//? if target is an array, run apply on each element
 		if (Array.isArray(this.target)) {
 			for (const target of this.target) {
-				input = this.apply(input);
+				matchInstances.push(...this.matchTargetInstances(input, resetTheme, target));
 			}
-			return input;
-		}
-
-		let out = removeThemeFlags(input);
-
-		
-
-		//- if target is a regex
-			//> find all matches
-			//| for each match
-				//> push match into matchList
-		//- else
-			//> find all matches
-			//> push match into matchList
-		//| for each match in matchList
-			//> replace match with the theme applied
-
-		//!! NEW PLAN 
-		//! find all matches, then put them into an array along with information about the length and position of the match in the string
-		//! then give it to the theme constructor and let it do the rest
-
-		//? array structure
-		/*
-			< [
-				- {
-					> index: number,
-					> length: number,
-					> match: string,
-					> theme: Theme
-				- },
-				| ...
-			< ]
-		*/
-		//* maybe make a class for this?
-
-		const matchList: string[] = [];
-		const match = out.match(this.target);
-		if (this.target instanceof RegExp) {
-			if (match != null) {
-				matchList.push(...match);
-			}
-		}
-		else {
-			if (out.includes(this.target)) {
-				if (match != null) {
-					matchList.push(...match);
-				}
-			}
+			return matchInstances;
 		}
 		
-		if (matchList.length === 0) { return input; }
+		//? force target into a regex
+		const target: RegExp = 
+			(targetOverride) ? 
+				(targetOverride instanceof RegExp) ? 
+					targetOverride : new RegExp(targetOverride, 'g') 
+				: (this.target instanceof RegExp) ? 
+					this.target : new RegExp(this.target, 'g')
+		;
+
+
+		const rawInput: string = removeThemeFlags(input); //? the input without any theme flags
+
+		const matchList: RegExpExecArray[] = [];
+		for (let i = 0; i < rawInput.split(target).length; i++) {
+			const match = target.exec(rawInput);
+			if (!match) { continue; }
+			matchList.push(match);
+		}
+
+		
+		if (matchList.length === 0) { return matchInstances; }
 		console.log(matchList)
 		for (const match of matchList) {
-			input = replaceAll(input, match, this.theme.getThemedString(match));
+			// input = replaceAll(input, match, this.theme.getThemedString(match));
+			//> target: string
+			//> rawString: string
+			//> override: Theme
+			//> index: number
+			//> length: number
+
+			// console.log(match)
+			//TODO fill out the info and push it to matchInstances
 		}
 
-		return input;
+		return matchInstances;
 	}
 
 	public getThemedString(input: string, resetTheme: Theme = new Theme('#ffffff')): string {
@@ -362,11 +365,13 @@ export class ThemeProfile {
 	}
 
 	public applyOverrides(input: string): string {
+		const overrideMatches: ThemeOverrideMatch[] = [];
 		for (let i = 0; i < this.overrides.length; i++) {
 			const override = this.overrides[i];
-			input = override.apply(input, this.default);
+			overrideMatches.push(...override.matchTargetInstances(input, this.default));
 		}
-		console.log(replaceAll(input, '\x1b', '\n'))
+		console.log(overrideMatches)
+		// console.log(replaceAll(input, '\x1b', '\n'))
 		return input;
 	}
 }
