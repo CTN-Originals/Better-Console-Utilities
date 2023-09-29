@@ -31,7 +31,7 @@ export async function test() {
 	// cons.log('green normal blue green');
 	// cons.log(testColors);
 
-	cons.log('. red + bold', ': green - blue');
+	// cons.log('. red + bold', ': green - blue');
 	// cons.log('abc');
 	// console.log(' ')
 	// cons.log(123);

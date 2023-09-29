@@ -433,7 +433,7 @@ export class ThemeProfile {
 
 			//- compleatedOverrides[+1] == match
 				//> dont add the reset flag to the array
-			flagPositionArray.push({ flag: resetTheme.themeFlags, index: match.index + match.length }); //? add the reset flag to the array with the position
+			flagPositionArray.push({ flag: styles.reset + resetTheme.themeFlags, index: match.index + match.length }); //? add the reset flag to the array with the position
 
 			compleatedOverrides.push(match);
 		}
@@ -484,7 +484,7 @@ export const defaultColorProfile = new ThemeProfile('default', {
 		new ThemeOverride(/(?<!\\)(['"`])(?:\\\1|.)*?(\1)/g, new Theme('#C4785B')),
 		new ThemeOverride(/[0-9]+/g, new Theme('#B5CEA8')),
 		new ThemeOverride(['.', ':'], new Theme('#e6d119')), //TODO Fix this so it works with the new system regex
-		new ThemeOverride(['some', 'thing', 'hello', 'world'], new Theme('#1972e6')),
+		new ThemeOverride(['some', 'thing', 'hello', 'world'], new Theme('#19e6e6', null, 'underline')),
 		new ThemeOverride(/ctn/gi, new Theme('#00FFFF', '#008000')),
 		new ThemeOverride('name', new Theme('#ff0000')),
 		new ThemeOverride('red', new Theme('#ff0000')),
