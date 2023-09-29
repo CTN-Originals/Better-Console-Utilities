@@ -26,8 +26,8 @@ export async function test() {
 	// console.log(JSON.stringify(parserTests.nestObject));
 	// console.log(parserTests.nestObject);
 	// console.log(' ')
-	cons.log('"string red" red', '"string red green someStr" red ... nothing "blue" normal ctn');
-	// cons.log('"string red" red');
+	// cons.log('"string red" red', '"string red green someStr" red ... nothing "blue" normal ctn');
+	cons.log('"string"`str` ::. ..: redred');
 	// cons.log('green normal blue green');
 	// cons.log(testColors);
 

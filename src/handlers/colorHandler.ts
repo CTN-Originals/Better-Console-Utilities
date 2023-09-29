@@ -97,7 +97,6 @@ export const styles = asStyles({
 });
 //#endregion
 
-//#region Theme Class
 export class Theme {
 	public foreground: Color; //? color or hex
 	public background: Color; //? color or hex
@@ -207,7 +206,6 @@ export class Theme {
         }
     }
 }
-//#endregion
 
 //#region ColorProfile Classes
 export class TypeThemes { 
@@ -375,9 +373,9 @@ export class ThemeOverride {
 		return matchInstances;
 	}
 
-	public getThemedString(input: string, resetTheme: Theme = new Theme('#ffffff')): string {
-		return this.theme.themeFlags + input + resetTheme.themeFlags;
-	}
+	// public getThemedString(input: string, resetTheme: Theme = new Theme('#ffffff')): string {
+	// 	return this.theme.themeFlags + input + resetTheme.themeFlags;
+	// }
 }
 
 export class ThemeProfile {
@@ -401,7 +399,21 @@ export class ThemeProfile {
 			overrideMatches.push(...override.matchTargetInstances(input, this.default));
 		}
 		overrideMatches.sort((a, b) => a.index - b.index); //? sort override matches by index
-		// console.log(overrideMatches)
+
+		//? merge any matches that share the same override
+		for (let i = 0; i < overrideMatches.length; i++) {
+			const match = overrideMatches[i];
+			const nextMatch = overrideMatches[i + 1];
+			if (!nextMatch) { break; }
+			if (match.override === nextMatch.override && match.index + match.length === nextMatch.index) {
+				match.target += nextMatch.target;
+				match.length += nextMatch.length;
+				overrideMatches.splice(i + 1, 1);
+				i--;
+			}
+		}
+
+		console.log(overrideMatches)
 		
 		//! Any theme flags fuck this process up so any flags are removed from input
 		//TODO Make a way around this so any theme flags already preset are also included
@@ -427,6 +439,7 @@ export class ThemeProfile {
 			}
 			
 			//TODO check if the prev flag is the same as the current flag
+			//?? or maybe change the way flags are added to the array
 			//- compleatedOverrides[-1] == match
 				//> dont add the color flag to the array
 			flagPositionArray.push({ flag: match.override.theme.themeFlags, index: match.index }); //? add the flag to the array with the position
@@ -452,7 +465,7 @@ export class ThemeProfile {
 			positionIndex += length;
 		}
 
-		console.log(out.split('\x1b'))
+		console.log(out.split(/\x1b/g).join('').split('[0m'))
 		return out;
 	}
 }
