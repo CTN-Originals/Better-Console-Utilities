@@ -71,7 +71,7 @@ export class ConsoleInstance implements IConsoleInstance {
 				indent: this.settings.indent,
 				indentString: this.settings.indentString,
 			};
-			log += utils.parser.parseInput(arg, collectionStringOptipons).ToString;
+			log += utils.parser.parseInput(arg, collectionStringOptipons).ToString + ((i != args.length - 1) ? '\n' : '');
 			// if (typeof arg === 'object') {
 			// }
 			// else {

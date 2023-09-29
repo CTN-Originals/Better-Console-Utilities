@@ -90,6 +90,7 @@ export const styles = asStyles({
 	bold: "\x1b[1m",
 	dim: "\x1b[2m",
 	underscore: "\x1b[4m",
+	underline: "\x1b[4m",
 	blink: "\x1b[5m",
 	inverse: "\x1b[7m",
 	hidden: "\x1b[8m",
@@ -260,8 +261,9 @@ export class TypeThemes {
 
 class ThemeOverrideMatch {
 	public target: string; //? The actual flag string (e.g. "hello world" to apply string color)
-	public rawString: string; //? The entire string
+	public input: string; //? The entire string
 	public override: ThemeOverride; //? The theme override that was used to capture the flag
+	public capture: RegExp|string; //? The regex that was used to capture the flag
 
 	public index: number; //? The index of the flag (position in the string)
 	public length: number; //? The length of the flag (how many characters it is)
@@ -269,8 +271,9 @@ class ThemeOverrideMatch {
 
 	constructor(input: ThemeOverrideMatch) {
 		this.target = input.target;
-		this.rawString = input.rawString;
+		this.input = input.input;
 		this.override = input.override;
+		this.capture = input.capture;
 
 		this.index = input.index;
 		this.length = input.length;
@@ -285,7 +288,7 @@ export class ThemeOverride {
 	 * @param {string|RegExp} target The target string or regex
 	 * @param {Theme} theme The theme to apply if the target is matched
 	*/
-	constructor(target: string|RegExp, theme: Theme = new Theme()) {
+	constructor(target: string|string[]|RegExp|RegExp[], theme: Theme = new Theme()) {
 		this.target = target;
 		this.theme = theme;
 	}
@@ -301,45 +304,72 @@ export class ThemeOverride {
 		const matchInstances: ThemeOverrideMatch[] = [];
 
 		//? if target is an array, run apply on each element
-		if (Array.isArray(this.target)) {
-			for (const target of this.target) {
+		if (Array.isArray(this.target) && targetOverride === null) {
+			for (let i = 0; i < this.target.length; i++) {
+				const target = this.target[i];
 				matchInstances.push(...this.matchTargetInstances(input, resetTheme, target));
 			}
 			return matchInstances;
 		}
 		
-		//? force target into a regex
-		const target: RegExp = 
-			(targetOverride) ? 
-				(targetOverride instanceof RegExp) ? 
-					targetOverride : new RegExp(targetOverride, 'g') 
-				: (this.target instanceof RegExp) ? 
-					this.target : new RegExp(this.target, 'g')
-		;
-
-
-		const rawInput: string = removeThemeFlags(input); //? the input without any theme flags
-
+		//? the input without any theme flags
+		const rawInput: string = removeThemeFlags(input);
+		//? array of all matches
 		const matchList: RegExpExecArray[] = [];
-		for (let i = 0; i < rawInput.split(target).length; i++) {
-			const match = target.exec(rawInput);
-			if (!match) { continue; }
-			matchList.push(match);
+
+		//? force target into a regex
+		//! Does not work when sting is also a regex flag
+		//TODO go back to the if and else if statement to seperate regex treatment from string treatment
+		// const regex: RegExp = 
+		// 	(targetOverride) ? 
+		// 		(targetOverride instanceof RegExp) ? 
+		// 			targetOverride : new RegExp(targetOverride, 'g') 
+		// 		: (this.target instanceof RegExp) ? 
+		// 			this.target : new RegExp(this.target as string, 'g')
+		// ;
+		
+
+		const currentTarget: string|RegExp = (targetOverride) ? targetOverride : this.target as string|RegExp;
+		if (currentTarget instanceof RegExp) {
+			for (let i = 0; i < rawInput.split(currentTarget).length; i++) {
+				const match = currentTarget.exec(rawInput);
+				if (!match) { continue; }
+				else if (matchList.find((e) => (e.index === match.index) && (e[0].length === match[0].length))) {
+					//? Array of matches includes a match with the same index, overwrite it
+					const index = matchList.findIndex((e) => e.index === match.index); 
+					matchList[index] = match;
+				}
+				else {
+					matchList.push(match);
+				}
+			}
+		}
+		else {
+			//? copy of the input to remove all instances of the target and not modify the input
+			let inputCopy = rawInput; 
+			for (let i = 0; i < rawInput.split(currentTarget as string).length - 1; i++) {
+				const fakeMatch = {
+					0: currentTarget as string,
+					input: rawInput,
+					index: inputCopy.indexOf(currentTarget as string),
+					length: (currentTarget as string).length,
+				} as RegExpExecArray;
+
+				//? replace the target in the copy with a placeholder
+				inputCopy = inputCopy.replace(currentTarget as string, ('◘').repeat((currentTarget as string).length));
+				matchList.push(fakeMatch);
+			}
 		}
 
-		
-		if (matchList.length === 0) { return matchInstances; }
-		console.log(matchList)
 		for (const match of matchList) {
-			// input = replaceAll(input, match, this.theme.getThemedString(match));
-			//> target: string
-			//> rawString: string
-			//> override: Theme
-			//> index: number
-			//> length: number
-
-			// console.log(match)
-			//TODO fill out the info and push it to matchInstances
+			matchInstances.push(new ThemeOverrideMatch({
+				target: match[0],
+				input: match.input,
+				override: this,
+				capture: currentTarget,
+				index: match.index,
+				length: match[0].length,
+			}));
 		}
 
 		return matchInstances;
@@ -370,9 +400,60 @@ export class ThemeProfile {
 			const override = this.overrides[i];
 			overrideMatches.push(...override.matchTargetInstances(input, this.default));
 		}
-		console.log(overrideMatches)
-		// console.log(replaceAll(input, '\x1b', '\n'))
-		return input;
+		overrideMatches.sort((a, b) => a.index - b.index); //? sort override matches by index
+		// console.log(overrideMatches)
+		
+		//! Any theme flags fuck this process up so any flags are removed from input
+		//TODO Make a way around this so any theme flags already preset are also included
+		let out = removeThemeFlags(input); //? the input without any theme flags
+
+		const compleatedOverrides: ThemeOverrideMatch[] = []; //? array of all overrides that have been compleated
+		const flagPositionArray: {flag: string, index: number}[] = [] //? array of all flag positions for where they should end up in the output string
+		for (const match of overrideMatches) {
+			//_ match
+			//> target: string
+			//> input: string
+			//> override: ThemeOverride
+			//> index: number
+			//> length: number
+
+			let resetTheme = this.default;
+			for (const override of compleatedOverrides) {
+				if (override.index > match.index) { break; } //? if the override is after the match, skip it
+				if (override.index + override.length > match.index) { //? if the override is in the match, set the resetTheme to the override theme
+					resetTheme = override.override.theme; 
+					break; //?? should it break? or should it do a highscore system where the smaller surrounding length override wins?
+				}
+			}
+			
+			//TODO check if the prev flag is the same as the current flag
+			//- compleatedOverrides[-1] == match
+				//> dont add the color flag to the array
+			flagPositionArray.push({ flag: match.override.theme.themeFlags, index: match.index }); //? add the flag to the array with the position
+
+			//- compleatedOverrides[+1] == match
+				//> dont add the reset flag to the array
+			flagPositionArray.push({ flag: resetTheme.themeFlags, index: match.index + match.length }); //? add the reset flag to the array with the position
+
+			compleatedOverrides.push(match);
+		}
+
+		
+		
+		flagPositionArray.sort((a, b) => a.index - b.index); //? sort flag positions by index
+		// console.log(flagPositionArray)
+		let positionIndex = 0;
+		for (let i = 0; i < flagPositionArray.length; i++) {
+			const data = flagPositionArray[i];
+			const index = data.index + positionIndex;
+			const length = data.flag.length;
+
+			out = out.slice(0, index) + data.flag + out.slice(index);
+			positionIndex += length;
+		}
+
+		console.log(out.split('\x1b'))
+		return out;
 	}
 }
 //#endregion
@@ -399,8 +480,11 @@ export const defaultColorProfile = new ThemeProfile('default', {
 		}
 	},
 	overrides: [
-		new ThemeOverride(/(['"`])(?:\\\1|.)*?\1/g, new Theme('#C4785B')),
+		// (?<!\\)(?:['"`])(?:\\['"`]|.)*?['"`]
+		new ThemeOverride(/(?<!\\)(['"`])(?:\\\1|.)*?(\1)/g, new Theme('#C4785B')),
 		new ThemeOverride(/[0-9]+/g, new Theme('#B5CEA8')),
+		new ThemeOverride(['.', ':'], new Theme('#e6d119')), //TODO Fix this so it works with the new system regex
+		new ThemeOverride(['some', 'thing', 'hello', 'world'], new Theme('#1972e6')),
 		new ThemeOverride(/ctn/gi, new Theme('#00FFFF', '#008000')),
 		new ThemeOverride('name', new Theme('#ff0000')),
 		new ThemeOverride('red', new Theme('#ff0000')),
@@ -487,6 +571,7 @@ export const defaultColorProfile = new ThemeProfile('default', {
 			//< returns the string
 
 		export function removeThemeFlags(input: string): string {
+			if (typeof input !== 'string') return input;
 			return input.replace(anyFlagRegex, '');
 		}
 	//#endregion

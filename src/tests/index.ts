@@ -26,11 +26,12 @@ export async function test() {
 	// console.log(JSON.stringify(parserTests.nestObject));
 	// console.log(parserTests.nestObject);
 	// console.log(' ')
-	// cons.log('"string red green red someStr" ... nothing blue normal ctn');
-	cons.log('"string red" red');
+	cons.log('"string red" red', '"string red green someStr" red ... nothing "blue" normal ctn');
+	// cons.log('"string red" red');
 	// cons.log('green normal blue green');
 	// cons.log(testColors);
 
+	cons.log('. red + bold', ': green - blue');
 	// cons.log('abc');
 	// console.log(' ')
 	// cons.log(123);
