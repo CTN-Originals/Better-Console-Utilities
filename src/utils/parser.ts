@@ -30,8 +30,7 @@ export class MessageObject {
 	public Type: string; //? The type of the object
 
 	public Content: MessageContent[]; //? An array of content
-	public Parent: MessageObject | null; //! Do we really need to store the parent?
-	//TODO Figure out if this significently impects preformance
+	public Parent: MessageObject | null; //? The parent of the MessageObject (only applies to items within collections)
 	public Holder: MessageContent | null; //? The item holder (only applies to items within collections)
 	
 	public Depth: number; //? The depth of the line (nest levels)
@@ -77,7 +76,6 @@ export class MessageObject {
 
 		const colorize = (input: string, type?: string, identifier?: string): string => {
 			const theme = this._getTypeTheme(type, identifier);
-			// if (input !== ',') addLine(`(${type} | ${identifier} | ${input})`);
 			let out = theme.getThemedString(input);
 			
 			return out;
@@ -92,26 +90,21 @@ export class MessageObject {
 				const holder = msgObj.Holder;
 				const brackets = msgObj.Holder?.Brackets;
 
-				// addLine(`${this._getTypeTheme(msgObj.Type, 'key').getThemedString(msgObj.ToString)}`, isLastItem, (holder && brackets) ? 0 : this.Depth);
 				addLine(`${colorize(msgObj.ToString, msgObj.Type, 'key')}`, isLastItem, (holder && brackets) ? 0 : this.Depth); //? depth=0 because indent is already applied to the content
 			}
 			else {
 				if (this.Holder?.Type === 'array') {
-					// addLine(`${this._getTypeTheme(contentObj.Type, 'value').getThemedString(contentObj.Value)}`, isLastItem);
 					addLine(`${colorize(contentObj.Value, contentObj.Type, 'value')}`, isLastItem);
 				}
 				else if (contentObj.Key !== '') {
-					// addLine(`${this._getTypeTheme(contentObj.Type, 'key').getThemedString(contentObj.Key)}: ${this._getTypeTheme(contentObj.Type, 'value').getThemedString(contentObj.Value)}` + ((contentObj.Type === 'null') ? `<null>` : ''), isLastItem);
 					addLine(`${colorize(contentObj.Key, 'object', 'key')}${colorize(':', 'object', 'punctuation')} ${colorize(contentObj.Value, contentObj.Type, 'value')}` + ((contentObj.Type === 'null') ? `<null>` : ''), isLastItem);
 				}
 				else {
 					addLine(`${colorize(defaultColorProfile.applyOverrides(contentObj.Value.toString()))}`, isLastItem);
-					// addLine(`${colorize(contentObj.Value)}`, isLastItem);
 				}
 			}
 		}
 
-		// console.log(this.Holder)
 		if (this.Holder && this.Holder.IsCollection) {
 			let holderIndent = getIndent((this.Depth > 0) ? this.Depth - 1 : 0);
 			let head: string = `${holderIndent}`;
@@ -122,7 +115,6 @@ export class MessageObject {
 					//TODO Reverse this to exclude this if statement
 				}
 				else {
-					// head += `${this._getTypeTheme(this.Type, 'key').getThemedString(this.Holder.Key)}: `;
 					head += `${colorize(this.Holder.Key, 'object', 'key')}${colorize(':', 'object', 'punctuation')} `;
 				}
 			}
@@ -130,7 +122,6 @@ export class MessageObject {
 			const brackets = this.Holder.Brackets;
 			if (brackets) {
 				for (let i = 0; i < brackets.length; i++) {
-					// brackets[i] = this._getTypeTheme(this.Type, 'value').getThemedString(brackets[i]);
 					brackets[i] = colorize(brackets[i], this.Holder.Type, 'brackets');
 				}
 				if (this.Content.length > 0) {
@@ -156,10 +147,8 @@ export class MessageObject {
 	*/
 	private _getTypeTheme(type?: string, identifier?: string): Theme {
 		const theme = (type) ? this.Theme.typeThemes[type as keyof TypeThemes] : this.Theme.default;
-		// console.log(type, identifier)
 		if (theme) {
 			if (theme instanceof Theme) {
-				// console.log('returning instance of theme')
 				return theme;
 			}
 			else if (identifier) {
@@ -177,7 +166,6 @@ export class MessageObject {
 				else { return theme.default; }
 			}
 		}
-		// console.log('returning default theme')
 		return this.Theme.default;
 	}
 }
@@ -223,9 +211,7 @@ export function parseInput(input: any, options: Partial<ICollectionToStringOptio
 		} break;
 	}
 	msgObject.Holder = holder;
-
-	console.log(msgObject);
-
+	// console.log(msgObject);
 	return msgObject;
 }
 
@@ -246,15 +232,6 @@ function valueToMessageObject(input: string|boolean|number, options: Partial<ICo
 	const value = input;
 	const type = typeOfValue(value);
 	msgObject.Content.push(new MessageContent({Type: type, Value: value}));
-
-	// if (['object', 'array'].includes(type)) {
-	// 	const valueContent = collectionToMessageObject(value, options, msgObject, value);
-	// 	const content = new MessageContent({Type: type, Value: valueContent});
-	// 	valueContent.Holder = content;
-	// 	msgObject.Content.push(content);
-	// }
-	// else {
-	// }
 	
 	return msgObject;
 }
