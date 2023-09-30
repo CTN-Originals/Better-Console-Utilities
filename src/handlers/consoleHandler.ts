@@ -1,4 +1,4 @@
-import * as util from '../utils';
+import * as utils from '../utils';
 import * as color from './colorHandler';
 
 interface IConsoleInstance {
@@ -12,19 +12,19 @@ interface IConsoleInstance {
 	conditions: any;
 }
 
-//* intercept console.log
-if (typeof console !== 'undefined') {
-	const log = console.log.bind(console)
-	console.log = (...args) => {
-		const input = Array.prototype.slice.call(args)
-		// log(args)
+// //* intercept console.log
+// if (console != null && false) {
+// 	const log = console.log.bind(console)
+// 	console.log = (...args) => {
+// 		const input = Array.prototype.slice.call(args)
+// 		// log(args)
 
-		//TODO add better (false log) detection
-		//! doesnt log valid empty messages
-		if (args.length == 1 && args[0] == '') return;
-		log(...args)
-	}
-}
+// 		//TODO add better (false log) detection
+// 		//! doesnt log valid empty messages
+// 		if (args.length == 1 && args[0] == '') return;
+// 		log(...args)
+// 	}
+// }
 
 export class ConsoleInstance implements IConsoleInstance {
 	name: string;
@@ -67,16 +67,11 @@ export class ConsoleInstance implements IConsoleInstance {
 		let log = '';
 		for (let i = 0; i < args.length; i++) {
 			const arg = args[i];
-			if (typeof arg === 'object') {
-				const collectionStringOptipons: util.parser.ICollectionToStringOptions = {
-					indent: this.settings.indent,
-					indentString: this.settings.indentString,
-				};
-				log += util.parser.collectionToString(arg, collectionStringOptipons);
-			}
-			else {
-				log += arg;
-			}
+			const collectionStringOptipons: utils.parser.ICollectionToStringOptions = {
+				indent: this.settings.indent,
+				indentString: this.settings.indentString,
+			};
+			log += utils.parser.parseInput(arg, collectionStringOptipons).ToString + ((i != args.length - 1) ? '\n' : '');
 		}
 		return log;
 	}

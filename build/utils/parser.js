@@ -11,7 +11,8 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.collectionToString = void 0;
+exports.collectionToMessageObject = exports.collectionToString = exports.MessageContent = exports.MessageObject = void 0;
+var colorHandler_1 = require("../handlers/colorHandler");
 var DefaultCollectionToStringOptions = {
     indent: 2,
     indentString: ' ',
@@ -26,7 +27,7 @@ var MessageObject = /** @class */ (function () {
     */
     function MessageObject(obj) {
         if (obj === void 0) { obj = {}; }
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        var _a, _b, _c, _d, _e, _f, _g;
         this.Type = (_a = obj.Type) !== null && _a !== void 0 ? _a : 'string';
         this.Content = [];
         this.Parent = (_b = obj.Parent) !== null && _b !== void 0 ? _b : null;
@@ -34,9 +35,8 @@ var MessageObject = /** @class */ (function () {
         this.Depth = (_d = obj.Depth) !== null && _d !== void 0 ? _d : 0;
         this.IndentCount = (_e = obj.IndentCount) !== null && _e !== void 0 ? _e : 2;
         this.IndentString = (_f = obj.IndentString) !== null && _f !== void 0 ? _f : ' ';
-        this.Color = (_g = obj.Color) !== null && _g !== void 0 ? _g : '';
-        this.BackgroundColor = (_h = obj.BackgroundColor) !== null && _h !== void 0 ? _h : '';
-        this.Style = (_j = obj.Style) !== null && _j !== void 0 ? _j : '';
+        this.Theme = (_g = obj.Theme) !== null && _g !== void 0 ? _g : (0, colorHandler_1.createTheme)('white', null, null);
+        //TODO Setting for punctuation (e.g. quotes around strings)
     }
     Object.defineProperty(MessageObject.prototype, "ToString", {
         get: function () {
@@ -51,7 +51,7 @@ var MessageObject = /** @class */ (function () {
                 }
                 var line = "".concat(getIndent(depth)).concat(input);
                 if (!isLastItem) {
-                    line += ', ';
+                    line += ',';
                 }
                 out.push("".concat(line));
             };
@@ -76,6 +76,9 @@ var MessageObject = /** @class */ (function () {
                 else {
                     if (((_b = this.Holder) === null || _b === void 0 ? void 0 : _b.Type) === 'array') {
                         addLine("".concat(contentObj.Value), isLastItem);
+                    }
+                    else if (contentObj.Type === 'null') {
+                        addLine("".concat(contentObj.Key, ": ").concat(contentObj.Value, "null"), isLastItem);
                     }
                     else {
                         addLine("".concat(contentObj.Key, ": ").concat(contentObj.Value), isLastItem);
@@ -117,6 +120,7 @@ var MessageObject = /** @class */ (function () {
     });
     return MessageObject;
 }());
+exports.MessageObject = MessageObject;
 var MessageContent = /** @class */ (function () {
     function MessageContent(obj) {
         if (obj === void 0) { obj = {}; }
@@ -134,6 +138,7 @@ var MessageContent = /** @class */ (function () {
     });
     return MessageContent;
 }());
+exports.MessageContent = MessageContent;
 /**
  * @param {Object} input Input object to be converted to string
  * @param {ICollectionToStringOptions} options Options for the conversion
@@ -186,19 +191,19 @@ function collectionToMessageObject(collection, options, parent, holder) {
     }
     return msgObject;
 }
+exports.collectionToMessageObject = collectionToMessageObject;
 //? Returns the type of the value as a string and also returns 'array' for arrays
 function typeOfValue(value) {
     if (typeof value == 'object') {
-        if (value instanceof MessageObject) {
-            return 'MessageObject';
-        }
-        else if (value instanceof MessageContent) {
-            return 'MessageContent';
-        }
-        else if (Array.isArray(value)) {
+        if (Array.isArray(value)) {
             return 'array';
         }
-        return 'object';
+        else if (value === null) {
+            return 'null';
+        }
+        else {
+            return 'object';
+        }
     }
     else {
         return typeof value;

@@ -22,25 +22,23 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 // import * as color from './handlers/colorHandler';
 var handler = __importStar(require("./handlers"));
-__exportStar(require("./handlers"), exports);
 //#region DEV
-//! COMMENT BEFORE BUIL
+//!! COMMENT BEFORE BUILD 
 // import * as test from './tests';
 // test.test();
+// setTimeout(() => {}, 1000 * 60 * 10); // 10 minutes
 //#endregion
 exports = {
     ConsoleInstance: handler.betterConsole.ConsoleInstance,
 };
+//#region Core
+//#endregion
 // console.log(color.tags.fg.red + 'Hello world!');
 var cons = new handler.betterConsole.ConsoleInstance('');
 //* Wait 10 minutes before exiting
-setTimeout(function () { }, 1000 * 60 * 10); // 10 minutes
 // console.log('hello world');
 // console.log('hello world2');
 // console.log('x = [fg=red]' + cons.settings.indent + '[bg=white] y = ' + cons.settings.indentString);

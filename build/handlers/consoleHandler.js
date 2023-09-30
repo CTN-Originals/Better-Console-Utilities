@@ -53,6 +53,7 @@ var ConsoleInstance = /** @class */ (function () {
     * @param {Object} conditions Conditions for the console instance
     */
     function ConsoleInstance(name, enabled, suffix, settings, conditions) {
+        if (name === void 0) { name = ''; }
         if (enabled === void 0) { enabled = true; }
         if (suffix === void 0) { suffix = ''; }
         if (settings === void 0) { settings = { indent: 2, indentString: '-' }; }

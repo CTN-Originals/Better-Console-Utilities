@@ -1,10 +1,22 @@
 import { ICollectionToStringOptions } from '../../src/utils/parser'
+import { 
+	Theme,
+	Color,
+	getColor,
+	getColorCodePrefix,
+} from '../handlers/colorHandler';
 
 export const simpleObject: { [key: string]: any } = {
 	name: 'Hello World',
 	active: true,
 	count: 8,
 	status: 'good',
+	list: [
+		'first',
+		'second',
+		'ctn',
+		12345,
+	],
 };
 
 export const simpleArray: string[] = [
@@ -13,14 +25,18 @@ export const simpleArray: string[] = [
 	'third'
 ];
 
+const color = new Color('#000080').seturate(0.1);
+
 export const nestObject: { [key: string]: any } = {
-	name: 'First object test',
+	// name: `${getColorCodePrefix(color, false)}First object test ${color.asHex}`,
+	name: `First object test`,
 	enabled: true,
 	suffix: '_stuff',
 	obj: {
 		name: 'John Doe',
 		age: '20',
 		work: 'developer',
+		bio: 'I am a person who likes to write code and play games. \nI have a dog named "Doggo" who is a good boy. \nI am currently working on a website for my community.',
 		hobbies: [
 			{
 				name: 'programming',
@@ -32,9 +48,9 @@ export const nestObject: { [key: string]: any } = {
 				years: 10,
 				favorite: true,
 				games: {
-					name: 'osu',
-					genre: 'rhythm',
-					years: 7,
+					name: 'rocket league',
+					genre: 'skill based',
+					years: 8,
 				}
 			},
 		],
@@ -42,7 +58,8 @@ export const nestObject: { [key: string]: any } = {
 	list: [
 		'first',
 		'second',
-		'third'
+		'ctn',
+		12345,
 	],
 	emptyObj: {},
 	emptyList: [],
