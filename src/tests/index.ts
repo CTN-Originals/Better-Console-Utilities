@@ -27,9 +27,11 @@ export async function test() {
 	// console.log(parserTests.nestObject);
 	// console.log(' ')
 	// cons.log('"string red" red', '"string red green someStr" red ... nothing "blue" normal ctn');
-	cons.log('"string"`str` ::. ..: redred');
+	// cons.log('"string red" red (testing :D)', '"string (red green someStr) awd" red ... nothing "blue" normal ctn');
+	// cons.log('"string"`str` ::. ..: redred');
 	// cons.log('green normal blue green');
 	// cons.log(testColors);
+	cons.log('const array = [1, 2, 3];', 'if (x == 1) { console.log("hello world"); }');
 
 	// cons.log('. red + bold', ': green - blue');
 	// cons.log('abc');

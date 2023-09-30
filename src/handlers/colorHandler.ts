@@ -433,8 +433,7 @@ export class ThemeProfile {
 			for (const override of compleatedOverrides) {
 				if (override.index > match.index) { break; } //? if the override is after the match, skip it
 				if (override.index + override.length > match.index) { //? if the override is in the match, set the resetTheme to the override theme
-					resetTheme = override.override.theme; 
-					break; //?? should it break? or should it do a highscore system where the smaller surrounding length override wins?
+					resetTheme = override.override.theme;
 				}
 			}
 			
@@ -494,6 +493,17 @@ export const defaultColorProfile = new ThemeProfile('default', {
 	},
 	overrides: [
 		// (?<!\\)(?:['"`])(?:\\['"`]|.)*?['"`]
+		new ThemeOverride([
+			/(\()(?:\)|.)*?(\))/g,
+			/(\{)(?:\}|.)*?(\})/g,
+			/(\[)(?:\]|.)*?(\])/g,
+		], new Theme('#c45b8c')),
+		new ThemeOverride([
+			'some', 'thing'
+		], new Theme('#19e6e6', null, 'underline')),
+		new ThemeOverride([
+			'.', ':', ';', ','
+		], new Theme('#e6d119')),
 		new ThemeOverride(/(?<!\\)(['"`])(?:\\\1|.)*?(\1)/g, new Theme('#C4785B')),
 		new ThemeOverride(/[0-9]+/g, new Theme('#B5CEA8')),
 		new ThemeOverride(['.', ':'], new Theme('#e6d119')), //TODO Fix this so it works with the new system regex
