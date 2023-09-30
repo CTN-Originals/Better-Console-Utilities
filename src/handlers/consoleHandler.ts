@@ -12,19 +12,19 @@ interface IConsoleInstance {
 	conditions: any;
 }
 
-//* intercept console.log
-if (console != null && false) {
-	const log = console.log.bind(console)
-	console.log = (...args) => {
-		const input = Array.prototype.slice.call(args)
-		// log(args)
+// //* intercept console.log
+// if (console != null && false) {
+// 	const log = console.log.bind(console)
+// 	console.log = (...args) => {
+// 		const input = Array.prototype.slice.call(args)
+// 		// log(args)
 
-		//TODO add better (false log) detection
-		//! doesnt log valid empty messages
-		if (args.length == 1 && args[0] == '') return;
-		log(...args)
-	}
-}
+// 		//TODO add better (false log) detection
+// 		//! doesnt log valid empty messages
+// 		if (args.length == 1 && args[0] == '') return;
+// 		log(...args)
+// 	}
+// }
 
 export class ConsoleInstance implements IConsoleInstance {
 	name: string;
@@ -72,11 +72,6 @@ export class ConsoleInstance implements IConsoleInstance {
 				indentString: this.settings.indentString,
 			};
 			log += utils.parser.parseInput(arg, collectionStringOptipons).ToString + ((i != args.length - 1) ? '\n' : '');
-			// if (typeof arg === 'object') {
-			// }
-			// else {
-			// 	log += arg;
-			// }
 		}
 		return log;
 	}
