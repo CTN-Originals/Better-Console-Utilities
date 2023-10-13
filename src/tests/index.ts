@@ -24,13 +24,16 @@ export async function test() {
 	// console.groupEnd();
 
 	// console.log(JSON.stringify(parserTests.nestObject));
-	// console.log(parserTests.nestObject);
+	cons.log(parserTests.nestObject);
 	// console.log(' ')
-	// cons.log('"string red" red (testing :D)', '"string (red green someStr) awd" red ... nothing "blue" normal ctn');
+	cons.log('"string red" red (testing :D)', '"string (red green someStr) awd" red ... nothing "blue" normal ctn');
 	// cons.log('"string"`str` ::. ..: redred');
 	// cons.log('green normal blue green');
 	// cons.log(testColors);
-	cons.log('const array = [1, 2, 3];', 'if (x == 1) { console.log("hello world"); }');
+	// cons.log('const array = [1, 2, 3];', 'if (x == 1) { console.log("hello world"); }');
+
+	cons.log('[fg=red]The lazy fox[/>] and the [fg=green]brown bear[/>] with the [fg=blue]gray wolf[/>]');
+	// cons.log('[fg=#ffAA00]almost red[/>] ... [fg=#00FFFF]green and blue[/>] + = / .;, [fg=#FF00FF]some "string here" works[/>]');
 
 	// cons.log('. red + bold', ': green - blue');
 	// cons.log('abc');

@@ -258,6 +258,7 @@ class ThemeOverrideMatch {
 	public input: string; //? The entire string
 	public override: ThemeOverride; //? The theme override that was used to capture the flag
 	public capture: RegExp|string; //? The regex that was used to capture the flag
+	public groups: RegExpExecArray['groups']|null; //? The groups of the regex that was used to capture the flag
 
 	public index: number; //? The index of the flag (position in the string)
 	public length: number; //? The length of the flag (how many characters it is)
@@ -267,6 +268,7 @@ class ThemeOverrideMatch {
 		this.input = input.input;
 		this.override = input.override;
 		this.capture = input.capture;
+		this.groups = input.groups;
 
 		this.index = input.index;
 		this.length = input.length;
@@ -314,12 +316,13 @@ export class ThemeOverride {
 			for (let i = 0; i < rawInput.split(currentTarget).length; i++) {
 				const match = currentTarget.exec(rawInput);
 				if (!match) { continue; }
+				//- if Array of matches includes a match with the same index, overwrite it
 				else if (matchList.find((e) => (e.index === match.index) && (e[0].length === match[0].length))) {
-					//? Array of matches includes a match with the same index, overwrite it
 					const index = matchList.findIndex((e) => e.index === match.index); 
 					matchList[index] = match;
 				}
 				else {
+					// console.log(match)
 					matchList.push(match);
 				}
 			}
@@ -347,6 +350,7 @@ export class ThemeOverride {
 				input: match.input,
 				override: this,
 				capture: currentTarget,
+				groups: match.groups as RegExpExecArray['groups'] ?? {},
 				index: match.index,
 				length: match[0].length,
 			}));
@@ -390,7 +394,7 @@ export class ThemeProfile {
 				i--;
 			}
 		}
-		// console.log(overrideMatches)
+		console.log(overrideMatches)
 		
 		//! Any theme flags fuck this process up so any flags are removed from input
 		//TODO Make a way around this so any theme flags already preset are also included
@@ -426,7 +430,7 @@ export class ThemeProfile {
 			positionIndex += length;
 		}
 
-		// console.log(out.split(/\x1b/g).join('').split('[0m'))
+		console.log(out.split(/\x1b/g).join('').split('[0m'))
 		return out;
 	}
 }
@@ -469,9 +473,12 @@ export const defaultColorProfile = new ThemeProfile('default', {
 		new ThemeOverride(/[0-9]+/g, new Theme('#B5CEA8')),
 		new ThemeOverride(/ctn/gi, new Theme('#00FFFF', '#008000')),
 		new ThemeOverride('name', new Theme('#ff0000')),
-		new ThemeOverride('red', new Theme('#ff0000')),
-		new ThemeOverride('green', new Theme('#00ff00')),
-		new ThemeOverride('blue', new Theme('#0000ff')),
+		// new ThemeOverride('red', new Theme('#ff0000')),
+		// new ThemeOverride('green', new Theme('#00ff00')),
+		// new ThemeOverride('blue', new Theme('#0000ff')),
+		new ThemeOverride(/(?<flag>\[fg=(?<fg>red)\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g, new Theme('red')),
+		new ThemeOverride(/(?<flag>\[fg=(?<fg>green)\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g, new Theme('green')),
+		new ThemeOverride(/(?<flag>\[fg=(?<fg>blue)\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g, new Theme('blue')),
 	]
 } as unknown as ThemeProfile);
 
