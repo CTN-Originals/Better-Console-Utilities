@@ -316,13 +316,12 @@ export class ThemeOverride {
 			for (let i = 0; i < rawInput.split(currentTarget).length; i++) {
 				const match = currentTarget.exec(rawInput);
 				if (!match) { continue; }
-				//- if Array of matches includes a match with the same index, overwrite it
 				else if (matchList.find((e) => (e.index === match.index) && (e[0].length === match[0].length))) {
+					//- if Array of matches includes a match with the same index, overwrite it
 					const index = matchList.findIndex((e) => e.index === match.index); 
 					matchList[index] = match;
 				}
 				else {
-					// console.log(match)
 					matchList.push(match);
 				}
 			}
@@ -364,6 +363,7 @@ export class ThemeProfile {
 	public name: string;
 	public default: Theme;
 	public typeThemes: TypeThemes;
+	public colorSyntax: RegExp[];
 	public overrides: ThemeOverride[];
 	
 	constructor(name: string, input: Partial<ThemeProfile>) {
@@ -371,6 +371,7 @@ export class ThemeProfile {
 		this.default = new Theme(input.default?.foreground, input.default?.background, input.default?.style);
 		
 		this.typeThemes = (input.typeThemes) ? new TypeThemes(input.typeThemes) : new TypeThemes();
+		this.colorSyntax = (input.colorSyntax) ? input.colorSyntax : [];
 		this.overrides = (input.overrides) ? input.overrides : [];
 	}
 
@@ -416,8 +417,6 @@ export class ThemeProfile {
 
 			compleatedOverrides.push(match);
 		}
-
-		
 		
 		flagPositionArray.sort((a, b) => a.index - b.index); //? sort flag positions by index
 		let positionIndex = 0;
@@ -457,6 +456,22 @@ export const defaultColorProfile = new ThemeProfile('default', {
 			punctuation: new Theme('#808080'),
 		}
 	},
+	/**
+	 * @description This is where custom theme overrides are defined
+	 * @param {Group} flag = [fg=red] or [bg=red] or [st=bold] or any combination of those
+	 * @param {Group} fg foreground | bg = background | st = style
+	 * @param {Group} bg = background | st = style
+	 * @param {Group} st = style
+	 * @param {Group} ftag = foreground tag | btag = background tag | stag = style tag
+	 * @param {Group} target = the string that gets colored, anything else will be removed
+	 * @param {Group} end = the end of the flag (always [/>])
+	 * @example input: [fg=red bg=blue st=bold]Hello World[/>]
+	 * @example output: \x1b[38;2;255;0;0m\x1b[48;2;0;0;255m\x1b[1mHello World\x1b[0m
+	*/
+	overrideSyntaxDefinations: [
+		//TODO Documentation about this
+		/(?<flag>\[(?<fg>fg=(?<ftag>.+?)\s?)?(?<bg>bg=(?<btag>.+?)\s?)?(?<st>st=(?<stag>.+?)\s?)?\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g,
+	],
 	overrides: [
 		new ThemeOverride([
 			/(\()(?:\)|.)*?(\))/g,
@@ -476,9 +491,6 @@ export const defaultColorProfile = new ThemeProfile('default', {
 		// new ThemeOverride('red', new Theme('#ff0000')),
 		// new ThemeOverride('green', new Theme('#00ff00')),
 		// new ThemeOverride('blue', new Theme('#0000ff')),
-		new ThemeOverride(/(?<flag>\[fg=(?<fg>red)\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g, new Theme('red')),
-		new ThemeOverride(/(?<flag>\[fg=(?<fg>green)\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g, new Theme('green')),
-		new ThemeOverride(/(?<flag>\[fg=(?<fg>blue)\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g, new Theme('blue')),
 	]
 } as unknown as ThemeProfile);
 
