@@ -32,7 +32,7 @@ export async function test() {
 	// cons.log(testColors);
 	// cons.log('const array = [1, 2, 3];', 'if (x == 1) { console.log("hello world"); }');
 
-	cons.log('[fg=red bg=blue st=bold ]The red blue fox[/>] and [fg=blue bg=green]The blue green frog fox[/>]');
+	cons.log('[fg=red bg=blue st=bold]The red blue fox[/>] and [fg=blue bg=green]The blue green frog[/>]');
 	// cons.log('[fg=red]The red fox[/>] and [fg=green]the green bear[/>] with [fg=blue]the blue wolf[/>]');
 	// cons.log('[fg=#ffAA00]almost red[/>] ... [fg=#00FFFF]green and blue[/>] + = / .;, [fg=#FF00FF]some "string here" works[/>]');
 

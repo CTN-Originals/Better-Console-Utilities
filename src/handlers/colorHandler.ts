@@ -1,6 +1,7 @@
 const colorFlagRegex = new RegExp(/\x1b\[(3|4)8;2(?<rbg>(;\d{1,3}){3})m/g); //? Matches \x1b[38;2;255;255;255m colors
 const styleFlagRegex = new RegExp(/\x1b\[\d{1}m/g); //? Matches \x1b[0m styles
 const anyFlagRegex = new RegExp(/\x1b\[((3|4)8|\d{1})(;2(;\d{1,3}){3})?m/g); //? Matches all flags
+const placeholderCharacter: string = '◘'; //? character that is used as a placeholder for color flags to prevent the flags from being colored by overrides
 
 export class Color {
 	public R: number;
@@ -307,14 +308,14 @@ export class ThemeOverride {
 		}
 		
 		//? the input without any theme flags
-		const rawInput: string = removeThemeFlags(input);
+		const safeInput: string = removeThemeFlags(input);
 		//? array of all matches
 		const matchList: RegExpExecArray[] = [];
 
 		const currentTarget: string|RegExp = (targetOverride) ? targetOverride : this.target as string|RegExp;
 		if (currentTarget instanceof RegExp) {
-			for (let i = 0; i < rawInput.split(currentTarget).length; i++) {
-				const match = currentTarget.exec(rawInput);
+			for (let i = 0; i < safeInput.split(currentTarget).length; i++) {
+				const match = currentTarget.exec(safeInput);
 				if (!match) { continue; }
 				else if (matchList.find((e) => (e.index === match.index) && (e[0].length === match[0].length))) {
 					//- if Array of matches includes a match with the same index, overwrite it
@@ -328,17 +329,17 @@ export class ThemeOverride {
 		}
 		else {
 			//? copy of the input to remove all instances of the target and not modify the input
-			let inputCopy = rawInput; 
-			for (let i = 0; i < rawInput.split(currentTarget as string).length - 1; i++) {
+			let inputCopy = safeInput; 
+			for (let i = 0; i < safeInput.split(currentTarget as string).length - 1; i++) {
 				const fakeMatch = {
 					0: currentTarget as string,
-					input: rawInput,
+					input: safeInput,
 					index: inputCopy.indexOf(currentTarget as string),
 					length: (currentTarget as string).length,
 				} as RegExpExecArray;
 
 				//? replace the target in the copy with a placeholder
-				inputCopy = inputCopy.replace(currentTarget as string, ('◘').repeat((currentTarget as string).length));
+				inputCopy = inputCopy.replace(currentTarget as string, (placeholderCharacter).repeat((currentTarget as string).length));
 				matchList.push(fakeMatch);
 			}
 		}
@@ -375,7 +376,39 @@ export class ThemeProfile {
 		this.overrides = (input.overrides) ? input.overrides : [];
 	}
 
-	public applyOverrides(input: string): string {
+	public applyThemeProfile(input: string): string {
+		input = this.applyColorSyntax(input);
+		input = this.applyOverrides(input);
+		return input;
+	}
+
+	private applyColorSyntax(input: string): string {
+		let out = input;
+		for (const regex of this.colorSyntax) {
+			const matches = input.match(regex);
+			if (!matches) { continue; }
+			for (const match of matches) {
+				const reg = new RegExp(regex).exec(match);
+				if (!reg || !reg.groups || !reg.groups.target) { continue; }
+				console.log(reg)
+
+				const target = reg.groups.target;
+
+				const fg: Color|null = (reg.groups.ftag) ? getColor(reg.groups.ftag) : null;
+				const bg: Color|null = (reg.groups.btag) ? getColor(reg.groups.btag) : null;
+				const st: string[]|null = (reg.groups.stag) ? reg.groups.stag.split(',') : null;
+
+				const theme = new Theme(fg, bg, st);
+
+				out = out.replace(reg.groups.flag + target + reg.groups.end, theme.themeFlags + target + styles.reset + this.default.themeFlags);
+			}
+		}
+		console.log([out])
+		console.log(out.split(/\x1b/g).join('').split('[0m'))
+		return out;
+	}
+
+	private applyOverrides(input: string): string {
 		const overrideMatches: ThemeOverrideMatch[] = [];
 		for (let i = 0; i < this.overrides.length; i++) {
 			const override = this.overrides[i];
@@ -468,7 +501,7 @@ export const defaultColorProfile = new ThemeProfile('default', {
 	 * @example input: [fg=red bg=blue st=bold]Hello World[/>]
 	 * @example output: \x1b[38;2;255;0;0m\x1b[48;2;0;0;255m\x1b[1mHello World\x1b[0m
 	*/
-	overrideSyntaxDefinations: [
+	colorSyntax: [
 		//TODO Documentation about this
 		/(?<flag>\[(?<fg>fg=(?<ftag>.+?)\s?)?(?<bg>bg=(?<btag>.+?)\s?)?(?<st>st=(?<stag>.+?)\s?)?\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g,
 	],
