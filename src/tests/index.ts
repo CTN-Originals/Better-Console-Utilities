@@ -32,8 +32,8 @@ export async function test() {
 	// cons.log(testColors);
 	// cons.log('const array = [1, 2, 3];', 'if (x == 1) { console.log("hello world"); }');
 
-	cons.log('[fg=red bg=blue st=bold,underscore]The red blue fox[/>] and [fg=blue bg=green]The blue green frog[/>]');
-	// cons.log('[fg=red]The red fox[/>] and [fg=green]the green bear[/>] with [fg=blue]the blue wolf[/>]');
+	// cons.log('[fg=red bg=blue st=bold,underscore]The red blue fox[/>] and [fg=blue bg=green]The blue green frog[/>]');
+	cons.log('[fg=red]The red fox[/>] and "some purple glow over [fg=green]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
 	// cons.log('[fg=#ffAA00]almost red[/>] ... [fg=#00FFFF]green and blue[/>] + = / .;, [fg=#FF00FF]some "string here" works[/>]');
 
 	// cons.log('. red + bold', ': green - blue');
@@ -82,7 +82,7 @@ export async function test() {
 	// cons.log('simpleObject: ', simpleObject, 'simpleArray: ', simpleArray, 'nestObject: ', nestObject);
 	// const str = collectionToString(nestObject, DefaultCollectionToStringOptions);
 	// console.log(str);
-	testColors();
+	// testColors();
 	//#endregion
 }
 
@@ -166,7 +166,6 @@ function testColors() {
 	const space = 20;
 	for (let color in table) {
 		const colorTable = table[color];
-		
 		let line = ``;
 		for (let style in colorTable) {
 			let lineSpaceCount = (space - (color.length + style.length)) / 2

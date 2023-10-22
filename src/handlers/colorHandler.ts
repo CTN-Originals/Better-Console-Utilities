@@ -1,6 +1,10 @@
 const colorFlagRegex = new RegExp(/\x1b\[(3|4)8;2(?<rbg>(;\d{1,3}){3})m/g); //? Matches \x1b[38;2;255;255;255m colors
 const styleFlagRegex = new RegExp(/\x1b\[\d{1}m/g); //? Matches \x1b[0m styles
 const anyFlagRegex = new RegExp(/\x1b\[((3|4)8|\d{1})(;2(;\d{1,3}){3})?m/g); //? Matches all flags
+const anyThemedString = new RegExp(
+	/(?<start>\x1b)(?<flags>(?<fg>(?:\x1b)?\[38;2(?:(?:;\d{1,3}){3})m)?(?<bg>(?:\x1b)?\[48;2(?:(?:;\d{1,3}){3})m)?(?<st>(?:\x1b)?\[(?:\d{1}m))*)(?<str>\x1b\[0m|.*?)(?<end>\x1b\[0m(?:\x1b\[38;2(?:(?:;\d{1,3}){3})m)?)/g
+)
+
 const placeholderCharacter: string = '◘'; //? character that is used as a placeholder for color flags to prevent the flags from being colored by overrides
 
 export class Color {
@@ -307,8 +311,8 @@ export class ThemeOverride {
 			return matchInstances;
 		}
 		
-		//? the input without any theme flags
-		const safeInput: string = removeThemeFlags(input);
+		//? copy of input for later use
+		let safeInput: string = input;
 		//? array of all matches
 		const matchList: RegExpExecArray[] = [];
 
@@ -390,7 +394,6 @@ export class ThemeProfile {
 			for (const match of matches) {
 				const reg = new RegExp(regex).exec(match);
 				if (!reg || !reg.groups || !reg.groups.target) { continue; }
-				console.log(reg)
 
 				const target = reg.groups.target;
 
@@ -403,16 +406,25 @@ export class ThemeProfile {
 				out = out.replace(reg.groups.flag + target + reg.groups.end, theme.themeFlags + target + styles.reset + this.default.themeFlags);
 			}
 		}
-		console.log([out])
-		console.log(out.split(/\x1b/g).join('').split('[0m'))
+		// console.log([out])
+		// console.log(out.split(/\x1b/g).join('').split('[0m'))
 		return out;
 	}
 
 	private applyOverrides(input: string): string {
 		const overrideMatches: ThemeOverrideMatch[] = [];
+
+		let safeInput: string = input;
+		const anyThemeMatch = safeInput.match(anyThemedString);
+		if (anyThemeMatch) {
+			for (const match of anyThemeMatch) {
+				safeInput = safeInput.replace(match, placeholderCharacter.repeat(match.length));
+			}
+		}
+
 		for (let i = 0; i < this.overrides.length; i++) {
 			const override = this.overrides[i];
-			overrideMatches.push(...override.matchTargetInstances(input, this.default));
+			overrideMatches.push(...override.matchTargetInstances(safeInput, this.default));
 		}
 		overrideMatches.sort((a, b) => a.index - b.index); //? sort override matches by index
 
@@ -428,11 +440,11 @@ export class ThemeProfile {
 				i--;
 			}
 		}
-		console.log(overrideMatches)
+		// console.log(overrideMatches)
 		
 		//! Any theme flags fuck this process up so any flags are removed from input
 		//TODO Make a way around this so any theme flags already preset are also included
-		let out = removeThemeFlags(input); //? the input without any theme flags
+		let out = input; //? the input without any theme flags
 
 		const compleatedOverrides: ThemeOverrideMatch[] = []; //? array of all overrides that have been compleated
 		const flagPositionArray: {flag: string, index: number}[] = [] //? array of all flag positions for where they should end up in the output string
@@ -462,7 +474,7 @@ export class ThemeProfile {
 			positionIndex += length;
 		}
 
-		console.log(out.split(/\x1b/g).join('').split('[0m'))
+		// console.log(out.split(/\x1b/g).join('').split('[0m'))
 		return out;
 	}
 }
@@ -512,18 +524,18 @@ export const defaultColorProfile = new ThemeProfile('default', {
 			/(\[)(?:\]|.)*?(\])/g,
 		], new Theme('#c45b8c')),
 		new ThemeOverride([
-			'some', 'thing'
-		], new Theme('#19e6e6', null, 'underline')),
-		new ThemeOverride([
 			'.', ':', ';', ','
 		], new Theme('#e6d119')),
 		new ThemeOverride(/(?<!\\)(['"`])(?:\\\1|.)*?(\1)/g, new Theme('#C4785B')),
 		new ThemeOverride(/[0-9]+/g, new Theme('#B5CEA8')),
 		new ThemeOverride(/ctn/gi, new Theme('#00FFFF', '#008000')),
-		new ThemeOverride('name', new Theme('#ff0000')),
-		// new ThemeOverride('red', new Theme('#ff0000')),
-		// new ThemeOverride('green', new Theme('#00ff00')),
-		// new ThemeOverride('blue', new Theme('#0000ff')),
+		new ThemeOverride('red', new Theme('#ff0000')),
+		new ThemeOverride('green', new Theme('#00ff00')),
+		new ThemeOverride('blue', new Theme('#0000ff')),
+		new ThemeOverride('orange', new Theme('#ff9900')),
+		new ThemeOverride('purple', new Theme('#990099')),
+		new ThemeOverride('glow', new Theme('#ff3c00', '#ffee00', 'dim')),
+		new ThemeOverride('warm', new Theme('#ff6600', null, ['bold', 'underscore', 'blink'])),
 	]
 } as unknown as ThemeProfile);
 
