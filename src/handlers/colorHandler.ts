@@ -365,11 +365,11 @@ export class ThemeOverride {
 }
 
 export class ThemeProfile {
-	public name: string;
-	public default: Theme;
-	public typeThemes: TypeThemes;
-	public colorSyntax: RegExp[];
-	public overrides: ThemeOverride[];
+	public name: string; //? The name of the color profile to be used to identify
+	public default: Theme; //? The default theme to use if one is not provided
+	public typeThemes: TypeThemes; //? The themes to use for each type
+	public colorSyntax: RegExp[]; //? The regex patterns to use to find any colored strings
+	public overrides: ThemeOverride[]; //? The theme overrides to use
 	
 	constructor(name: string, input: Partial<ThemeProfile>) {
 		this.name = name;
@@ -387,6 +387,8 @@ export class ThemeProfile {
 	}
 
 	private applyColorSyntax(input: string): string {
+		//TODO bug Fix: 
+			//> when you dont close off the syntax flag correctly it just colors everything after that the specified color. this could just be a feature that is left in as intended but i rather have it where it would ignore that flag entirely.
 		let out = input;
 		for (const regex of this.colorSyntax) {
 			const matches = input.match(regex);
@@ -417,6 +419,7 @@ export class ThemeProfile {
 		let safeInput: string = input;
 		const anyThemeMatch = safeInput.match(anyThemedString);
 		if (anyThemeMatch) {
+			//? replace any themed string (flag + string + reset) with placeholder characters to prevent the flags from being colored by overrides
 			for (const match of anyThemeMatch) {
 				safeInput = safeInput.replace(match, placeholderCharacter.repeat(match.length));
 			}
@@ -424,6 +427,7 @@ export class ThemeProfile {
 
 		for (let i = 0; i < this.overrides.length; i++) {
 			const override = this.overrides[i];
+			//? find all matches for each override
 			overrideMatches.push(...override.matchTargetInstances(safeInput, this.default));
 		}
 		overrideMatches.sort((a, b) => a.index - b.index); //? sort override matches by index
@@ -540,7 +544,6 @@ export const defaultColorProfile = new ThemeProfile('default', {
 } as unknown as ThemeProfile);
 
 //#region Methods
-
 	//#region Getters
 		/** 
 		 * @param {string} input The color. supports: hex (#123ABC) or named colors (red, blue, etc.)
