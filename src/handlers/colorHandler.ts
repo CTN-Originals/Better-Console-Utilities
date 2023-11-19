@@ -1,6 +1,11 @@
 const colorFlagRegex = new RegExp(/\x1b\[(3|4)8;2(?<rbg>(;\d{1,3}){3})m/g); //? Matches \x1b[38;2;255;255;255m colors
 const styleFlagRegex = new RegExp(/\x1b\[\d{1}m/g); //? Matches \x1b[0m styles
 const anyFlagRegex = new RegExp(/\x1b\[((3|4)8|\d{1})(;2(;\d{1,3}){3})?m/g); //? Matches all flags
+const anyThemedString = new RegExp(
+	/(?<start>\x1b)(?<flags>(?<fg>(?:\x1b)?\[38;2(?:(?:;\d{1,3}){3})m)?(?<bg>(?:\x1b)?\[48;2(?:(?:;\d{1,3}){3})m)?(?<st>(?:\x1b)?\[(?:\d{1}m))*)(?<str>\x1b\[0m|.*?)(?<end>\x1b\[0m(?:\x1b\[38;2(?:(?:;\d{1,3}){3})m)?)/g
+)
+
+const placeholderCharacter: string = '◘'; //? character that is used as a placeholder for color flags to prevent the flags from being colored by overrides
 
 export class Color {
 	public R: number;
@@ -258,6 +263,7 @@ class ThemeOverrideMatch {
 	public input: string; //? The entire string
 	public override: ThemeOverride; //? The theme override that was used to capture the flag
 	public capture: RegExp|string; //? The regex that was used to capture the flag
+	public groups: RegExpExecArray['groups']|null; //? The groups of the regex that was used to capture the flag
 
 	public index: number; //? The index of the flag (position in the string)
 	public length: number; //? The length of the flag (how many characters it is)
@@ -267,6 +273,7 @@ class ThemeOverrideMatch {
 		this.input = input.input;
 		this.override = input.override;
 		this.capture = input.capture;
+		this.groups = input.groups;
 
 		this.index = input.index;
 		this.length = input.length;
@@ -304,18 +311,18 @@ export class ThemeOverride {
 			return matchInstances;
 		}
 		
-		//? the input without any theme flags
-		const rawInput: string = removeThemeFlags(input);
+		//? copy of input for later use
+		let safeInput: string = input;
 		//? array of all matches
 		const matchList: RegExpExecArray[] = [];
 
 		const currentTarget: string|RegExp = (targetOverride) ? targetOverride : this.target as string|RegExp;
 		if (currentTarget instanceof RegExp) {
-			for (let i = 0; i < rawInput.split(currentTarget).length; i++) {
-				const match = currentTarget.exec(rawInput);
+			for (let i = 0; i < safeInput.split(currentTarget).length; i++) {
+				const match = currentTarget.exec(safeInput);
 				if (!match) { continue; }
 				else if (matchList.find((e) => (e.index === match.index) && (e[0].length === match[0].length))) {
-					//? Array of matches includes a match with the same index, overwrite it
+					//- if Array of matches includes a match with the same index, overwrite it
 					const index = matchList.findIndex((e) => e.index === match.index); 
 					matchList[index] = match;
 				}
@@ -326,17 +333,17 @@ export class ThemeOverride {
 		}
 		else {
 			//? copy of the input to remove all instances of the target and not modify the input
-			let inputCopy = rawInput; 
-			for (let i = 0; i < rawInput.split(currentTarget as string).length - 1; i++) {
+			let inputCopy = safeInput; 
+			for (let i = 0; i < safeInput.split(currentTarget as string).length - 1; i++) {
 				const fakeMatch = {
 					0: currentTarget as string,
-					input: rawInput,
+					input: safeInput,
 					index: inputCopy.indexOf(currentTarget as string),
 					length: (currentTarget as string).length,
 				} as RegExpExecArray;
 
 				//? replace the target in the copy with a placeholder
-				inputCopy = inputCopy.replace(currentTarget as string, ('◘').repeat((currentTarget as string).length));
+				inputCopy = inputCopy.replace(currentTarget as string, (placeholderCharacter).repeat((currentTarget as string).length));
 				matchList.push(fakeMatch);
 			}
 		}
@@ -347,6 +354,7 @@ export class ThemeOverride {
 				input: match.input,
 				override: this,
 				capture: currentTarget,
+				groups: match.groups as RegExpExecArray['groups'] ?? {},
 				index: match.index,
 				length: match[0].length,
 			}));
@@ -357,24 +365,70 @@ export class ThemeOverride {
 }
 
 export class ThemeProfile {
-	public name: string;
-	public default: Theme;
-	public typeThemes: TypeThemes;
-	public overrides: ThemeOverride[];
+	public name: string; //? The name of the color profile to be used to identify
+	public default: Theme; //? The default theme to use if one is not provided
+	public typeThemes: TypeThemes; //? The themes to use for each type
+	public colorSyntax: RegExp[]; //? The regex patterns to use to find any colored strings
+	public overrides: ThemeOverride[]; //? The theme overrides to use
 	
 	constructor(name: string, input: Partial<ThemeProfile>) {
 		this.name = name;
 		this.default = new Theme(input.default?.foreground, input.default?.background, input.default?.style);
 		
 		this.typeThemes = (input.typeThemes) ? new TypeThemes(input.typeThemes) : new TypeThemes();
+		this.colorSyntax = (input.colorSyntax) ? input.colorSyntax : [];
 		this.overrides = (input.overrides) ? input.overrides : [];
 	}
 
-	public applyOverrides(input: string): string {
+	public applyThemeProfile(input: string): string {
+		input = this.applyColorSyntax(input);
+		input = this.applyOverrides(input);
+		return input;
+	}
+
+	private applyColorSyntax(input: string): string {
+		//TODO bug Fix: 
+			//> when you dont close off the syntax flag correctly it just colors everything after that the specified color. this could just be a feature that is left in as intended but i rather have it where it would ignore that flag entirely.
+		let out = input;
+		for (const regex of this.colorSyntax) {
+			const matches = input.match(regex);
+			if (!matches) { continue; }
+			for (const match of matches) {
+				const reg = new RegExp(regex).exec(match);
+				if (!reg || !reg.groups || !reg.groups.target) { continue; }
+
+				const target = reg.groups.target;
+
+				const fg: Color|null = (reg.groups.ftag) ? getColor(reg.groups.ftag) : null;
+				const bg: Color|null = (reg.groups.btag) ? getColor(reg.groups.btag) : null;
+				const st: string[]|null = (reg.groups.stag) ? reg.groups.stag.split(',') : null;
+
+				const theme = new Theme(fg, bg, st);
+
+				out = out.replace(reg.groups.flag + target + reg.groups.end, theme.themeFlags + target + styles.reset + this.default.themeFlags);
+			}
+		}
+		// console.log([out])
+		// console.log(out.split(/\x1b/g).join('').split('[0m'))
+		return out;
+	}
+
+	private applyOverrides(input: string): string {
 		const overrideMatches: ThemeOverrideMatch[] = [];
+
+		let safeInput: string = input;
+		const anyThemeMatch = safeInput.match(anyThemedString);
+		if (anyThemeMatch) {
+			//? replace any themed string (flag + string + reset) with placeholder characters to prevent the flags from being colored by overrides
+			for (const match of anyThemeMatch) {
+				safeInput = safeInput.replace(match, placeholderCharacter.repeat(match.length));
+			}
+		}
+
 		for (let i = 0; i < this.overrides.length; i++) {
 			const override = this.overrides[i];
-			overrideMatches.push(...override.matchTargetInstances(input, this.default));
+			//? find all matches for each override
+			overrideMatches.push(...override.matchTargetInstances(safeInput, this.default));
 		}
 		overrideMatches.sort((a, b) => a.index - b.index); //? sort override matches by index
 
@@ -394,7 +448,7 @@ export class ThemeProfile {
 		
 		//! Any theme flags fuck this process up so any flags are removed from input
 		//TODO Make a way around this so any theme flags already preset are also included
-		let out = removeThemeFlags(input); //? the input without any theme flags
+		let out = input; //? the input without any theme flags
 
 		const compleatedOverrides: ThemeOverrideMatch[] = []; //? array of all overrides that have been compleated
 		const flagPositionArray: {flag: string, index: number}[] = [] //? array of all flag positions for where they should end up in the output string
@@ -412,8 +466,6 @@ export class ThemeProfile {
 
 			compleatedOverrides.push(match);
 		}
-
-		
 		
 		flagPositionArray.sort((a, b) => a.index - b.index); //? sort flag positions by index
 		let positionIndex = 0;
@@ -453,6 +505,22 @@ export const defaultColorProfile = new ThemeProfile('default', {
 			punctuation: new Theme('#808080'),
 		}
 	},
+	/**
+	 * @description This is where custom theme overrides are defined
+	 * @param {Group} flag = [fg=red] or [bg=red] or [st=bold] or any combination of those
+	 * @param {Group} fg foreground | bg = background | st = style
+	 * @param {Group} bg = background | st = style
+	 * @param {Group} st = style
+	 * @param {Group} ftag = foreground tag | btag = background tag | stag = style tag
+	 * @param {Group} target = the string that gets colored, anything else will be removed
+	 * @param {Group} end = the end of the flag (always [/>])
+	 * @example input: [fg=red bg=blue st=bold]Hello World[/>]
+	 * @example output: \x1b[38;2;255;0;0m\x1b[48;2;0;0;255m\x1b[1mHello World\x1b[0m
+	*/
+	colorSyntax: [
+		//TODO Documentation about this
+		/(?<flag>\[(?<fg>fg=(?<ftag>.+?)\s?)?(?<bg>bg=(?<btag>.+?)\s?)?(?<st>st=(?<stag>.+?)\s?)?\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g,
+	],
 	overrides: [
 		new ThemeOverride([
 			/(\()(?:\)|.)*?(\))/g,
@@ -460,23 +528,22 @@ export const defaultColorProfile = new ThemeProfile('default', {
 			/(\[)(?:\]|.)*?(\])/g,
 		], new Theme('#c45b8c')),
 		new ThemeOverride([
-			'some', 'thing'
-		], new Theme('#19e6e6', null, 'underline')),
-		new ThemeOverride([
 			'.', ':', ';', ','
 		], new Theme('#e6d119')),
 		new ThemeOverride(/(?<!\\)(['"`])(?:\\\1|.)*?(\1)/g, new Theme('#C4785B')),
 		new ThemeOverride(/[0-9]+/g, new Theme('#B5CEA8')),
 		new ThemeOverride(/ctn/gi, new Theme('#00FFFF', '#008000')),
-		new ThemeOverride('name', new Theme('#ff0000')),
 		new ThemeOverride('red', new Theme('#ff0000')),
 		new ThemeOverride('green', new Theme('#00ff00')),
 		new ThemeOverride('blue', new Theme('#0000ff')),
+		new ThemeOverride('orange', new Theme('#ff9900')),
+		new ThemeOverride('purple', new Theme('#990099')),
+		new ThemeOverride('glow', new Theme('#ff3c00', '#ffee00', 'dim')),
+		new ThemeOverride('warm', new Theme('#ff6600', null, ['bold', 'underscore', 'blink'])),
 	]
 } as unknown as ThemeProfile);
 
 //#region Methods
-
 	//#region Getters
 		/** 
 		 * @param {string} input The color. supports: hex (#123ABC) or named colors (red, blue, etc.)

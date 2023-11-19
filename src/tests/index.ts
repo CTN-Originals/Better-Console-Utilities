@@ -24,13 +24,17 @@ export async function test() {
 	// console.groupEnd();
 
 	// console.log(JSON.stringify(parserTests.nestObject));
-	// console.log(parserTests.nestObject);
+	// cons.log(parserTests.nestObject);
 	// console.log(' ')
 	// cons.log('"string red" red (testing :D)', '"string (red green someStr) awd" red ... nothing "blue" normal ctn');
 	// cons.log('"string"`str` ::. ..: redred');
 	// cons.log('green normal blue green');
 	// cons.log(testColors);
-	cons.log('const array = [1, 2, 3];', 'if (x == 1) { console.log("hello world"); }');
+	// cons.log('const array = [1, 2, 3];', 'if (x == 1) { console.log("hello world"); }');
+
+	// cons.log('[fg=red bg=blue st=bold,underscore]The red blue fox[/>] and [fg=blue bg=green]The blue green frog[/>]');
+	cons.log('[fg=red]The red fox[/>] and "some purple glow over [fg=green]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
+	// cons.log('[fg=#ffAA00]almost red[/>] ... [fg=#00FFFF]green and blue[/>] + = / .;, [fg=#FF00FF]some "string here" works[/>]');
 
 	// cons.log('. red + bold', ': green - blue');
 	// cons.log('abc');
@@ -83,11 +87,95 @@ export async function test() {
 }
 
 function testColors() {
-	console.log(getColorCodePrefix('#00FFFF') + ' i am cyan')
-	console.log(getColorCodePrefix('#aa00FF') + ' i am purple')
-	console.log(getColorCodePrefix('orange') + ' i am orange')
-}
+	// console.log([
+	// 	'[38;2;255;0;0m[1mred bold[0m [38;2;255;0;0m[4mred underscore[0m [38;2;255;0;0m[2mred dim[0m [38;2;255;0;0m[5mred blink[0m [38;2;255;0;0m[7mred inverse[0m [38;2;255;0;0m[8mred hidden[0m [38;2;255;0;0m[1m[4mred bold underscore[0m',
+	// 	'[38;2;0;255;0m[1mgreen bold[0m [38;2;0;255;0m[4mgreen underscore[0m [38;2;0;255;0m[2mgreen dim[0m [38;2;0;255;0m[5mgreen blink[0m [38;2;0;255;0m[7mgreen inverse[0m [38;2;0;255;0m[8mgreen hidden[0m [38;2;0;255;0m[1m[4mgreen bold underscore[0m',
+	// 	'[38;2;0;0;255m[1mblue bold[0m [38;2;0;0;255m[4mblue underscore[0m [38;2;0;0;255m[2mblue dim[0m [38;2;0;0;255m[5mblue blink[0m [38;2;0;0;255m[7mblue inverse[0m [38;2;0;0;255m[8mblue hidden[0m [38;2;0;0;255m[1m[4mblue bold underscore[0m',
+	// 	'[38;2;255;255;255m[1mwhite bold[0m [38;2;255;255;255m[4mwhite underscore[0m [38;2;255;255;255m[2mwhite dim[0m [38;2;255;255;255m[5mwhite blink[0m [38;2;255;255;255m[7mwhite inverse[0m [38;2;255;255;255m[8mwhite hidden[0m [38;2;255;255;255m[1m[4mwhite bold underscore[0m',
+	// 	'[38;2;255;165;0m[1morange bold[0m [38;2;255;165;0m[4morange underscore[0m [38;2;255;165;0m[2morange dim[0m [38;2;255;165;0m[5morange blink[0m [38;2;255;165;0m[7morange inverse[0m [38;2;255;165;0m[8morange hidden[0m [38;2;255;165;0m[1m[4morange bold underscore[0m',
+	// 	'[38;2;128;0;128m[1mpurple bold[0m [38;2;128;0;128m[4mpurple underscore[0m [38;2;128;0;128m[2mpurple dim[0m [38;2;128;0;128m[5mpurple blink[0m [38;2;128;0;128m[7mpurple inverse[0m [38;2;128;0;128m[8mpurple hidden[0m [38;2;128;0;128m[1m[4mpurple bold underscore[0m',
+	// 	'[38;2;255;192;203m[1mpink bold[0m [38;2;255;192;203m[4mpink underscore[0m [38;2;255;192;203m[2mpink dim[0m [38;2;255;192;203m[5mpink blink[0m [38;2;255;192;203m[7mpink inverse[0m [38;2;255;192;203m[8mpink hidden[0m [38;2;255;192;203m[1m[4mpink bold underscore[0m',
+	// 	'[38;2;255;255;0m[1myellow bold[0m [38;2;255;255;0m[4myellow underscore[0m [38;2;255;255;0m[2myellow dim[0m [38;2;255;255;0m[5myellow blink[0m [38;2;255;255;0m[7myellow inverse[0m [38;2;255;255;0m[8myellow hidden[0m [38;2;255;255;0m[1m[4myellow bold underscore[0m',
+	// ].join('\n'))
+	const table: {[key: string]: {[key: string]: string}} = {
+		red: { 
+			bold: "[38;2;255;0;0m[1mred bold[0m", 
+			underscore: "[38;2;255;0;0m[4mred underscore[0m", 
+			dim: "[38;2;255;0;0m[2mred dim[0m", 
+			blink: "[38;2;255;0;0m[5mred blink[0m", 
+			inverse: "[38;2;255;0;0m[7mred inverse[0m",
+		},
+		green: { 
+			bold: "[38;2;0;255;0m[1mgreen bold[0m", 
+			underscore: "[38;2;0;255;0m[4mgreen underscore[0m", 
+			dim: "[38;2;0;255;0m[2mgreen dim[0m", 
+			blink: "[38;2;0;255;0m[5mgreen blink[0m", 
+			inverse: "[38;2;0;255;0m[7mgreen inverse[0m",
+		},
+		blue: { 
+			bold: "[38;2;0;0;255m[1mblue bold[0m", 
+			underscore: "[38;2;0;0;255m[4mblue underscore[0m", 
+			dim: "[38;2;0;0;255m[2mblue dim[0m", 
+			blink: "[38;2;0;0;255m[5mblue blink[0m", 
+			inverse: "[38;2;0;0;255m[7mblue inverse[0m",
+		},
+		white: { 
+			bold: "[38;2;255;255;255m[1mwhite bold[0m", 
+			underscore: "[38;2;255;255;255m[4mwhite underscore[0m", 
+			dim: "[38;2;255;255;255m[2mwhite dim[0m", 
+			blink: "[38;2;255;255;255m[5mwhite blink[0m", 
+			inverse: "[38;2;255;255;255m[7mwhite inverse[0m",
+		},
+		cyan: {
+			bold: "[38;2;0;255;255m[1mcyan bold[0m", 
+			underscore: "[38;2;0;255;255m[4mcyan underscore[0m", 
+			dim: "[38;2;0;255;255m[2mcyan dim[0m", 
+			blink: "[38;2;0;255;255m[5mcyan blink[0m", 
+			inverse: "[38;2;0;255;255m[7mcyan inverse[0m",
+		},
+		orange: { 
+			bold: "[38;2;255;165;0m[1morange bold[0m", 
+			underscore: "[38;2;255;165;0m[4morange underscore[0m", 
+			dim: "[38;2;255;165;0m[2morange dim[0m", 
+			blink: "[38;2;255;165;0m[5morange blink[0m", 
+			inverse: "[38;2;255;165;0m[7morange inverse[0m",
+		},
+		yellow: { 
+			bold: "[38;2;255;255;0m[1myellow bold[0m", 
+			underscore: "[38;2;255;255;0m[4myellow underscore[0m", 
+			dim: "[38;2;255;255;0m[2myellow dim[0m", 
+			blink: "[38;2;255;255;0m[5myellow blink[0m", 
+			inverse: "[38;2;255;255;0m[7myellow inverse[0m",
+		},
+		pink: { 
+			bold: "[38;2;255;192;203m[1mpink bold[0m", 
+			underscore: "[38;2;255;192;203m[4mpink underscore[0m", 
+			dim: "[38;2;255;192;203m[2mpink dim[0m", 
+			blink: "[38;2;255;192;203m[5mpink blink[0m", 
+			inverse: "[38;2;255;192;203m[7mpink inverse[0m",
+		},
+		purple: { 
+			bold: "[38;2;128;0;128m[1mpurple bold[0m", 
+			underscore: "[38;2;128;0;128m[4mpurple underscore[0m", 
+			dim: "[38;2;128;0;128m[2mpurple dim[0m", 
+			blink: "[38;2;128;0;128m[5mpurple blink[0m", 
+			inverse: "[38;2;128;0;128m[7mpurple inverse[0m",
+		},
+	};
 
+	const space = 20;
+	for (let color in table) {
+		const colorTable = table[color];
+		let line = ``;
+		for (let style in colorTable) {
+			let lineSpaceCount = (space - (color.length + style.length)) / 2
+			lineSpaceCount = (lineSpaceCount % 2 === 0) ? lineSpaceCount : lineSpaceCount + 1;
+			let lineSpace = ' '.repeat(lineSpaceCount);
+			line += `${lineSpace}${colorTable[style]}${lineSpace}`;
+		}
+		console.log(line);
+	}
+}
 
 // function sleep(ms: number) {
 // 	return new Promise(resolve => setTimeout(resolve, ms));
