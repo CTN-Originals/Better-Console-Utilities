@@ -217,15 +217,15 @@ export class TypeThemes {
 	public object: {
 		default: Theme,
 		key: Theme,
-		value: { typeOverride: boolean, theme: Theme },
-		brackets: Theme,
-		punctuation: Theme,
+		value: { typeOverride: boolean /*TODO*/, theme: Theme },
+		brackets: Theme, //TODO
+		punctuation: Theme, //TODO
 	};
 	public array: {
 		default: Theme,
-		value: { typeOverride: boolean, theme: Theme },
-		brackets: Theme,
-		punctuation: Theme,
+		value: { typeOverride: boolean /*TODO*/, theme: Theme },
+		brackets: Theme, //TODO
+		punctuation: Theme, //TODO
 	};
 
 	/** 
@@ -287,6 +287,10 @@ export class ThemeOverride {
 	/** 
 	 * @param {string|RegExp} target The target string or regex
 	 * @param {Theme} theme The theme to apply if the target is matched
+	 * @param {string} theme.foreground The foreground color (e.g. '#ffffff' or 'white')
+	 * @param {string} theme.background The background color (e.g. '#ffffff' or 'white')
+	 * @param {string|string[]} theme.style The style or styles (e.g. 'bold' or ['bold', 'underscore'])
+	 * @returns {ThemeOverride} The theme override
 	*/
 	constructor(target: string|string[]|RegExp|RegExp[], theme: Theme = new Theme()) {
 		this.target = target;
@@ -526,20 +530,24 @@ export const defaultColorProfile = new ThemeProfile('default', {
 			/(\()(?:\)|.)*?(\))/g,
 			/(\{)(?:\}|.)*?(\})/g,
 			/(\[)(?:\]|.)*?(\])/g,
-		], new Theme('#c45b8c')),
+		], new Theme('#aaaaaa')),
+		new ThemeOverride([
+			' + ', ' - ', ' / ', ' * ', ' = ', ' % '
+		], new Theme('#bebebe', null, 'bold')),
 		new ThemeOverride([
 			'.', ':', ';', ','
-		], new Theme('#e6d119')),
-		new ThemeOverride(/(?<!\\)(['"`])(?:\\\1|.)*?(\1)/g, new Theme('#C4785B')),
+		], new Theme('#998440')),
+		new ThemeOverride([/(?<!\\)(['"`])(?:\\\1|.)*?(\1)/g], new Theme('#C4785B')),
 		new ThemeOverride(/[0-9]+/g, new Theme('#B5CEA8')),
-		new ThemeOverride(/ctn/gi, new Theme('#00FFFF', '#008000')),
-		new ThemeOverride('red', new Theme('#ff0000')),
-		new ThemeOverride('green', new Theme('#00ff00')),
-		new ThemeOverride('blue', new Theme('#0000ff')),
-		new ThemeOverride('orange', new Theme('#ff9900')),
-		new ThemeOverride('purple', new Theme('#990099')),
-		new ThemeOverride('glow', new Theme('#ff3c00', '#ffee00', 'dim')),
-		new ThemeOverride('warm', new Theme('#ff6600', null, ['bold', 'underscore', 'blink'])),
+		new ThemeOverride([/true|false/gi], new Theme('#569CD6')),
+		new ThemeOverride([/override/gi], new Theme('#2d4ee2')),
+		new ThemeOverride([/error/gi], new Theme('#ff0000', null, 'bold')),
+		new ThemeOverride([/ERROR/g, /danger/gi], new Theme('#be0000', null, ['bold', 'blink', 'underscore'])),
+		new ThemeOverride([/warn(ing)?/gi], new Theme('#ffbb00', null, 'bold')),
+		new ThemeOverride([/alert/gi], new Theme('#ffbb00', null, ['bold', 'blink'])),
+		new ThemeOverride(/ red /gi, new Theme('#ff0000')),
+		new ThemeOverride(/ green /gi, new Theme('#00ff00')),
+		new ThemeOverride(/ blue /gi, new Theme('#0000ff')),
 	]
 } as unknown as ThemeProfile);
 

@@ -19,7 +19,7 @@ export async function test() {
 	// console.groupEnd();
 
 	// console.group('Nested Object');
-	// cons.log(parserTests.nestObject);
+	cons.log(parserTests.nestObject);
 	// console.log(' ')
 	// console.groupEnd();
 
@@ -32,9 +32,12 @@ export async function test() {
 	// cons.log(testColors);
 	// cons.log('const array = [1, 2, 3];', 'if (x == 1) { console.log("hello world"); }');
 
-	// cons.log('[fg=red bg=blue st=bold,underscore]The red blue fox[/>] and [fg=blue bg=green]The blue green frog[/>]');
+	cons.log('[fg=red bg=blue st=bold,underscore]The red blue fox[/>] and [fg=blue bg=green]The blue green frog[/>]');
 	cons.log('[fg=red]The red fox[/>] and "some purple glow over [fg=green]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
-	// cons.log('[fg=#ffAA00]almost red[/>] ... [fg=#00FFFF]green and blue[/>] + = / .;, [fg=#FF00FF]some "string here" works[/>]');
+	cons.log('[fg=#ffAA00]almost red[/>] ... [fg=#00FFFF]green and blue[/>] + - / * = % . ; , [fg=#FF00FF]Opposite side hex colors[/>]');
+	cons.log('I love how a "string color" is almost universal. [fg=#00ff22]color syntax prioritizes over overrides "like a string" for example[/>]');
+	cons.log('Color syntax has a bug where "if you have an override like a string and [fg=red]some color flag like this[/>] it will not continue the string after the color flag unless there is another override inside it"');
+	cons.log('Warning ... We are in Danger! There was [ERROR] Error an eRrOr?! We need to warn the User! Alert the captain!');
 
 	// cons.log('. red + bold', ': green - blue');
 	// cons.log('abc');
