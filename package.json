@@ -1,17 +1,17 @@
 {
 	"name": "better-console-utilities",
-	"version": "1.0.10",
-	"description": "This node.js module provides a better way of handling the build-in console for node.js and also adds custom colors with auto colorization and custom color tags.",
+	"version": "1.0.10.1",
+	"description": "Provides utilities and enhancements to console logging and adds a configurable color profile to apply colors to any output automatically.",
 	"main": "./src/index.ts",
 	"scripts": {
 		"start": "npm run build && node dist/index.js",
 		"start:dev": "npx nodemon",
-		"build": "rimraf ./build && tsc",
+		"build": "rimraf ./dist && tsc",
 		"test": "jest",
 		"test:watch": "jest --watch"
 	},
 	"exports": {
-		".": "./build/index.js"
+		".": "./dist/index.js"
 	},
 	"files": [
 		"dist",
