@@ -1,17 +1,23 @@
 // import * as handler from '../handlers';
 import { ConsoleInstance } from '../handlers/consoleHandler';
-import { Theme, getColorCodePrefix, getColoredString, getThemedString } from '../handlers/colorHandler';
+import { Theme, ThemeProfile, TypeThemes, getColorCodePrefix, getColoredString, getThemedString } from '../handlers/colorHandler';
 import * as parserTests from './parserTestData';
-import { defaultColorProfile } from '../handlers/colorHandler';
+import { defaultThemeProfile } from '../handlers/colorHandler';
 
-
-const cons = new ConsoleInstance('test', true, '', {indent: 2, indentString: ' '}, {})
+const primaryTheme: ThemeProfile = new ThemeProfile({
+	default: new Theme('#c9c9c9'),
+	typeThemes: new TypeThemes({
+		string: {default: new Theme('#cebaa8')},
+	})
+});
+const cons = new ConsoleInstance({theme: primaryTheme ,indent: 2, indentString: '-'})
 // const cons = new ConsoleInstance('test', true, '', {indent: parserTests.DefaultCollectionToStringOptions.indent ?? 2, indentString: parserTests.DefaultCollectionToStringOptions.indentString ?? ' '}, {});
 export async function test() {
-
+	console.log(cons.theme)
+	
 	//#region Color Handler Tests
 	// console.groupCollapsed('Simple Object');
-	// cons.log(parserTests.simpleObject);
+	cons.log(parserTests.simpleObject);
 	// console.groupEnd();
 
 	// console.groupCollapsed('Simple Array');
@@ -19,7 +25,7 @@ export async function test() {
 	// console.groupEnd();
 
 	// console.group('Nested Object');
-	cons.log(parserTests.nestObject);
+	// cons.log(parserTests.nestObject);
 	// console.log(' ')
 	// console.groupEnd();
 

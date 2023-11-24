@@ -2,7 +2,7 @@ import {
 	Theme,
 	ThemeProfile,
 	TypeThemes,
-	defaultColorProfile,
+	defaultThemeProfile,
 	getColor,
 	getColorCodePrefix,
 	getThemedString,
@@ -13,6 +13,7 @@ export interface ICollectionToStringOptions {
 	indentString?:	string;  //? indentation string
 	//! do we really need this? this might already be handled by indent and depth
 	currentIndent?:	number; //? current indentation level
+	theme?: 		ThemeProfile; //? theme profile
 	brackets?:		boolean; //? adds brackets around the output
 	color?:			boolean; //? colors the output
 	autoColor?:		boolean; //? colors the values automatically based on their type
@@ -54,7 +55,7 @@ export class MessageObject {
 		this.IndentCount = obj.IndentCount ?? 2;
 		this.IndentString = obj.IndentString ?? ' ';
 
-		this.Theme = obj.Theme ?? defaultColorProfile;
+		this.Theme = obj.Theme ?? defaultThemeProfile;
 	}
 
 	public get ToString(): string {
@@ -100,7 +101,7 @@ export class MessageObject {
 					addLine(`${colorize(contentObj.Key, 'object', 'key')}${colorize(':', 'object', 'punctuation')} ${colorize(contentObj.Value, contentObj.Type, 'value')}` + ((contentObj.Type === 'null') ? `<null>` : ''), isLastItem);
 				}
 				else {
-					addLine(`${colorize(defaultColorProfile.applyThemeProfile(contentObj.Value.toString()))}`, isLastItem);
+					addLine(`${colorize(this.Theme.applyThemeProfile(contentObj.Value.toString()))}`, isLastItem);
 				}
 			}
 		}
@@ -227,6 +228,7 @@ function valueToMessageObject(input: string|boolean|number, options: Partial<ICo
 		Depth: 0,
 		IndentCount: options.indent,
 		IndentString: options.indentString,
+		Theme: options.theme,
 	});
 
 	const value = input;
@@ -246,6 +248,7 @@ export function collectionToMessageObject(collection: any, options: Required<ICo
 		Depth: (parent) ? parent.Depth + 1 : 1,
 		IndentCount: options.indent,
 		IndentString: options.indentString,
+		Theme: options.theme,
 	});
 	
 	recursionStorage.push(collection); 

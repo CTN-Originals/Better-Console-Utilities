@@ -369,19 +369,19 @@ export class ThemeOverride {
 }
 
 export class ThemeProfile {
-	public name: string; //? The name of the color profile to be used to identify
+	// public name: string; //? The name of the color profile to be used to identify
 	public default: Theme; //? The default theme to use if one is not provided
 	public typeThemes: TypeThemes; //? The themes to use for each type
 	public colorSyntax: RegExp[]; //? The regex patterns to use to find any colored strings
 	public overrides: ThemeOverride[]; //? The theme overrides to use
 	
-	constructor(name: string, input: Partial<ThemeProfile>) {
-		this.name = name;
+	constructor(input: Partial<ThemeProfile>) {
+		// this.name = name;
 		this.default = new Theme(input.default?.foreground, input.default?.background, input.default?.style);
 		
-		this.typeThemes = (input.typeThemes) ? new TypeThemes(input.typeThemes) : new TypeThemes();
-		this.colorSyntax = (input.colorSyntax) ? input.colorSyntax : [];
-		this.overrides = (input.overrides) ? input.overrides : [];
+		this.typeThemes = (input.typeThemes) ? new TypeThemes(input.typeThemes, this.default) : defaultThemeProfile.typeThemes;
+		this.colorSyntax = (input.colorSyntax) ? input.colorSyntax : defaultThemeProfile.colorSyntax;
+		this.overrides = (input.overrides) ? input.overrides : defaultThemeProfile.overrides;
 	}
 
 	public applyThemeProfile(input: string): string {
@@ -488,8 +488,8 @@ export class ThemeProfile {
 }
 //#endregion
 
-export const defaultColorProfile = new ThemeProfile('default', {
-	name: "default",
+export const defaultThemeProfile = new ThemeProfile({
+	// name: "default",
 	default: new Theme('#ffffff', null),
 	typeThemes: {
 		string: { default: new Theme('#C4785B', null) },

@@ -3,6 +3,7 @@
 **private.**
 **_**
 archive
+tests
 
 # TypeScript
 *.csv
