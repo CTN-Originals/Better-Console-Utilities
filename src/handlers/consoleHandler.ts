@@ -31,16 +31,19 @@ export class ConsoleInstance {
 	indentString: string;
 	
 	/**
-	 * @param {ThemeProfile} options.theme Theme profile for the console instance
-	 * @param {Number} options.indent Indentation level of the console instance
-	 * @param {String} options.indentString Indentation string of the console instance
+	 * @param {ThemeProfile} theme Theme profile for the console instance
+	 * @param {Number} indent Indentation level of the console instance
+	 * @param {String} indentString Indentation string of the console instance
 	*/
-	constructor(options: Partial<IConsoleOptions>) {
-		this.enabled = true;
+	constructor(theme?: ThemeProfile, indent?: number, indentString?: string);
+	/** @param {IConsoleOptions} options Options for the console instance */
+	constructor(options: Partial<IConsoleOptions>);
+	constructor(optionsOrTheme?: Partial<IConsoleOptions> | ThemeProfile, indent?: number, indentString?: string) {
+    	this.enabled = true;
 
-		this.theme = options.theme ?? defaultThemeProfile;
-		this.indent = options.indent ?? 0;
-		this.indentString = options.indentString ?? ' ';
+		this.theme = 		((optionsOrTheme instanceof ThemeProfile) ? optionsOrTheme : optionsOrTheme?.theme) ?? defaultThemeProfile;
+		this.indent = 		((optionsOrTheme instanceof ThemeProfile) ? indent : optionsOrTheme?.indent) ?? 2;
+		this.indentString = ((optionsOrTheme instanceof ThemeProfile) ? indentString : optionsOrTheme?.indentString) ?? ' ';
 	}
 	
 	public log(...args: any[]) {
@@ -64,6 +67,7 @@ export class ConsoleInstance {
 			};
 			log += utils.parser.parseInput(arg, collectionStringOptipons).ToString + ((i != args.length - 1) ? '\n' : '');
 		}
+		// console.log(log.split(/\x1b/g).join('').split('[0m'))
 		return log;
 	}
 }
