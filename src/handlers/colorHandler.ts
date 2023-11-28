@@ -545,9 +545,9 @@ export const defaultThemeProfile = new ThemeProfile({
 		new ThemeOverride([/ERROR/g, /danger/gi], new Theme('#be0000', null, ['bold', 'blink', 'underscore'])),
 		new ThemeOverride([/warn(ing)?/gi], new Theme('#ffbb00', null, 'bold')),
 		new ThemeOverride([/alert/gi], new Theme('#ffbb00', null, ['bold', 'blink'])),
-		new ThemeOverride(/ red /gi, new Theme('#ff0000')),
-		new ThemeOverride(/ green /gi, new Theme('#00ff00')),
-		new ThemeOverride(/ blue /gi, new Theme('#0000ff')),
+		// new ThemeOverride(/ red /gi, new Theme('#ff0000')),
+		// new ThemeOverride(/ green /gi, new Theme('#00ff00')),
+		// new ThemeOverride(/ blue /gi, new Theme('#0000ff')),
 	]
 } as unknown as ThemeProfile);
 

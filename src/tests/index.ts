@@ -8,16 +8,33 @@ const primaryTheme: ThemeProfile = new ThemeProfile({
 	default: new Theme('#c9c9c9'),
 	typeThemes: new TypeThemes({
 		string: {default: new Theme('#cebaa8')},
-	})
+		// object: {
+		// 	default: new Theme('#c9c9c9'),
+		// 	brackets: new Theme('#cebaa8'),
+		// } //TODO
+	}, new Theme('#c9c9c9')),
 });
-const cons = new ConsoleInstance({theme: primaryTheme ,indent: 2, indentString: '-'})
-// const cons = new ConsoleInstance('test', true, '', {indent: parserTests.DefaultCollectionToStringOptions.indent ?? 2, indentString: parserTests.DefaultCollectionToStringOptions.indentString ?? ' '}, {});
+const secondaryTheme: ThemeProfile = new ThemeProfile({
+	default: new Theme('#ff6f6f'),
+	typeThemes: new TypeThemes({
+		string: {default: new Theme('#966133')},
+		number: {default: new Theme('#1ce4d3')},
+	}, new Theme('#82da67')),
+});
+
+const cons = new ConsoleInstance({theme: primaryTheme, indent: 2, indentString: '-'})
+const cons2 = new ConsoleInstance(secondaryTheme, 1, '_')
+
 export async function test() {
 	console.log(cons.theme)
+	console.log(cons2.theme)
 	
 	//#region Color Handler Tests
 	// console.groupCollapsed('Simple Object');
 	cons.log(parserTests.simpleObject);
+	cons.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
+	cons2.log(parserTests.simpleObject);
+	cons2.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
 	// console.groupEnd();
 
 	// console.groupCollapsed('Simple Array');
@@ -38,12 +55,12 @@ export async function test() {
 	// cons.log(testColors);
 	// cons.log('const array = [1, 2, 3];', 'if (x == 1) { console.log("hello world"); }');
 
-	cons.log('[fg=red bg=blue st=bold,underscore]The red blue fox[/>] and [fg=blue bg=green]The blue green frog[/>]');
-	cons.log('[fg=red]The red fox[/>] and "some purple glow over [fg=green]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
-	cons.log('[fg=#ffAA00]almost red[/>] ... [fg=#00FFFF]green and blue[/>] + - / * = % . ; , [fg=#FF00FF]Opposite side hex colors[/>]');
-	cons.log('I love how a "string color" is almost universal. [fg=#00ff22]color syntax prioritizes over overrides "like a string" for example[/>]');
-	cons.log('Color syntax has a bug where "if you have an override like a string and [fg=red]some color flag like this[/>] it will not continue the string after the color flag unless there is another override inside it"');
-	cons.log('Warning ... We are in Danger! There was [ERROR] Error an eRrOr?! We need to warn the User! Alert the captain!');
+	// cons.log('[fg=red bg=blue st=bold,underscore]The red blue fox[/>] and [fg=blue bg=green]The blue green frog[/>]');
+	// cons.log('[fg=red]The red fox[/>] and "some purple glow over [fg=green]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
+	// cons.log('[fg=#ffAA00]almost red[/>] ... [fg=#00FFFF]green and blue[/>] + - / * = % . ; , [fg=#FF00FF]Opposite side hex colors[/>]');
+	// cons.log('I love how a "string color" is almost universal. [fg=#00ff22]color syntax prioritizes over overrides "like a string" for example[/>]');
+	// cons.log('Color syntax has a bug where "if you have an override like a string and [fg=red]some color flag like this[/>] it will not continue the string after the color flag unless there is another override inside it"');
+	// cons.log('Warning ... We are in Danger! There was [ERROR] Error an eRrOr?! We need to warn the User! Alert the captain!');
 
 	// cons.log('. red + bold', ': green - blue');
 	// cons.log('abc');

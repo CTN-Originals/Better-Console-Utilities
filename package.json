@@ -1,6 +1,6 @@
 {
 	"name": "better-console-utilities",
-	"version": "1.0.10.1",
+	"version": "1.0.11",
 	"description": "Provides utilities and enhancements to console logging and adds a configurable color profile to apply colors to any output automatically.",
 	"main": "./src/index.ts",
 	"scripts": {
