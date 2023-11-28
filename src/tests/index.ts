@@ -1,6 +1,6 @@
 // import * as handler from '../handlers';
 import { ConsoleInstance } from '../handlers/consoleHandler';
-import { Theme, ThemeProfile, TypeThemes, getColorCodePrefix, getColoredString, getThemedString } from '../handlers/colorHandler';
+import { Theme, ThemeProfile, TypeThemes } from '../handlers/colorHandler';
 import * as parserTests from './parserTestData';
 import { defaultThemeProfile } from '../handlers/colorHandler';
 

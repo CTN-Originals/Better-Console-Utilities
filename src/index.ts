@@ -1,5 +1,14 @@
 import * as handler from './handlers';
 export { ConsoleInstance } from './handlers/consoleHandler';
+export {
+	Color,
+	Theme,
+	TypeThemes,
+	ThemeOverride,
+	ThemeProfile,
+	defaultThemeProfile,
+} from './handlers/colorHandler';
+
 
 //#region DEV
 	// //!! COMMENT BEFORE BUILD 

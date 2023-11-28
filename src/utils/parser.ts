@@ -3,9 +3,6 @@ import {
 	ThemeProfile,
 	TypeThemes,
 	defaultThemeProfile,
-	getColor,
-	getColorCodePrefix,
-	getThemedString,
 } from '../handlers/colorHandler';
 
 export interface ICollectionToStringOptions {

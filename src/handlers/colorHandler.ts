@@ -7,30 +7,51 @@ const anyThemedString = new RegExp(
 
 const placeholderCharacter: string = '◘'; //? character that is used as a placeholder for color flags to prevent the flags from being colored by overrides
 
+type RGB = { R: number, G: number, B: number };
+/** 
+ * @class Color - Represents a color in RGB
+ * @param {RGB} input_Red_Hex The RGB value of the color
+ * @param {number} input_Red_Hex The red value of the color
+ * @param {number} g The green value of the color
+ * @param {number} b The blue value of the color
+ * @param {string} input_Red_Hex The hex value of the color (e.g. '#ffffff' or 'white')
+*/
 export class Color {
 	public R: number;
 	public G: number;
 	public B: number;
 	
+	/** 
+	 * @param {RGB} input The RGB value of the color
+	 * @param {number} input.R The red value of the color
+	 * @param {number} input.G The green value of the color
+	 * @param {number} input.B The blue value of the color
+	*/
 	constructor(input: { R: number, G: number, B: number });
+	/** 
+	 * @param {number} r The red value of the color
+	 * @param {number} g The green value of the color
+	 * @param {number} b The blue value of the color
+	*/
 	constructor(r: number, g: number, b: number);
+	/** @param {string} hex The hex value of the color (e.g. '#ffffff' or 'white') */
 	constructor(hex: string);
-	constructor(inputOrR: { R: number, G: number, B: number } | number | string, g?: number, b?: number) {
-		if (typeof inputOrR === "number") {
-			this.R = inputOrR;
+	constructor(input_Red_Hex: RGB | number | string, g?: number, b?: number) {
+		if (typeof input_Red_Hex === "number") {
+			this.R = input_Red_Hex;
 			this.G = g!;
 			this.B = b!;
 		} 
-		else if (typeof inputOrR === "string") {
-			const rgb = getColor(inputOrR);
+		else if (typeof input_Red_Hex === "string") {
+			const rgb = getColor(input_Red_Hex);
 			this.R = rgb.R;
 			this.G = rgb.G;
 			this.B = rgb.B;
 		}
 		else {
-			this.R = inputOrR.R;
-			this.G = inputOrR.G;
-			this.B = inputOrR.B;
+			this.R = input_Red_Hex.R;
+			this.G = input_Red_Hex.G;
+			this.B = input_Red_Hex.B;
 		}
 	}
 
@@ -47,55 +68,55 @@ export class Color {
 	}
 }
 //#region Static Definitions
-//? This function is used to keep intellisence working when referencing the colors object
-function asColors<T extends Record<string, Color>>(arg: T): T { return arg; }
-export const colors = asColors({
-	transparent: new Color({ R: -1, G: -1, B: -1 }),
+	//? This function is used to keep intellisence working when referencing the colors object
+	function asColors<T extends Record<string, Color>>(arg: T): T { return arg; }
+	const colors = asColors({
+		transparent: new Color({ R: -1, G: -1, B: -1 }),
 
-	black: new Color({ R: 0, G: 0, B: 0 }),
-	white: new Color({ R: 255, G: 255, B: 255 }),
+		black: new Color({ R: 0, G: 0, B: 0 }),
+		white: new Color({ R: 255, G: 255, B: 255 }),
 
-	//#region Primary
-	red: new Color({ R: 255, G: 0, B: 0 }),
-	green: new Color({ R: 0, G: 255, B: 0 }),
-	blue: new Color({ R: 0, G: 0, B: 255 }),
-	//#endregion
+		//#region Primary
+		red: new Color({ R: 255, G: 0, B: 0 }),
+		green: new Color({ R: 0, G: 255, B: 0 }),
+		blue: new Color({ R: 0, G: 0, B: 255 }),
+		//#endregion
 
-	//#region Secondary
-	yellow: new Color({ R: 255, G: 255, B: 0 }),
-	cyan: new Color({ R: 0, G: 255, B: 255 }),
-	magenta: new Color({ R: 255, G: 0, B: 255 }),
-	gray: new Color({ R: 128, G: 128, B: 128 }),
-	orange: new Color({ R: 255, G: 165, B: 0 }),
-	pink: new Color({ R: 255, G: 192, B: 203 }),
-	purple: new Color({ R: 128, G: 0, B: 128 }),
-	//#endregion
-	
-	//#region Extended
-	lime: new Color({ R: 0, G: 255, B: 0 }),
-	teal: new Color({ R: 0, G: 128, B: 128 }),
-	lavender: new Color({ R: 230, G: 230, B: 250 }),
-	brown: new Color({ R: 165, G: 42, B: 42 }),
-	beige: new Color({ R: 245, G: 245, B: 220 }),
-	maroon: new Color({ R: 128, G: 0, B: 0 }),
-	mint: new Color({ R: 62, G: 180, B: 137 }),
-	olive: new Color({ R: 128, G: 128, B: 0 }),
-	coral: new Color({ R: 255, G: 127, B: 80 }),
-	navy: new Color({ R: 0, G: 0, B: 128 }),
-	grey: new Color({ R: 128, G: 128, B: 128 }),
-	//#endregion
-});
-function asStyles<T extends Record<string, string>>(arg: T): T { return arg; }
-export const styles = asStyles({
-	reset: "\x1b[0m",
-	bold: "\x1b[1m",
-	dim: "\x1b[2m",
-	underscore: "\x1b[4m",
-	underline: "\x1b[4m",
-	blink: "\x1b[5m",
-	inverse: "\x1b[7m",
-	hidden: "\x1b[8m",
-});
+		//#region Secondary
+		yellow: new Color({ R: 255, G: 255, B: 0 }),
+		cyan: new Color({ R: 0, G: 255, B: 255 }),
+		magenta: new Color({ R: 255, G: 0, B: 255 }),
+		gray: new Color({ R: 128, G: 128, B: 128 }),
+		orange: new Color({ R: 255, G: 165, B: 0 }),
+		pink: new Color({ R: 255, G: 192, B: 203 }),
+		purple: new Color({ R: 128, G: 0, B: 128 }),
+		//#endregion
+		
+		//#region Extended
+		lime: new Color({ R: 0, G: 255, B: 0 }),
+		teal: new Color({ R: 0, G: 128, B: 128 }),
+		lavender: new Color({ R: 230, G: 230, B: 250 }),
+		brown: new Color({ R: 165, G: 42, B: 42 }),
+		beige: new Color({ R: 245, G: 245, B: 220 }),
+		maroon: new Color({ R: 128, G: 0, B: 0 }),
+		mint: new Color({ R: 62, G: 180, B: 137 }),
+		olive: new Color({ R: 128, G: 128, B: 0 }),
+		coral: new Color({ R: 255, G: 127, B: 80 }),
+		navy: new Color({ R: 0, G: 0, B: 128 }),
+		grey: new Color({ R: 128, G: 128, B: 128 }),
+		//#endregion
+	});
+	function asStyles<T extends Record<string, string>>(arg: T): T { return arg; }
+	const styles = asStyles({
+		reset: "\x1b[0m",
+		bold: "\x1b[1m",
+		dim: "\x1b[2m",
+		underscore: "\x1b[4m",
+		underline: "\x1b[4m",
+		blink: "\x1b[5m",
+		inverse: "\x1b[7m",
+		hidden: "\x1b[8m",
+	});
 //#endregion
 
 export class Theme {
@@ -375,6 +396,9 @@ export class ThemeProfile {
 	public colorSyntax: RegExp[]; //? The regex patterns to use to find any colored strings
 	public overrides: ThemeOverride[]; //? The theme overrides to use
 	
+	/** 
+	 * @param {Partial<ThemeProfile>} input The color profile
+	*/
 	constructor(input: Partial<ThemeProfile>) {
 		// this.name = name;
 		this.default = new Theme(input.default?.foreground, input.default?.background, input.default?.style);
@@ -549,7 +573,7 @@ export const defaultThemeProfile = new ThemeProfile({
 		// new ThemeOverride(/ green /gi, new Theme('#00ff00')),
 		// new ThemeOverride(/ blue /gi, new Theme('#0000ff')),
 	]
-} as unknown as ThemeProfile);
+} as ThemeProfile);
 
 //#region Methods
 	//#region Getters
@@ -557,7 +581,7 @@ export const defaultThemeProfile = new ThemeProfile({
 		 * @param {string} input The color. supports: hex (#123ABC) or named colors (red, blue, etc.)
 		 * @returns {Color} The RGB value of the color
 		*/
-		export function getColor(input: string): Color {
+		function getColor(input: string): Color {
 			if (input in colors) {
 				return colors[input as keyof typeof colors];
 			}
@@ -577,7 +601,7 @@ export const defaultThemeProfile = new ThemeProfile({
 			return new Color(red, green, blue);
 		}
 
-		export function getColorCodePrefix(color: Color|string, fgColor: boolean = true): string {
+		function getColorCodePrefix(color: Color|string, fgColor: boolean = true): string {
 			//? credits to new_duck - twitch viewer
 			if (typeof color === 'string') color = getColor(color);
 			
@@ -586,20 +610,11 @@ export const defaultThemeProfile = new ThemeProfile({
 				
 			return `${flag}${color.R};${color.G};${color.B}m`
 		}
-		export function getColoredString(input: string, color: string): string {
-			return `${getColorCodePrefix(color)}${input}${styles.reset}`
-		}
-		export function getThemedString(input: string, theme: Theme): string {
-			const fg = (theme.foreground != null) ? getColorCodePrefix(theme.foreground) : '';
-			const bg = (theme.background != null) ? getColorCodePrefix(theme.background, false) : '';
-			const style = (theme.style.length > 0) ? theme.style.join('') : '';
-			if (fg === '' && bg === '' && style === '') return input;
-			return `${fg}${bg}${style}${input}${styles.reset}`
-		}
 	//#endregion
 
 	//#region Constructors and Parsers
-		export function removeThemeFlags(input: string): string {
+		//TODO Export this or not? maybe usefull for a user?
+		function removeThemeFlags(input: string): string {
 			if (typeof input !== 'string') return input;
 			return input.replace(anyFlagRegex, '');
 		}

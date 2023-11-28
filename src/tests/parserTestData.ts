@@ -2,8 +2,6 @@ import { ICollectionToStringOptions } from '../../src/utils/parser'
 import { 
 	Theme,
 	Color,
-	getColor,
-	getColorCodePrefix,
 } from '../handlers/colorHandler';
 
 export const simpleObject: { [key: string]: any } = {
