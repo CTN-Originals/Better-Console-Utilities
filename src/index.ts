@@ -1,4 +1,5 @@
-import * as handler from './handlers';
+// /// <reference path="./index.d.ts" />
+
 export { ConsoleInstance } from './handlers/consoleHandler';
 export {
 	Color,

@@ -1,28 +1,15 @@
 {
 	"name": "better-console-utilities",
-	"version": "1.0.11",
 	"description": "Provides utilities and enhancements to console logging and adds a configurable color profile to apply colors to any output automatically.",
-	"main": "./src/index.ts",
-	"scripts": {
-		"start": "npm run build && node dist/index.js",
-		"start:dev": "npx nodemon",
-		"build": "rimraf ./dist && tsc",
-		"test": "jest",
-		"test:watch": "jest --watch"
-	},
-	"exports": {
-		".": "./dist/index.js"
-	},
-	"files": [
-		"dist",
-		"README.md",
-		"LICENSE",
-		"package.json"
-	],
+	"author": "CTN-Originals",
+	"version": "1.0.11",
+	"license": "ISC",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/CTN-Originals/Better-Console-Utilities.git"
 	},
+	"homepage": "https://github.com/CTN-Originals/Better-Console-Utilities#readme",
+	"bugs": { "url": "https://github.com/CTN-Originals/Better-Console-Utilities/issues" },
 	"keywords": [
 		"CTN",
 		"CTN-Originals",
@@ -43,12 +30,29 @@
 		"colorized",
 		"colorizing"
 	],
-	"author": "CTN-Originals",
-	"license": "ISC",
-	"bugs": {
-		"url": "https://github.com/CTN-Originals/Better-Console-Utilities/issues"
+	
+	
+	"main": "./src/index.ts",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"start": "npm run build && node dist/index.js",
+		"start:dev": "npx nodemon",
+		"build": "rimraf ./dist && tsc",
+		"test": "jest",
+		"test:watch": "jest --watch"
 	},
-	"homepage": "https://github.com/CTN-Originals/Better-Console-Utilities#readme",
+	"exports": {
+		".": "./dist/index.js"
+	},
+	"files": [
+		"dist",
+		"src",
+		"README.md",
+		"LICENSE",
+		"package.json"
+	],
+	
+	
 	"devDependencies": {
 		"@types/jest": "^29.5.2",
 		"@types/node": "^18.15.11",

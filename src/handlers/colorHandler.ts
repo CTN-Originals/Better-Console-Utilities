@@ -8,25 +8,12 @@ const anyThemedString = new RegExp(
 const placeholderCharacter: string = '◘'; //? character that is used as a placeholder for color flags to prevent the flags from being colored by overrides
 
 type RGB = { R: number, G: number, B: number };
-/** 
- * @class Color - Represents a color in RGB
- * @param {RGB} input_Red_Hex The RGB value of the color
- * @param {number} input_Red_Hex The red value of the color
- * @param {number} g The green value of the color
- * @param {number} b The blue value of the color
- * @param {string} input_Red_Hex The hex value of the color (e.g. '#ffffff' or 'white')
-*/
 export class Color {
 	public R: number;
 	public G: number;
 	public B: number;
 	
-	/** 
-	 * @param {RGB} input The RGB value of the color
-	 * @param {number} input.R The red value of the color
-	 * @param {number} input.G The green value of the color
-	 * @param {number} input.B The blue value of the color
-	*/
+	/** @param {RGB} input The RGB value of the color (e.g. { R: 255, G: 0, B: 0 } = red) */
 	constructor(input: { R: number, G: number, B: number });
 	/** 
 	 * @param {number} r The red value of the color
@@ -60,6 +47,7 @@ export class Color {
 		return `#${this.R.toString(16).padStart(2, '0')}${this.G.toString(16).padStart(2, '0')}${this.B.toString(16).padStart(2, '0')}`;
 	}
 	
+	/** @param {number} amount The amount to seturate the color by (e.g. 1.5 to seturate by 50% or 0.5 to desaturate by 50%) */
 	public seturate(amount: number): Color {
 		const r = Math.round(Math.min(Math.max(0, this.R * amount), 255));
 		const g = Math.round(Math.min(Math.max(0, this.G * amount), 255));
@@ -546,7 +534,6 @@ export const defaultThemeProfile = new ThemeProfile({
 	 * @example output: \x1b[38;2;255;0;0m\x1b[48;2;0;0;255m\x1b[1mHello World\x1b[0m
 	*/
 	colorSyntax: [
-		//TODO Documentation about this
 		/(?<flag>\[(?<fg>fg=(?<ftag>.+?)\s?)?(?<bg>bg=(?<btag>.+?)\s?)?(?<st>st=(?<stag>.+?)\s?)?\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g,
 	],
 	overrides: [

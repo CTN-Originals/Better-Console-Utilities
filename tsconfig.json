@@ -10,11 +10,14 @@
 		"noImplicitAny": true,
 		"esModuleInterop": true,
 		"resolveJsonModule": true,
+		"declaration": true,
 	},
-	"include": ["src"],
 	"exclude": [
 		"node_modules",
 		"**/tests/**/*",
 		"src/tests/**/*",
+	],
+	"include": [
+		"src",
 	],
 }
