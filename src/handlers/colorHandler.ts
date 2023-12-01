@@ -254,19 +254,13 @@ export class TypeThemes {
 		this.object = {
 			default: (input.object?.default instanceof Theme) ? input.object?.default : fallbackTheme,
 			key: (input.object?.key instanceof Theme) ? input.object?.key : fallbackTheme,
-			value: {
-				typeOverride: input.object?.value?.typeOverride ?? true,
-				theme: (input.object?.value?.theme instanceof Theme) ? input.object?.value.theme : fallbackTheme
-			},
+			value: (input.object?.value instanceof Theme) ? input.object?.value : fallbackTheme,
 			brackets: (input.object?.brackets instanceof Theme) ? input.object?.brackets : fallbackTheme,
 			punctuation: (input.object?.punctuation instanceof Theme) ? input.object?.punctuation : fallbackTheme,
 		};
 		this.array = {
 			default: (input.array?.default instanceof Theme) ? input.array?.default : fallbackTheme,
-			value: {
-				typeOverride: input.array?.value?.typeOverride ?? true,
-				theme: (input.array?.value?.theme instanceof Theme) ? input.array?.value.theme : fallbackTheme
-			},
+			value: (input.array?.value instanceof Theme) ? input.array?.value : fallbackTheme,
 			brackets: (input.array?.brackets instanceof Theme) ? input.array?.brackets : fallbackTheme,
 			punctuation: (input.array?.punctuation instanceof Theme) ? input.array?.punctuation : fallbackTheme,
 		};
@@ -529,13 +523,13 @@ export const defaultThemeProfile = new ThemeProfile({
 		object: {
 			default: new Theme('#9CDCFE'),
 			key: new Theme('#569CD6', null, 'bold'),
-			value: { typeOverride: true, theme: new Theme('#9CDCFE') },
+			value: new Theme('#9CDCFE'),
 			brackets: new Theme('#aaaaaa'),
 			punctuation: new Theme('#808080'),
 		},
 		array: {
 			default: new Theme('#9CDCFE'),
-			value: { typeOverride: true, theme: new Theme('#9CDCFE') },
+			value: new Theme('#9CDCFE'),
 			brackets: new Theme('#aaaaaa'),
 			punctuation: new Theme('#808080'),
 		}
