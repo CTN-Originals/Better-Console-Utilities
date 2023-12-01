@@ -24,7 +24,13 @@ export class Color {
 	/** @param {string} hex The hex value of the color (e.g. '#ffffff' or 'white') */
 	constructor(hex: string);
 	constructor(input_Red_Hex: RGB | number | string, g?: number, b?: number) {
-		if (typeof input_Red_Hex === "number") {
+		if (!input_Red_Hex && input_Red_Hex !== 0) {
+			this.R = -1;
+			this.G = -1;
+			this.B = -1;
+			return;
+		}
+		else if (typeof input_Red_Hex === "number") {
 			this.R = input_Red_Hex;
 			this.G = g!;
 			this.B = b!;
@@ -249,8 +255,8 @@ export class TypeThemes {
 			default: (input.object?.default instanceof Theme) ? input.object?.default : fallbackTheme,
 			key: (input.object?.key instanceof Theme) ? input.object?.key : fallbackTheme,
 			value: {
-				typeOverride: input.object?.value.typeOverride ?? true,
-				theme: (input.object?.value.theme instanceof Theme) ? input.object?.value.theme : fallbackTheme
+				typeOverride: input.object?.value?.typeOverride ?? true,
+				theme: (input.object?.value?.theme instanceof Theme) ? input.object?.value.theme : fallbackTheme
 			},
 			brackets: (input.object?.brackets instanceof Theme) ? input.object?.brackets : fallbackTheme,
 			punctuation: (input.object?.punctuation instanceof Theme) ? input.object?.punctuation : fallbackTheme,
@@ -258,8 +264,8 @@ export class TypeThemes {
 		this.array = {
 			default: (input.array?.default instanceof Theme) ? input.array?.default : fallbackTheme,
 			value: {
-				typeOverride: input.array?.value.typeOverride ?? true,
-				theme: (input.array?.value.theme instanceof Theme) ? input.array?.value.theme : fallbackTheme
+				typeOverride: input.array?.value?.typeOverride ?? true,
+				theme: (input.array?.value?.theme instanceof Theme) ? input.array?.value.theme : fallbackTheme
 			},
 			brackets: (input.array?.brackets instanceof Theme) ? input.array?.brackets : fallbackTheme,
 			punctuation: (input.array?.punctuation instanceof Theme) ? input.array?.punctuation : fallbackTheme,
@@ -378,15 +384,28 @@ export class ThemeOverride {
 }
 
 export class ThemeProfile {
-	// public name: string; //? The name of the color profile to be used to identify
-	public default: Theme; //? The default theme to use if one is not provided
-	public typeThemes: TypeThemes; //? The themes to use for each type
-	public colorSyntax: RegExp[]; //? The regex patterns to use to find any colored strings
-	public overrides: ThemeOverride[]; //? The theme overrides to use
-	
-	/** 
-	 * @param {Partial<ThemeProfile>} input The color profile
+	/** The default theme to use if one is not provided 
+	 * @example new Theme('#ffffff')
 	*/
+	public default: Theme;
+
+	/** The themes to use for each type
+	 * @example { default: new Theme('#ffffff') }
+	*/
+	public typeThemes: TypeThemes;
+
+	/** The regex patterns used to find any color string syntax
+	 * @default /(?<flag>\[(?<fg>fg=(?<ftag>.+?)\s?)?(?<bg>bg=(?<btag>.+?)\s?)?(?<st>st=(?<stag>.+?)\s?)?\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g
+	 * @example '[fg=red bg=blue st=bold,underscore]The red blue fox[/>]'
+	*/
+	public colorSyntax: RegExp[];
+
+	/** The theme overrides to apply automatically when the target is matched
+	 * @example [ new ThemeOverride('Hello World', new Theme('#ff0000')) ]
+	*/
+	public overrides: ThemeOverride[]; 
+	
+	/** @param {Partial<ThemeProfile>} input The color profile */
 	constructor(input: Partial<ThemeProfile>) {
 		// this.name = name;
 		this.default = new Theme(input.default?.foreground, input.default?.background, input.default?.style);
