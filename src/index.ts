@@ -1,5 +1,3 @@
-// /// <reference path="./index.d.ts" />
-
 export { ConsoleInstance } from './handlers/consoleHandler';
 export {
 	Color,

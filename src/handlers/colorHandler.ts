@@ -250,14 +250,9 @@ export class TypeThemes {
 
 	/** 
 	 * @param {Partial<TypeThemes>} input The color profile
-	 * @param {Theme} fallbackTheme The theme to use if a theme is not provided
 	*/
 	constructor(input: Partial<TypeThemes> = {}) {
 		this.default = (input.default instanceof Theme) ? input.default : new Theme();
-		// this.string = { default: (input.string?.default instanceof Theme) ? input.string?.default : this.default };
-		// this.number = { default: (input.number?.default instanceof Theme) ? input.number?.default : this.default};
-		// this.boolean = { default: (input.boolean?.default instanceof Theme) ? input.boolean?.default : this.default};
-
 		this.string = { default: input.string?.default};
 		this.number = { default: input.number?.default};
 		this.boolean = { default: input.boolean?.default};

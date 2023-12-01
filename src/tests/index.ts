@@ -1,28 +1,40 @@
 // import * as handler from '../handlers';
 import { ConsoleInstance } from '../handlers/consoleHandler';
-import { Theme, ThemeProfile, TypeThemes } from '../handlers/colorHandler';
+import { Color, Theme, ThemeProfile, TypeThemes } from '../handlers/colorHandler';
 import * as parserTests from './parserTestData';
 import { defaultThemeProfile } from '../handlers/colorHandler';
 
-const primaryTheme: ThemeProfile = new ThemeProfile({
+const color = new Color({R: 255, G: 155, B: 55})
+const color2 = new Color('#2a40ac')
+const color3 = new Color()
+const primaryTheme = new ThemeProfile({
 	default: new Theme('#c9c9c9'),
 	typeThemes: new TypeThemes({
-		string: {default: new Theme('#cebaa8')},
-		// object: {
-		// 	default: new Theme('#c9c9c9'),
-		// 	brackets: new Theme('#cebaa8'),
-		// } //TODO
-	}, new Theme('#c9c9c9')),
+		// string: {default: new Theme('#cebaa8')},
+		object: {
+			default: new Theme('#ff0000'),
+			// key: new Theme(color),
+			// punctuation: new Theme('green'),
+			// brackets: new Theme(color2.seturate(3)),
+			// value: new Theme('#00ffaa'),
+		},
+		array: {
+			default: new Theme('green'),
+			// punctuation: new Theme('yellow'),
+			// brackets: new Theme(color2),
+			// value: new Theme('#ff66ff'),
+		}
+	}),
 });
 const secondaryTheme: ThemeProfile = new ThemeProfile({
 	default: new Theme('#ff6f6f'),
 	typeThemes: new TypeThemes({
 		string: {default: new Theme('#966133')},
 		number: {default: new Theme('#1ce4d3')},
-	}, new Theme('#82da67')),
+	}),
 });
 
-const cons = new ConsoleInstance({theme: primaryTheme, indent: 2, indentString: '-'})
+const cons = new ConsoleInstance({theme: primaryTheme, indent: 2, indentString: ' '})
 const cons2 = new ConsoleInstance(secondaryTheme, 1, '_')
 
 export async function test() {
@@ -32,9 +44,10 @@ export async function test() {
 	//#region Color Handler Tests
 	// console.groupCollapsed('Simple Object');
 	cons.log(parserTests.simpleObject);
+	cons.log(parserTests.simpleArray);
 	cons.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
-	cons2.log(parserTests.simpleObject);
-	cons2.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
+	// cons2.log(parserTests.simpleObject);
+	// cons2.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
 	// console.groupEnd();
 
 	// console.groupCollapsed('Simple Array');
