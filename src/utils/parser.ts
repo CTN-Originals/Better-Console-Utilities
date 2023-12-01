@@ -57,14 +57,14 @@ export class MessageObject {
 
 	public get ToString(): string {
 		let out: string[] = [];
-		const addLine = (input: string, isLastItem: boolean = false, depth: number = this.Depth) => {
+		const addLine = (input: string, isLastItem: boolean = false, depth: number = this.Depth, type: string = 'object') => {
 			if (depth < 0) { depth = 0; }
 			
 			let line = `${getIndent(depth)}${input}`;
 			//? If the line contains a newline, add indent to each line
 			if (line.includes('\n')) { line = line.replace(/\n/g, `\n${getIndent(depth)}`); }
 			//? If the line is not the last item, add a comma to the end
-			if (!isLastItem) { line += colorize(',', 'object', 'punctuation'); }
+			if (!isLastItem) { line += colorize(',', type, 'punctuation'); }
 
 			out.push(`${line}`);
 		}
@@ -92,7 +92,7 @@ export class MessageObject {
 			}
 			else {
 				if (this.Holder?.Type === 'array') {
-					addLine(`${colorize(contentObj.Value, contentObj.Type, 'value')}`, isLastItem);
+					addLine(`${colorize(contentObj.Value, contentObj.Type, 'value')}`, isLastItem, this.Depth, this.Holder?.Type);
 				}
 				else if (contentObj.Key !== '') {
 					addLine(`${colorize(contentObj.Key, 'object', 'key')}${colorize(':', 'object', 'punctuation')} ${colorize(contentObj.Value, contentObj.Type, 'value')}` + ((contentObj.Type === 'null') ? `<null>` : ''), isLastItem);
