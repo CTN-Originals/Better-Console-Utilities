@@ -23,7 +23,8 @@ export class Color {
 	constructor(r: number, g: number, b: number);
 	/** @param {string} hex The hex value of the color (e.g. '#ffffff' or 'white') */
 	constructor(hex: string);
-	constructor(input_Red_Hex: RGB | number | string, g?: number, b?: number) {
+	constructor();
+	constructor(input_Red_Hex?: RGB | number | string, g?: number, b?: number) {
 		if (!input_Red_Hex && input_Red_Hex !== 0) {
 			this.R = -1;
 			this.G = -1;
@@ -225,22 +226,25 @@ export class Theme {
 
 //#region ColorProfile Classes
 export class TypeThemes { 
-
 	public string: { default: Theme };
 	public number: { default: Theme };
 	public boolean: { default: Theme };
+	//! Does making these optional introduce more bugs?
 	public object: {
-		default: Theme,
-		key: Theme,
-		value: { typeOverride: boolean /*TODO*/, theme: Theme },
-		brackets: Theme, //TODO
-		punctuation: Theme, //TODO
+		default?: Theme,
+		key?: Theme,
+		/** Not functional yet, overwriten by whatever type the value is */
+		value?: Theme, //TODO
+		brackets?: Theme,
+		punctuation?: Theme,
 	};
+	//! Does making these optional introduce more bugs?
 	public array: {
-		default: Theme,
-		value: { typeOverride: boolean /*TODO*/, theme: Theme },
-		brackets: Theme, //TODO
-		punctuation: Theme, //TODO
+		default?: Theme,
+		/** Not functional yet, overwriten by whatever type the value is */
+		value?: Theme, //TODO
+		brackets?: Theme,
+		punctuation?: Theme,
 	};
 
 	/** 

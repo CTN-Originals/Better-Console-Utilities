@@ -144,7 +144,7 @@ export class MessageObject {
 	 * @returns {Theme} the theme to use for the object
 	*/
 	private _getTypeTheme(type?: string, identifier?: string): Theme {
-		const theme = (type) ? this.Theme.typeThemes[type as keyof TypeThemes] : this.Theme.default;
+		const theme = (type && this.Theme.typeThemes[type as keyof TypeThemes]) ? this.Theme.typeThemes[type as keyof TypeThemes] : this.Theme.default;
 		if (theme) {
 			if (theme instanceof Theme) {
 				return theme;
@@ -154,14 +154,17 @@ export class MessageObject {
 				for (let i = 0; i < keys.length; i++) {
 					const key = keys[i];
 					if (key === identifier) {
-						const field = theme[key as keyof typeof theme];
+						//! does this create any issues?
+						const field = theme[key as keyof typeof theme] as Theme; //+ as Theme
 						return (field instanceof Theme) ? field : field['theme' as keyof typeof field];
 					}
 				}
 				if (theme[identifier as keyof typeof theme] instanceof Theme) {
-					return theme[identifier as keyof typeof theme];
+					//! does this create any issues?
+					return theme[identifier as keyof typeof theme] as Theme; //+ as Theme
 				}
-				else { return theme.default; }
+				//! does this create any issues?
+				else { return theme.default as Theme } //+ as Theme
 			}
 		}
 		return this.Theme.default;
