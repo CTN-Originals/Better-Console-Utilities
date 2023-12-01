@@ -72,8 +72,8 @@ export class MessageObject {
 			return this.IndentString.repeat(this.IndentCount * depth);
 		}
 
-		const colorize = (input: string, type?: string, identifier?: string): string => {
-			const theme = this._getTypeTheme(type, identifier);
+		const colorize = (input: string, type?: string, identifier?: string, holderType?: string): string => {
+			const theme = this._getTypeTheme(type, identifier, holderType);
 			let out = theme.getThemedString(input);
 			
 			return out;
@@ -92,10 +92,10 @@ export class MessageObject {
 			}
 			else {
 				if (this.Holder?.Type === 'array') {
-					addLine(`${colorize(contentObj.Value, contentObj.Type, 'value')}`, isLastItem, this.Depth, this.Holder?.Type);
+					addLine(`${colorize(contentObj.Value, contentObj.Type, 'value', this.Holder?.Type)}`, isLastItem, this.Depth, this.Holder?.Type);
 				}
 				else if (contentObj.Key !== '') {
-					addLine(`${colorize(contentObj.Key, 'object', 'key')}${colorize(':', 'object', 'punctuation')} ${colorize(contentObj.Value, contentObj.Type, 'value')}` + ((contentObj.Type === 'null') ? `<null>` : ''), isLastItem);
+					addLine(`${colorize(contentObj.Key, 'object', 'key', this.Holder?.Type)}${colorize(':', 'object', 'punctuation', this.Holder?.Type)} ${colorize(contentObj.Value, contentObj.Type, 'value', this.Holder?.Type)}` + ((contentObj.Type === 'null') ? `<null>` : ''), isLastItem);
 				}
 				else {
 					addLine(`${colorize(this.Theme.applyThemeProfile(contentObj.Value.toString()))}`, isLastItem);
@@ -143,8 +143,11 @@ export class MessageObject {
 	 * @param {string} identifier the identifier of the object (only applies to collections)
 	 * @returns {Theme} the theme to use for the object
 	*/
-	private _getTypeTheme(type?: string, identifier?: string): Theme {
-		const theme = (type && this.Theme.typeThemes[type as keyof TypeThemes]) ? this.Theme.typeThemes[type as keyof TypeThemes] : this.Theme.default;
+	private _getTypeTheme(type?: string, identifier?: string, holderType?: string): Theme {
+		const getTheme = (t?: string) => {return (t && this.Theme.typeThemes[t as keyof TypeThemes]) ? this.Theme.typeThemes[t as keyof TypeThemes] : this.Theme.typeThemes.default}
+		const theme = getTheme(type);
+		// let fallbackTheme = new Theme('#000000', '#ffffff', 'blink');
+		// let fallbackTheme = this.Theme.typeThemes.default;
 		if (theme) {
 			if (theme instanceof Theme) {
 				return theme;
@@ -153,18 +156,26 @@ export class MessageObject {
 				const keys = Object.keys(theme);
 				for (let i = 0; i < keys.length; i++) {
 					const key = keys[i];
-					if (key === identifier) {
-						//! does this create any issues?
-						const field = theme[key as keyof typeof theme] as Theme; //+ as Theme
-						return (field instanceof Theme) ? field : field['theme' as keyof typeof field];
+					
+					if (key === identifier && theme[key as keyof typeof theme] !== undefined && theme[key as keyof typeof theme] !== null) {
+						const field = theme[key as keyof typeof theme] as Theme;
+						return field;
 					}
 				}
 				if (theme[identifier as keyof typeof theme] instanceof Theme) {
 					//! does this create any issues?
-					return theme[identifier as keyof typeof theme] as Theme; //+ as Theme
+					return theme[identifier as keyof typeof theme] as Theme;
 				}
-				//! does this create any issues?
-				else { return theme.default as Theme } //+ as Theme
+				else {
+					if (theme.default instanceof Theme) {
+						return theme.default;
+					}
+					else if (holderType) {
+						const holderTheme = getTheme(holderType);
+						const field = holderTheme['default' as keyof typeof holderTheme] as Theme;
+						return field;
+					}
+				}
 			}
 		}
 		return this.Theme.default;

@@ -226,9 +226,10 @@ export class Theme {
 
 //#region ColorProfile Classes
 export class TypeThemes { 
-	public string: { default: Theme };
-	public number: { default: Theme };
-	public boolean: { default: Theme };
+	public default: Theme;
+	public string: { default?: Theme };
+	public number: { default?: Theme };
+	public boolean: { default?: Theme };
 	//! Does making these optional introduce more bugs?
 	public object: {
 		default?: Theme,
@@ -251,22 +252,28 @@ export class TypeThemes {
 	 * @param {Partial<TypeThemes>} input The color profile
 	 * @param {Theme} fallbackTheme The theme to use if a theme is not provided
 	*/
-	constructor(input: Partial<TypeThemes> = {}, fallbackTheme: Theme = new Theme()) {
-		this.string = { default: (input.string?.default instanceof Theme) ? input.string?.default : fallbackTheme };
-		this.number = { default: (input.number?.default instanceof Theme) ? input.number?.default : fallbackTheme};
-		this.boolean = { default: (input.boolean?.default instanceof Theme) ? input.boolean?.default : fallbackTheme};
+	constructor(input: Partial<TypeThemes> = {}) {
+		this.default = (input.default instanceof Theme) ? input.default : new Theme();
+		// this.string = { default: (input.string?.default instanceof Theme) ? input.string?.default : this.default };
+		// this.number = { default: (input.number?.default instanceof Theme) ? input.number?.default : this.default};
+		// this.boolean = { default: (input.boolean?.default instanceof Theme) ? input.boolean?.default : this.default};
+
+		this.string = { default: input.string?.default};
+		this.number = { default: input.number?.default};
+		this.boolean = { default: input.boolean?.default};
+
 		this.object = {
-			default: (input.object?.default instanceof Theme) ? input.object?.default : fallbackTheme,
-			key: (input.object?.key instanceof Theme) ? input.object?.key : fallbackTheme,
-			value: (input.object?.value instanceof Theme) ? input.object?.value : fallbackTheme,
-			brackets: (input.object?.brackets instanceof Theme) ? input.object?.brackets : fallbackTheme,
-			punctuation: (input.object?.punctuation instanceof Theme) ? input.object?.punctuation : fallbackTheme,
+			default: input.object?.default,
+			key: input.object?.key,
+			value: input.object?.value,
+			brackets: input.object?.brackets,
+			punctuation: input.object?.punctuation,
 		};
 		this.array = {
-			default: (input.array?.default instanceof Theme) ? input.array?.default : fallbackTheme,
-			value: (input.array?.value instanceof Theme) ? input.array?.value : fallbackTheme,
-			brackets: (input.array?.brackets instanceof Theme) ? input.array?.brackets : fallbackTheme,
-			punctuation: (input.array?.punctuation instanceof Theme) ? input.array?.punctuation : fallbackTheme,
+			default: input.array?.default,
+			value: input.array?.value,
+			brackets: input.array?.brackets,
+			punctuation: input.array?.punctuation,
 		};
 	}
 }
@@ -388,7 +395,10 @@ export class ThemeProfile {
 	public default: Theme;
 
 	/** The themes to use for each type
-	 * @example { default: new Theme('#ffffff') }
+	 * @example { 
+	 * 	string: { default: new Theme('#C4785B'),
+	 * 	object: { key: new Theme('#569CD6', null, 'bold') }
+	 * }
 	*/
 	public typeThemes: TypeThemes;
 
@@ -408,7 +418,7 @@ export class ThemeProfile {
 		// this.name = name;
 		this.default = new Theme(input.default?.foreground, input.default?.background, input.default?.style);
 		
-		this.typeThemes = (input.typeThemes) ? new TypeThemes(input.typeThemes, this.default) : defaultThemeProfile.typeThemes;
+		this.typeThemes = (input.typeThemes) ? new TypeThemes(input.typeThemes) : defaultThemeProfile.typeThemes;
 		this.colorSyntax = (input.colorSyntax) ? input.colorSyntax : defaultThemeProfile.colorSyntax;
 		this.overrides = (input.overrides) ? input.overrides : defaultThemeProfile.overrides;
 	}
