@@ -3,6 +3,7 @@ This node.js module provides a better way of handling the build-in console for n
 
 ## How to install
 You can install this module through npm:
+It's recommended to add `--save-dev` to the end of the command so that it's installed as a dev dependency.
 ```bash
 npm install better-console-utilities
 ```
