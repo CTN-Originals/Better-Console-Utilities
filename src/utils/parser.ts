@@ -74,6 +74,7 @@ export class MessageObject {
 
 		const colorize = (input: string, type?: string, identifier?: string, holderType?: string): string => {
 			const theme = this._getTypeTheme(type, identifier, holderType);
+			// console.log(theme)
 			let out = theme.getThemedString(input);
 			
 			return out;
@@ -146,24 +147,20 @@ export class MessageObject {
 	private _getTypeTheme(type?: string, identifier?: string, holderType?: string): Theme {
 		const getTheme = (t?: string) => {return (t && this.Theme.typeThemes[t as keyof TypeThemes]) ? this.Theme.typeThemes[t as keyof TypeThemes] : this.Theme.typeThemes.default}
 		const theme = getTheme(type);
-		// let fallbackTheme = new Theme('#000000', '#ffffff', 'blink');
-		// let fallbackTheme = this.Theme.typeThemes.default;
 		if (theme) {
 			if (theme instanceof Theme) {
 				return theme;
 			}
-			else if (identifier) {
+			else if (identifier) { //? if the theme is an object, get the theme based on the identifier
 				const keys = Object.keys(theme);
 				for (let i = 0; i < keys.length; i++) {
 					const key = keys[i];
-					
+					//? if the key is the identifier and the value is a theme, return the theme
 					if (key === identifier && theme[key as keyof typeof theme] !== undefined && theme[key as keyof typeof theme] !== null) {
-						const field = theme[key as keyof typeof theme] as Theme;
-						return field;
+						return theme[key as keyof typeof theme] as Theme;
 					}
 				}
 				if (theme[identifier as keyof typeof theme] instanceof Theme) {
-					//! does this create any issues?
 					return theme[identifier as keyof typeof theme] as Theme;
 				}
 				else {
@@ -173,12 +170,12 @@ export class MessageObject {
 					else if (holderType) {
 						const holderTheme = getTheme(holderType);
 						const field = holderTheme['default' as keyof typeof holderTheme] as Theme;
-						return field;
+						if (field instanceof Theme) { return field; }
 					}
 				}
 			}
 		}
-		return this.Theme.default;
+		return this.Theme.default ?? new Theme();
 	}
 }
 
