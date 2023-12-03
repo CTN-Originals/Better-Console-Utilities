@@ -7,9 +7,11 @@ import { defaultThemeProfile } from '../handlers/colorHandler';
 const color = new Color({R: 255, G: 155, B: 55})
 const color2 = new Color('#2a40ac')
 const color3 = new Color()
-const primaryTheme = new ThemeProfile({
+
+const primary = new ThemeProfile({
 	default: new Theme('#c9c9c9'),
 	typeThemes: new TypeThemes({
+		
 		// string: {default: new Theme('#cebaa8')},
 		object: {
 			default: new Theme('#ff0000'),
@@ -26,26 +28,68 @@ const primaryTheme = new ThemeProfile({
 		}
 	}),
 });
-const secondaryTheme: ThemeProfile = new ThemeProfile({
-	default: new Theme('#ff6f6f'),
+
+const secondary = new ThemeProfile({
+	default: new Theme('#c9c9c9'),
 	typeThemes: new TypeThemes({
-		string: {default: new Theme('#966133')},
-		number: {default: new Theme('#1ce4d3')},
+		default: new Theme('#ff0000'),
+		string: {default: new Theme('#cebaa8')},
+		object: {
+			key: new Theme(color),
+			punctuation: new Theme('green'),
+		},
+		array: {
+			punctuation: new Theme('red'),
+			brackets: new Theme(color3),
+		}
 	}),
 });
 
-const cons = new ConsoleInstance({theme: primaryTheme, indent: 2, indentString: ' '})
-const cons2 = new ConsoleInstance(secondaryTheme, 1, '_')
+
+const cons = new ConsoleInstance({theme: primary, indent: 2, indentString: ' '})
+const cons2 = new ConsoleInstance({theme: secondary, indent: 2, indentString: ' '})
+
+console.log('Test Hello World')
+cons.log('Test "Hello World" red ')
+
+const simpleObject = {
+	name: 'Hello World',
+	active: true,
+	count: 8,
+	status: 'good',
+	list: [
+		'first',
+		'second',
+		'ctn',
+		12345,
+	],
+};
+const simpleArray = [
+	'first',
+	'second',
+	'third',
+	321,
+	{
+		name: 'Hello World',
+		active: true
+	},
+];
+
 
 export async function test() {
-	console.log(cons.theme)
-	console.log(cons2.theme)
+	cons.log(simpleObject)
+	cons.log(simpleArray)
+	cons.log(' ')
+	cons2.log(simpleObject)
+	cons2.log(simpleArray)
+	// console.log(cons.theme)
+	// console.log(cons2.theme)
 	
 	//#region Color Handler Tests
 	// console.groupCollapsed('Simple Object');
-	cons.log(parserTests.simpleObject);
-	cons.log(parserTests.simpleArray);
-	cons.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
+	// cons.log(parserTests.simpleObject);
+	// cons.log(parserTests.simpleArray);
+	// cons.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
 	// cons2.log(parserTests.simpleObject);
 	// cons2.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
 	// console.groupEnd();
