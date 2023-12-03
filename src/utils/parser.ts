@@ -168,7 +168,7 @@ export class MessageObject {
 						return theme.default;
 					}
 					else if (holderType) {
-						const holderTheme = getTheme(holderType);
+						const holderTheme = getTheme(holderType) as ThemeProfile;
 						const field = holderTheme['default' as keyof typeof holderTheme] as Theme;
 						if (field instanceof Theme) { return field; }
 					}

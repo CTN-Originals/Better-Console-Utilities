@@ -10,8 +10,8 @@ const color3 = new Color()
 
 const primary = new ThemeProfile({
 	default: new Theme('#c9c9c9'),
-	typeThemes: new TypeThemes({
-		
+	typeThemes: {
+		// default: new Theme('#0000FF'),
 		// string: {default: new Theme('#cebaa8')},
 		object: {
 			default: new Theme('#ff0000'),
@@ -26,23 +26,23 @@ const primary = new ThemeProfile({
 			// brackets: new Theme(color2),
 			// value: new Theme('#ff66ff'),
 		}
-	}),
+	},
 });
 
 const secondary = new ThemeProfile({
-	default: new Theme('#c9c9c9'),
-	typeThemes: new TypeThemes({
-		default: new Theme('#ff0000'),
-		string: {default: new Theme('#cebaa8')},
-		object: {
-			key: new Theme(color),
-			punctuation: new Theme('green'),
-		},
-		array: {
-			punctuation: new Theme('red'),
-			brackets: new Theme(color3),
-		}
-	}),
+	default: new Theme('#ffffff'),
+	// typeThemes: new TypeThemes({
+	// 	default: new Theme('#ff0000'),
+	// 	string: {default: new Theme('#cebaa8')},
+	// 	object: {
+	// 		key: new Theme(color),
+	// 		punctuation: new Theme('green'),
+	// 	},
+	// 	array: {
+	// 		punctuation: new Theme('red'),
+	// 		brackets: new Theme(color3),
+	// 	}
+	// }),
 });
 
 
@@ -78,10 +78,10 @@ const simpleArray = [
 
 export async function test() {
 	cons.log(simpleObject)
-	cons.log(simpleArray)
-	cons.log(' ')
+	// cons.log(simpleArray)
+	// cons.log(' ')
 	cons2.log(simpleObject)
-	cons2.log(simpleArray)
+	// cons2.log(simpleArray)
 	// console.log(cons.theme)
 	// console.log(cons2.theme)
 	
@@ -89,9 +89,9 @@ export async function test() {
 	// console.groupCollapsed('Simple Object');
 	// cons.log(parserTests.simpleObject);
 	// cons.log(parserTests.simpleArray);
-	// cons.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
+	cons.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
 	// cons2.log(parserTests.simpleObject);
-	// cons2.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
+	cons2.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
 	// console.groupEnd();
 
 	// console.groupCollapsed('Simple Array');

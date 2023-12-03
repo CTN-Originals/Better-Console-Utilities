@@ -248,28 +248,40 @@ export class TypeThemes {
 		punctuation?: Theme,
 	};
 
-	/** 
-	 * @param {Partial<TypeThemes>} input The color profile
-	*/
-	constructor(input: Partial<TypeThemes> = {}) {
-		this.default = (input.default instanceof Theme) ? input.default : new Theme();
-		this.string = { default: input.string?.default};
-		this.number = { default: input.number?.default};
-		this.boolean = { default: input.boolean?.default};
-
-		this.object = {
-			default: input.object?.default,
-			key: input.object?.key,
-			value: input.object?.value,
-			brackets: input.object?.brackets,
-			punctuation: input.object?.punctuation,
-		};
-		this.array = {
-			default: input.array?.default,
-			value: input.array?.value,
-			brackets: input.array?.brackets,
-			punctuation: input.array?.punctuation,
-		};
+	/** @param {Partial<TypeThemes>} input The color profile */
+	constructor(input: Partial<TypeThemes>);
+	/** @param {Theme} theme The default theme for all types */
+	constructor(theme: Theme);
+	constructor(input_theme: Partial<TypeThemes> | Theme = new Theme()) {
+		if (input_theme instanceof Theme) {
+			this.default = input_theme;
+			this.string = { default: input_theme };
+			this.number = { default: input_theme };
+			this.boolean = { default: input_theme };
+			this.object = { default: input_theme };
+			this.array = { default: input_theme };
+		}
+		else {
+			const input = input_theme as Partial<TypeThemes>;
+			this.default = (input.default instanceof Theme) ? input.default : new Theme();
+			this.string = { default: input.string?.default ?? this.default };
+			this.number = { default: input.number?.default ?? this.default };
+			this.boolean = { default: input.boolean?.default ?? this.default };
+	
+			this.object = {
+				default: input.object?.default ?? this.default,
+				key: input.object?.key,
+				value: input.object?.value,
+				brackets: input.object?.brackets,
+				punctuation: input.object?.punctuation,
+			};
+			this.array = {
+				default: input.array?.default ?? this.default,
+				value: input.array?.value,
+				brackets: input.array?.brackets,
+				punctuation: input.array?.punctuation,
+			};
+		}
 	}
 }
 
@@ -391,11 +403,12 @@ export class ThemeProfile {
 
 	/** The themes to use for each type
 	 * @example { 
+	 * 	default: new Theme('#ffffff'),
 	 * 	string: { default: new Theme('#C4785B'),
 	 * 	object: { key: new Theme('#569CD6', null, 'bold') }
 	 * }
 	*/
-	public typeThemes: TypeThemes;
+	public typeThemes: Partial<TypeThemes>;
 
 	/** The regex patterns used to find any color string syntax
 	 * @default /(?<flag>\[(?<fg>fg=(?<ftag>.+?)\s?)?(?<bg>bg=(?<btag>.+?)\s?)?(?<st>st=(?<stag>.+?)\s?)?\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g
@@ -410,10 +423,12 @@ export class ThemeProfile {
 	
 	/** @param {Partial<ThemeProfile>} input The color profile */
 	constructor(input: Partial<ThemeProfile>) {
-		// this.name = name;
 		this.default = new Theme(input.default?.foreground, input.default?.background, input.default?.style);
-		
-		this.typeThemes = (input.typeThemes) ? new TypeThemes(input.typeThemes) : defaultThemeProfile.typeThemes;
+
+		if (input.typeThemes) {
+			if (!input.typeThemes.default) input.typeThemes.default = this.default;
+		}
+		this.typeThemes = (input.typeThemes) ? new TypeThemes(input.typeThemes) : new TypeThemes(this.default);
 		this.colorSyntax = (input.colorSyntax) ? input.colorSyntax : defaultThemeProfile.colorSyntax;
 		this.overrides = (input.overrides) ? input.overrides : defaultThemeProfile.overrides;
 	}
