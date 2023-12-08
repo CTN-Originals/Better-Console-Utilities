@@ -11,8 +11,11 @@ const resetPlaceholderCharacter: string = '�'; //? character that is used as a
 
 type RGB = { R: number, G: number, B: number };
 export class Color {
+	/** Red color channel */
 	public R: number;
+	/** Green color channel */
 	public G: number;
+	/** Blue color channel */
 	public B: number;
 	
 	/** @param {RGB} input The RGB value of the color (e.g. { R: 255, G: 0, B: 0 } = red) */
@@ -25,6 +28,7 @@ export class Color {
 	constructor(r: number, g: number, b: number);
 	/** @param {string} hex The hex value of the color (e.g. '#ffffff' or 'white') */
 	constructor(hex: string);
+	/** Creates a null color and will not apply any color to any string */
 	constructor();
 	constructor(input_Red_Hex?: RGB | number | string, g?: number, b?: number) {
 		if (!input_Red_Hex && input_Red_Hex !== 0) {
@@ -51,16 +55,28 @@ export class Color {
 		}
 	}
 
+	/** @returns {number[]} The RGB value of the color (e.g. [255, 0, 0]) */
 	public get asArray(): number[] { return [this.R, this.G, this.B]; }
+	/** @returns {string} The hex value of the color (e.g. '#ffffff') */
 	public get asHex(): string {
 		return `#${this.R.toString(16).padStart(2, '0')}${this.G.toString(16).padStart(2, '0')}${this.B.toString(16).padStart(2, '0')}`;
 	}
 	
-	/** @param {number} amount The amount to seturate the color by (e.g. 1.5 to seturate by 50% or 0.5 to desaturate by 50%) */
-	public seturate(amount: number): Color {
+	/** 
+	 * @param {number} amount The amount to seturate the color by (e.g. #888888.seturate(0.5) = #444444)
+	 * @param {boolean} apply Whether to apply the saturation to the color (default: false)
+	 * @returns {Color} The saturated color
+	*/
+	public seturate(amount: number, apply: boolean = false): Color {
 		const r = Math.round(Math.min(Math.max(0, this.R * amount), 255));
 		const g = Math.round(Math.min(Math.max(0, this.G * amount), 255));
 		const b = Math.round(Math.min(Math.max(0, this.B * amount), 255));
+
+		if (apply) {
+			this.R = r;
+			this.G = g;
+			this.B = b;
+		}
 		return new Color(r, g, b);
 	}
 }
