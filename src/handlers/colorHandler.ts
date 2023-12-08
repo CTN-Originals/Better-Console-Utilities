@@ -148,7 +148,7 @@ export class Theme {
 	/** 
 	 * @param {Color|string|null} foreground The foreground color
 	 * @param {Color|string|null} background The background color
-	 * @param {string|string[]|null} style The style or styles
+	 * @param {string|string[]|null} style The style or styles (e.g. 'bold' or ['bold', 'underscore'])
 	 * @returns {Theme} The theme
 	*/
 	constructor(foreground: Color|string|null = colors.transparent, background?: Color|string|null, style?: string|string[]|null) {
@@ -156,7 +156,7 @@ export class Theme {
         this.background = (background instanceof Color) ? background : (background) ? getColor(background) : colors.transparent;
         this._style = (Array.isArray(style)) ? style : (style) ? [style] : [];
 
-        this.validate();
+        this.validateStyle();
     }
 
     public get style(): string[] {
@@ -165,19 +165,15 @@ export class Theme {
 
     public set style(value: string|string[]) {
         this._style = (Array.isArray(value)) ? value : [value];
-        this.validate();
+        this.validateStyle();
     }
 
-	/** 
-	 * @param {...string} style The style or styles names to add (e.g. 'bold', 'underscore', etc.)
-	*/
+	/** @param {...string} style The style or styles names to add (e.g. 'bold', 'underscore', etc.) */
 	public addStyle(...style: string[]) {
 		this._style.push(...style);
-		this.validate();
+		this.validateStyle();
 	}
-	/** 
-	 * @param {...string} style The style or styles names to remove (e.g. 'bold', 'underscore', etc.)
-	*/
+	/** @param {...string} style The style or styles names to remove (e.g. 'bold', 'underscore', etc.) */
 	public removeStyle(...style: string[]) {
 		for (const s of style) {
 			const styleFlag = styles[s as keyof typeof styles];
@@ -191,7 +187,7 @@ export class Theme {
 
 	/** 
 	 * @param {string} input The string to apply the theme to
-	 * @returns {string} The themed string (e.g. \x1b[38;2;255;0;0m$Hello World\x1b[0m)
+	 * @returns {string} The themed string
 	*/
 	public getThemedString(input: string): string {
 		const fg = (this.foreground != null && this.foreground != colors.transparent) ? getColorCodePrefix(this.foreground) : '';
@@ -201,6 +197,7 @@ export class Theme {
 		return `${fg}${bg}${style}${input}${styles.reset}`
 	}
 
+	/** Used for debug purposes */
 	public getColorNames(): { foreground: string, background: string } {
 		const keys = Object.keys(colors);
 		let fg = '';
@@ -234,7 +231,7 @@ export class Theme {
 		return out;
 	}
 
-    private validate() {
+    private validateStyle() {
         for (let i = 0; i < this._style.length; i++) {
             if (Object.keys(styles).includes(this._style[i])) {
                 this._style[i] = styles[this._style[i] as keyof typeof styles];
@@ -243,6 +240,7 @@ export class Theme {
                 continue;
             }
             else {
+				if (this._style[i] === '') { continue; }
                 console.warn(`Invalid style input: ${this._style[i]}`);
                 this._style.splice(i, 1);
             }
