@@ -5,7 +5,9 @@ const anyThemedString = new RegExp(
 	/(?<start>\x1b)(?<flags>(?<fg>(?:\x1b)?\[38;2(?:(?:;\d{1,3}){3})m)?(?<bg>(?:\x1b)?\[48;2(?:(?:;\d{1,3}){3})m)?(?<st>(?:\x1b)?\[(?:\d{1}m))*)(?<str>\x1b\[0m|.*?)(?<end>\x1b\[0m(?:\x1b\[38;2(?:(?:;\d{1,3}){3})m)?)/g
 )
 
+//? alt code = 8
 const placeholderCharacter: string = '◘'; //? character that is used as a placeholder for color flags to prevent the flags from being colored by overrides
+const resetPlaceholderCharacter: string = '�'; //? character that is used as a placeholder for color flags to prevent the flags from being colored by overrides
 
 type RGB = { R: number, G: number, B: number };
 export class Color {
@@ -433,9 +435,15 @@ export class ThemeProfile {
 		this.overrides = (input.overrides) ? input.overrides : defaultThemeProfile.overrides;
 	}
 
+	/** 
+	 * @param {string} input The string to apply the theme to
+	 * @returns {string} The themed string
+	*/
 	public applyThemeProfile(input: string): string {
 		input = this.applyColorSyntax(input);
+		// console.log(input.split(/\x1b/g).join('').split('[0m'))
 		input = this.applyOverrides(input);
+		// console.log(input.split(/\x1b/g).join('').split('[0m'))
 		return input;
 	}
 
@@ -468,14 +476,19 @@ export class ThemeProfile {
 
 	private applyOverrides(input: string): string {
 		const overrideMatches: ThemeOverrideMatch[] = [];
+		let defaultResetString = styles.reset + this.default.themeFlags; //? the string to reset to the default theme. kept for later use
 
 		let safeInput: string = input;
 		const anyThemeMatch = safeInput.match(anyThemedString);
 		if (anyThemeMatch) {
 			//? replace any themed string (flag + string + reset) with placeholder characters to prevent the flags from being colored by overrides
 			for (const match of anyThemeMatch) {
-				safeInput = safeInput.replace(match, placeholderCharacter.repeat(match.length));
+				//? replace any reset strings with reset placeholder characters
+				safeInput = safeInput.replace(match, match.split(defaultResetString)[0] + resetPlaceholderCharacter.repeat((defaultResetString).length));
+				//? replace any non reset strings with placeholder characters
+				safeInput = safeInput.replace(match.split(defaultResetString)[0], placeholderCharacter.repeat(match.split(defaultResetString)[0].length));
 			}
+			// console.log([safeInput])
 		}
 
 		for (let i = 0; i < this.overrides.length; i++) {
@@ -498,29 +511,77 @@ export class ThemeProfile {
 			}
 		}
 		// console.log(overrideMatches)
-		
-		//! Any theme flags fuck this process up so any flags are removed from input
-		//TODO Make a way around this so any theme flags already preset are also included
-		let out = input; //? the input without any theme flags
+
+		let out = input; //? the output string
 
 		const compleatedOverrides: ThemeOverrideMatch[] = []; //? array of all overrides that have been compleated
 		const flagPositionArray: {flag: string, index: number}[] = [] //? array of all flag positions for where they should end up in the output string
+		// const indexOffsetPositions: {index: number, offset: number}[] = []; //? at "index" add up "offset" to the indexOffset
 		for (const match of overrideMatches) {
 			let resetTheme = this.default;
-			for (const override of compleatedOverrides) {
-				if (override.index > match.index) { break; } //? if the override is after the match, skip it
-				if (override.index + override.length > match.index) { //? if the override is in the match, set the resetTheme to the override theme
-					resetTheme = override.override.theme;
+			
+			//TODO bug Fix
+			//? add the index offset to the match index if it is after any previous matches that have been offset
+			// let indexOffset = indexOffsetPositions.reduce((acc, cur) => (cur.index < match.index) ? acc + cur.offset : acc, 0); //? acc = accumulator, cur = current value
+			// let getIndexOffset = () => {
+			// 	let out = 0;
+			// 	for (const offset of indexOffsetPositions) {
+			// 		if (offset.index < match.index) {
+			// 			out += offset.offset;
+			// 		}
+			// 	}
+			// 	return out;
+			// };
+			// console.log(indexOffsetPositions)
+			// match.index += getIndexOffset();
+			// console.log(`index offset: ${getIndexOffset()} | match index: ${match.index} | match length: ${match.length}`)
+
+			//+ bug fixed with indexOffsetPositions //! this introduces a new bug where if an override is indexed before any of the reset placeholder characters, that override will have shifted with the index offset and will be applied on the wrong index
+			//! introduced a new bug where if the split is more then 1 it will mess up the second loop and cut off the wrong part of the string.
+			//- if the match target contains a reset placeholder character, replace it with the current reset theme
+			// if (match.target.includes(resetPlaceholderCharacter)) {
+			// 	const resetPlaceholderSplit = match.target.split(resetPlaceholderCharacter.repeat(defaultResetString.length));
+			// 	console.log(resetPlaceholderSplit)
+			// 	//| for each reset placeholder character, replace the reset placeholder characters with the current reset theme
+			// 	for (let i = 0; i < resetPlaceholderSplit.length - 1; i++) {
+			// 		// const currentResetIndex = match.index + resetPlaceholderSplit[i].length; //! does not account for index offsets from previous matches
+			// 		const currentResetIndex = match.index + resetPlaceholderSplit[i].length;
+			// 		// console.log(resetPlaceholderSplit[i])
+			// 		console.log(`currentResetIndex: ${currentResetIndex}`)
+			// 		//? replace the reset placeholder characters with the reset theme
+			// 		// console.log([out])
+			// 		out = out.slice(0, currentResetIndex) + styles.reset + match.override.theme.themeFlags + out.slice(currentResetIndex + defaultResetString.length);
+			// 		console.log([out])
+
+			// 		//? add the offset to the index offset positions
+			// 		indexOffsetPositions.push({
+			// 			index: currentResetIndex,
+			// 			offset: (styles.reset + match.override.theme.themeFlags).length - defaultResetString.length
+			// 		});
+			// 	}
+			// 	//? replace all reset placeholder characters with placeholder characters at the end of the match target and the correct length
+			// 	match.target = resetPlaceholderSplit.join(placeholderCharacter.repeat((styles.reset + match.override.theme.themeFlags).length));
+			// 	//? set the match length to the new length
+			// 	match.length = match.target.length;
+			// }
+
+			//| for each compleated override, check if the match index is inside the current override index
+			for (const comOverride of compleatedOverrides) {
+				if (comOverride.index > match.index) { break; } //- if the override is after the match, break the loop
+				if ((comOverride.index + comOverride.length) > match.index) { //- if the override is in the current match, set the resetTheme to the override theme
+					resetTheme = comOverride.override.theme;
 				}
 			}
+
+			
 			
 			flagPositionArray.push({ flag: match.override.theme.themeFlags, index: match.index }); //? add the flag to the array with the position
 			flagPositionArray.push({ flag: styles.reset + resetTheme.themeFlags, index: match.index + match.length }); //? add the reset flag to the array with the position
 
 			compleatedOverrides.push(match);
 		}
-		
 		flagPositionArray.sort((a, b) => a.index - b.index); //? sort flag positions by index
+		
 		let positionIndex = 0;
 		for (let i = 0; i < flagPositionArray.length; i++) {
 			const data = flagPositionArray[i];
