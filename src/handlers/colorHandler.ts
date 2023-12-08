@@ -106,13 +106,37 @@ export class Color {
 	function asStyles<T extends Record<string, string>>(arg: T): T { return arg; }
 	const styles = asStyles({
 		reset: "\x1b[0m",
+		clear: "\x1b[0m",
+
 		bold: "\x1b[1m",
+		thick: "\x1b[1m",
+
 		dim: "\x1b[2m",
+		fade: "\x1b[2m",
+
+		italic: "\x1b[3m",
+
 		underscore: "\x1b[4m",
 		underline: "\x1b[4m",
+		line: "\x1b[4m",
+
 		blink: "\x1b[5m",
+		slowblink: "\x1b[5m",
+
+		flash: "\x1b[6m",
+		fastblink: "\x1b[6m",
+
 		inverse: "\x1b[7m",
+		invert: "\x1b[7m",
+		inverted: "\x1b[7m",
+		reversed: "\x1b[7m",
+
 		hidden: "\x1b[8m",
+		hide: "\x1b[8m",
+		invisible: "\x1b[8m",
+		
+		strike: "\x1b[9m",
+		strikethrough: "\x1b[9m",
 	});
 //#endregion
 
