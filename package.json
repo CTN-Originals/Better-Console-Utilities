@@ -2,7 +2,7 @@
 	"name": "better-console-utilities",
 	"description": "Provides utilities and enhancements to console logging and adds a configurable color profile to apply colors to any output automatically.",
 	"author": "CTN-Originals",
-	"version": "1.0.11",
+	"version": "1.0.11.2",
 	"license": "ISC",
 	"repository": {
 		"type": "git",
@@ -32,7 +32,7 @@
 	],
 	
 	
-	"main": "./src/index.ts",
+	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"scripts": {
 		"start": "npm run build && node dist/index.js",
@@ -46,7 +46,6 @@
 	},
 	"files": [
 		"dist",
-		"src",
 		"README.md",
 		"LICENSE",
 		"package.json"
