@@ -25,10 +25,14 @@ export interface IConsoleOptions {
 }
 
 export class ConsoleInstance {
-	enabled: boolean;
-	theme: ThemeProfile;
-	indent: number;
-	indentString: string;
+	/** Whether the console is enabled or not [default: `true`] */
+	public enabled: boolean;
+	/** Theme profile for the console instance [default: `defaultThemeProfile`] */
+	public theme: ThemeProfile;
+	/** Indentation level of the console instance [default: `2`] */
+	public indent: number;
+	/** Indentation string of the console instance [default: `' '`] */
+	public indentString: string;
 	
 	/**
 	 * @param {ThemeProfile} theme Theme profile for the console instance
@@ -46,17 +50,25 @@ export class ConsoleInstance {
 		this.indentString = ((optionsOrTheme instanceof ThemeProfile) ? indentString : optionsOrTheme?.indentString) ?? ' ';
 	}
 	
-	public log(...args: any[]) {
+	/** 
+	 * @param {any[]} args Message(s) to log to the console (if multiple, each will be on a new line)
+	 * @description Logs the message(s) to the console
+	*/
+	public log(...args: any[]) : void {
 		if (!this.enabled) return;
 		// TODO: Add conditions
 
 		const logOut = true; //TODO get condition from args
 		if (logOut) {
-			console.log(this._getLog(...args));
+			console.log(this.getLog(...args));
 		}
 	}
 
-	private _getLog(...args: any[]) {
+	/** 
+	 * @param {any[]} args Message(s) to log to the console (if multiple, each will be on a new line)
+	 * @returns {String} Returns the formatted, parsed and colored message(s) as a string
+	*/
+	public getLog(...args: any[]) : string {
 		let log = '';
 		for (let i = 0; i < args.length; i++) {
 			const arg = args[i];
