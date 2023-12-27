@@ -9,7 +9,7 @@ const color2 = new Color('#2a40ac')
 const color3 = new Color()
 
 const primary = new ThemeProfile({
-	default: new Theme('#c9c9c9'),
+	default: new Theme('#010101'),
 	typeThemes: {
 		// default: new Theme('#0000FF'),
 		// string: {default: new Theme('#cebaa8')},
@@ -46,11 +46,11 @@ const secondary = new ThemeProfile({
 });
 
 
-const cons = new ConsoleInstance({theme: primary, indent: 2, indentString: ' '})
+const cons = new ConsoleInstance({indent: 2, indentString: ' '})
 const cons2 = new ConsoleInstance({theme: secondary, indent: 2, indentString: ' '})
 
 console.log('Test Hello World')
-cons.log('Test "Hello World" red ')
+cons.log('Test "Hello World"')
 
 const simpleObject = {
 	name: 'Hello World',
@@ -77,10 +77,14 @@ const simpleArray = [
 
 
 export async function test() {
-	cons.log(simpleObject)
+	// cons.log('testing "Hello true World" and "Hello [fg=green]green[/>] World"')
+	// cons.log('testing "Hello [st=bold]bold[/>] and true World" and finally also "Hello [fg=red]red[/>] and also true and [fg=#800000]cruwl[/>] World"')
+	// cons.log('"if you have an override like a string and [fg=red]some color flag like this[/>] it will not continue the [fg=orange]string[/>] after the color flag unless there is another override inside it"');
+
+	// cons.log(simpleObject)
 	// cons.log(simpleArray)
 	// cons.log(' ')
-	cons2.log(simpleObject)
+	// cons2.log(simpleObject)
 	// cons2.log(simpleArray)
 	// console.log(cons.theme)
 	// console.log(cons2.theme)
@@ -89,9 +93,9 @@ export async function test() {
 	// console.groupCollapsed('Simple Object');
 	// cons.log(parserTests.simpleObject);
 	// cons.log(parserTests.simpleArray);
-	cons.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
+	// cons.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
 	// cons2.log(parserTests.simpleObject);
-	cons2.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
+	// cons2.log('[fg=red]The red fox[/>] and "some true glow over [fg=green bg=#000040]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
 	// console.groupEnd();
 
 	// console.groupCollapsed('Simple Array');
@@ -104,7 +108,7 @@ export async function test() {
 	// console.groupEnd();
 
 	// console.log(JSON.stringify(parserTests.nestObject));
-	// cons.log(parserTests.nestObject);
+	cons.log(parserTests.nestObject);
 	// console.log(' ')
 	// cons.log('"string red" red (testing :D)', '"string (red green someStr) awd" red ... nothing "blue" normal ctn');
 	// cons.log('"string"`str` ::. ..: redred');
@@ -112,12 +116,12 @@ export async function test() {
 	// cons.log(testColors);
 	// cons.log('const array = [1, 2, 3];', 'if (x == 1) { console.log("hello world"); }');
 
-	// cons.log('[fg=red bg=blue st=bold,underscore]The red blue fox[/>] and [fg=blue bg=green]The blue green frog[/>]');
-	// cons.log('[fg=red]The red fox[/>] and "some purple glow over [fg=green]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
-	// cons.log('[fg=#ffAA00]almost red[/>] ... [fg=#00FFFF]green and blue[/>] + - / * = % . ; , [fg=#FF00FF]Opposite side hex colors[/>]');
-	// cons.log('I love how a "string color" is almost universal. [fg=#00ff22]color syntax prioritizes over overrides "like a string" for example[/>]');
-	// cons.log('Color syntax has a bug where "if you have an override like a string and [fg=red]some color flag like this[/>] it will not continue the string after the color flag unless there is another override inside it"');
-	// cons.log('Warning ... We are in Danger! There was [ERROR] Error an eRrOr?! We need to warn the User! Alert the captain!');
+	cons.log('[fg=red bg=blue st=bold,underscore]The red blue fox[/>] and [fg=blue bg=green]The blue green frog[/>]');
+	cons.log('[fg=red]The red fox[/>] and "some purple glow over [fg=green]the green bear[/>] on a warm orange day" at 13:45 with [fg=blue]the blue wolf[/>]');
+	cons.log('[fg=#ffAA00]almost red[/>] ... [fg=#00FFFF]green and blue[/>] + blalala - / * = % . ; , [fg=#FF00FF]Opposite side hex colors[/>]');
+	cons.log('I love how a "string color" is almost universal. [fg=#00ff22]color syntax prioritizes over overrides "like a string" for example[/>]');
+	cons.log('"if you have an override like a string and [fg=red]some color flag like this[/>] it will not continue the [fg=orange]string[/>] after the color flag unless there is another override inside it"');
+	cons.log('Warning ... We are in Danger! There was [ERROR] Error an eRrOr?! We need to warn the User! Alert the captain!');
 
 	// cons.log('. red + bold', ': green - blue');
 	// cons.log('abc');
