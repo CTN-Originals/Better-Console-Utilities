@@ -36,7 +36,7 @@
 	"types": "./dist/index.d.ts",
 	"scripts": {
 		"start": "npm run build && node dist/index.js",
-		"start:dev": "npx nodemon",
+		"start:dev": "npx nodemon --exec \"ts-node\" src/index.ts",
 		"build": "rimraf ./dist && tsc",
 		"test": "jest",
 		"test:watch": "jest --watch"
