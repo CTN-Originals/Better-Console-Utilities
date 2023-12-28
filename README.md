@@ -14,7 +14,7 @@
 		<img alt="Static Badge" src="https://img.shields.io/badge/LICENSE-BSD_3--Clause_License-FF5722">
 	</a>
 	<br>
-	<a href="https://discord.gg/GCBSm4B" title="Project author Disc[Title](README.md)ord Community">
+	<a href="https://discord.gg/GCBSm4B" title="Discord Community Server Invite">
 		<img src="https://img.shields.io/discord/746005565150593035?logo=discord&amp;label=discord&amp;style=for-the-badge" alt="Discord server badge" />
 	</a>
 	<a href="https://www.twitch.tv/ctnoriginals" title="Twitch Channel">
@@ -54,13 +54,13 @@ myConsole.log("Hello World!");
 const myConsole = new betterConsole.ConsoleInstance();
 myConsole.log({hello: "world", foo: "bar"});
 ```
-![Image Object hello-world log](assets/object_hello-world.png)
+![Image Object hello-world log](assets/object_hello-world.png) <br>
 This prints the object in a JSON format. This also works with arrays and other type of collections.
 The colerisation that you see is the "defaultThemeProfile" applied to the console instance if none is specified.
 
 ---
 
-#### Theme and Color objects
+### Theme and Color objects
 To customize the looks of any console instance you can use theme and color objects. These objects are the building blocks of the themes and colors that are used in the console. You can customize them to fit your needs.
 ```javascript
 // Slight heads up, these two variable names could conflict with other variables that either you or other packages have defined.
