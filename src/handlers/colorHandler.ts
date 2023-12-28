@@ -633,6 +633,16 @@ export class ThemeProfile {
 		// console.log(out.split(/\x1b/g).join('').split('[0m'))
 		return out;
 	}
+
+	/** @returns {ThemeProfile} A copy of this theme profile */
+	public clone(): ThemeProfile {
+		return new ThemeProfile({
+			default: this.default,
+			typeThemes: this.typeThemes,
+			colorSyntax: this.colorSyntax,
+			overrides: this.overrides,
+		});
+	}
 }
 //#endregion
 
