@@ -2,8 +2,8 @@
 	"name": "better-console-utilities",
 	"description": "Provides utilities and enhancements to console logging and adds a configurable color profile to apply colors to any output automatically.",
 	"author": "CTN-Originals",
-	"version": "1.0.12",
-	"license": "ISC",
+	"version": "1.1.0",
+	"license": "BSD-3-Clause",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/CTN-Originals/Better-Console-Utilities.git"
