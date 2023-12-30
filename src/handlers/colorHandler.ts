@@ -658,9 +658,9 @@ export class ThemeProfile {
 
 export const defaultThemeProfile = new ThemeProfile({
 	// name: "default",
-	default: new Theme('#ffffff', null),
+	default: new Theme('#ffffff'),
 	typeThemes: {
-		string: { default: new Theme('#C4785B', null) },
+		string: { default: new Theme('#C4785B') },
 		number: { default: new Theme('#B5CEA8') },
 		boolean: { default: new Theme('#569CD6') },
 		object: {
