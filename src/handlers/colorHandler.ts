@@ -452,7 +452,17 @@ export class ThemeProfile {
 
 	/** The regex patterns used to find any color string syntax
 	 * @default /(?<flag>\[(?<fg>fg=(?<ftag>.+?)\s?)?(?<bg>bg=(?<btag>.+?)\s?)?(?<st>st=(?<stag>.+?)\s?)?\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g
-	 * @example '[fg=red bg=blue st=bold,underscore]The red blue fox[/>]'
+	 * @param {Group} flag [fg=red] or [bg=red] or [st=bold] or any combination of those
+	 * @param {Group} fg foreground
+	 * @param {Group} bg background
+	 * @param {Group} st style
+	 * @param {Group} ftag foreground tag
+	 * @param {Group} btag background tag
+	 * @param {Group} stag style tag
+	 * @param {Group} target the string that gets colored, anything else will be removed
+	 * @param {Group} end the end of the flag (always [/>])
+	 * @example input: '[fg=red bg=blue st=bold]Hello World[/>]'
+	 * @example output: '\x1b[38;2;255;0;0m\x1b[48;2;0;0;255m\x1b[1mHello World\x1b[0m'
 	*/
 	public colorSyntax: RegExp[];
 
@@ -667,18 +677,6 @@ export const defaultThemeProfile = new ThemeProfile({
 			punctuation: new Theme('#808080'),
 		}
 	},
-	/**
-	 * @description This is where custom theme overrides are defined
-	 * @param {Group} flag = [fg=red] or [bg=red] or [st=bold] or any combination of those
-	 * @param {Group} fg foreground | bg = background | st = style
-	 * @param {Group} bg = background | st = style
-	 * @param {Group} st = style
-	 * @param {Group} ftag = foreground tag | btag = background tag | stag = style tag
-	 * @param {Group} target = the string that gets colored, anything else will be removed
-	 * @param {Group} end = the end of the flag (always [/>])
-	 * @example input: [fg=red bg=blue st=bold]Hello World[/>]
-	 * @example output: \x1b[38;2;255;0;0m\x1b[48;2;0;0;255m\x1b[1mHello World\x1b[0m
-	*/
 	colorSyntax: [
 		/(?<flag>\[(?<fg>fg=(?<ftag>.+?)\s?)?(?<bg>bg=(?<btag>.+?)\s?)?(?<st>st=(?<stag>.+?)\s?)?\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g,
 	],
