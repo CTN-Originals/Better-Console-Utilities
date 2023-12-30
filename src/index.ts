@@ -1,15 +1,17 @@
-// import * as color from './handlers/colorHandler';
-import * as handler from './handlers';
-import * as utils from './utils';
+export { ConsoleInstance } from './handlers/consoleHandler';
+export {
+	Color,
+	Theme,
+	TypeThemes,
+	ThemeOverride,
+	ThemeProfile,
+	defaultThemeProfile,
+} from './handlers/colorHandler';
+
 
 //#region DEV
-	//!! COMMENT BEFORE BUILD 
-	import * as test from './tests';
-	test.test();
-	setTimeout(() => {}, 1000 * 60 * 10); //* Wait 10 minutes before exiting
+	// //!! COMMENT BEFORE BUILD 
+	// import * as test from './tests';
+	// test.test();
+	// setTimeout(() => {}, 1000 * 60 * 10); //* Wait 10 minutes before exiting
 //#endregion
-
-exports = {
-	ConsoleInstance: handler.betterConsole.ConsoleInstance,
-}
-// const cons = new handler.betterConsole.ConsoleInstance('');

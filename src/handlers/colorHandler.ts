@@ -5,97 +5,155 @@ const anyThemedString = new RegExp(
 	/(?<start>\x1b)(?<flags>(?<fg>(?:\x1b)?\[38;2(?:(?:;\d{1,3}){3})m)?(?<bg>(?:\x1b)?\[48;2(?:(?:;\d{1,3}){3})m)?(?<st>(?:\x1b)?\[(?:\d{1}m))*)(?<str>\x1b\[0m|.*?)(?<end>\x1b\[0m(?:\x1b\[38;2(?:(?:;\d{1,3}){3})m)?)/g
 )
 
+//? alt code = 8
 const placeholderCharacter: string = '◘'; //? character that is used as a placeholder for color flags to prevent the flags from being colored by overrides
+const resetPlaceholderCharacter: string = '�'; //? character that is used as a placeholder for color flags to prevent the flags from being colored by overrides
 
+type RGB = { R: number, G: number, B: number };
 export class Color {
+	/** Red color channel */
 	public R: number;
+	/** Green color channel */
 	public G: number;
+	/** Blue color channel */
 	public B: number;
 	
+	/** @param {RGB} input The RGB value of the color (e.g. { R: 255, G: 0, B: 0 } = red) */
 	constructor(input: { R: number, G: number, B: number });
+	/** 
+	 * @param {number} r The red value of the color
+	 * @param {number} g The green value of the color
+	 * @param {number} b The blue value of the color
+	*/
 	constructor(r: number, g: number, b: number);
+	/** @param {string} hex The hex value of the color (e.g. '#ffffff' or 'white') */
 	constructor(hex: string);
-	constructor(inputOrR: { R: number, G: number, B: number } | number | string, g?: number, b?: number) {
-		if (typeof inputOrR === "number") {
-			this.R = inputOrR;
+	/** Creates a null color and will not apply any color to any string */
+	constructor();
+	constructor(input_Red_Hex?: RGB | number | string, g?: number, b?: number) {
+		if (!input_Red_Hex && input_Red_Hex !== 0) {
+			this.R = -1;
+			this.G = -1;
+			this.B = -1;
+			return;
+		}
+		else if (typeof input_Red_Hex === "number") {
+			this.R = input_Red_Hex;
 			this.G = g!;
 			this.B = b!;
 		} 
-		else if (typeof inputOrR === "string") {
-			const rgb = getColor(inputOrR);
+		else if (typeof input_Red_Hex === "string") {
+			const rgb = getColor(input_Red_Hex);
 			this.R = rgb.R;
 			this.G = rgb.G;
 			this.B = rgb.B;
 		}
 		else {
-			this.R = inputOrR.R;
-			this.G = inputOrR.G;
-			this.B = inputOrR.B;
+			this.R = input_Red_Hex.R;
+			this.G = input_Red_Hex.G;
+			this.B = input_Red_Hex.B;
 		}
 	}
 
+	/** @returns {number[]} The RGB value of the color (e.g. [255, 0, 0]) */
 	public get asArray(): number[] { return [this.R, this.G, this.B]; }
+	/** @returns {string} The hex value of the color (e.g. '#ffffff') */
 	public get asHex(): string {
 		return `#${this.R.toString(16).padStart(2, '0')}${this.G.toString(16).padStart(2, '0')}${this.B.toString(16).padStart(2, '0')}`;
 	}
 	
-	public seturate(amount: number): Color {
+	/** 
+	 * @param {number} amount The amount to seturate the color by (e.g. #888888.seturate(0.5) = #444444)
+	 * @param {boolean} apply Whether to apply the saturation to the color (default: false)
+	 * @returns {Color} The saturated color
+	*/
+	public seturate(amount: number, apply: boolean = false): Color {
 		const r = Math.round(Math.min(Math.max(0, this.R * amount), 255));
 		const g = Math.round(Math.min(Math.max(0, this.G * amount), 255));
 		const b = Math.round(Math.min(Math.max(0, this.B * amount), 255));
+
+		if (apply) {
+			this.R = r;
+			this.G = g;
+			this.B = b;
+		}
 		return new Color(r, g, b);
 	}
 }
 //#region Static Definitions
-//? This function is used to keep intellisence working when referencing the colors object
-function asColors<T extends Record<string, Color>>(arg: T): T { return arg; }
-export const colors = asColors({
-	transparent: new Color({ R: -1, G: -1, B: -1 }),
+	//? This function is used to keep intellisence working when referencing the colors object
+	function asColors<T extends Record<string, Color>>(arg: T): T { return arg; }
+	const colors = asColors({
+		transparent: new Color({ R: -1, G: -1, B: -1 }),
 
-	black: new Color({ R: 0, G: 0, B: 0 }),
-	white: new Color({ R: 255, G: 255, B: 255 }),
+		black: new Color({ R: 0, G: 0, B: 0 }),
+		white: new Color({ R: 255, G: 255, B: 255 }),
 
-	//#region Primary
-	red: new Color({ R: 255, G: 0, B: 0 }),
-	green: new Color({ R: 0, G: 255, B: 0 }),
-	blue: new Color({ R: 0, G: 0, B: 255 }),
-	//#endregion
+		//#region Primary
+		red: new Color({ R: 255, G: 0, B: 0 }),
+		green: new Color({ R: 0, G: 255, B: 0 }),
+		blue: new Color({ R: 0, G: 0, B: 255 }),
+		//#endregion
 
-	//#region Secondary
-	yellow: new Color({ R: 255, G: 255, B: 0 }),
-	cyan: new Color({ R: 0, G: 255, B: 255 }),
-	magenta: new Color({ R: 255, G: 0, B: 255 }),
-	gray: new Color({ R: 128, G: 128, B: 128 }),
-	orange: new Color({ R: 255, G: 165, B: 0 }),
-	pink: new Color({ R: 255, G: 192, B: 203 }),
-	purple: new Color({ R: 128, G: 0, B: 128 }),
-	//#endregion
-	
-	//#region Extended
-	lime: new Color({ R: 0, G: 255, B: 0 }),
-	teal: new Color({ R: 0, G: 128, B: 128 }),
-	lavender: new Color({ R: 230, G: 230, B: 250 }),
-	brown: new Color({ R: 165, G: 42, B: 42 }),
-	beige: new Color({ R: 245, G: 245, B: 220 }),
-	maroon: new Color({ R: 128, G: 0, B: 0 }),
-	mint: new Color({ R: 62, G: 180, B: 137 }),
-	olive: new Color({ R: 128, G: 128, B: 0 }),
-	coral: new Color({ R: 255, G: 127, B: 80 }),
-	navy: new Color({ R: 0, G: 0, B: 128 }),
-	grey: new Color({ R: 128, G: 128, B: 128 }),
-	//#endregion
-});
-function asStyles<T extends Record<string, string>>(arg: T): T { return arg; }
-export const styles = asStyles({
-	reset: "\x1b[0m",
-	bold: "\x1b[1m",
-	dim: "\x1b[2m",
-	underscore: "\x1b[4m",
-	underline: "\x1b[4m",
-	blink: "\x1b[5m",
-	inverse: "\x1b[7m",
-	hidden: "\x1b[8m",
-});
+		//#region Secondary
+		yellow: new Color({ R: 255, G: 255, B: 0 }),
+		cyan: new Color({ R: 0, G: 255, B: 255 }),
+		magenta: new Color({ R: 255, G: 0, B: 255 }),
+		gray: new Color({ R: 128, G: 128, B: 128 }),
+		orange: new Color({ R: 255, G: 165, B: 0 }),
+		pink: new Color({ R: 255, G: 192, B: 203 }),
+		purple: new Color({ R: 128, G: 0, B: 128 }),
+		//#endregion
+		
+		//#region Extended
+		lime: new Color({ R: 0, G: 255, B: 0 }),
+		teal: new Color({ R: 0, G: 128, B: 128 }),
+		lavender: new Color({ R: 230, G: 230, B: 250 }),
+		brown: new Color({ R: 165, G: 42, B: 42 }),
+		beige: new Color({ R: 245, G: 245, B: 220 }),
+		maroon: new Color({ R: 128, G: 0, B: 0 }),
+		mint: new Color({ R: 62, G: 180, B: 137 }),
+		olive: new Color({ R: 128, G: 128, B: 0 }),
+		coral: new Color({ R: 255, G: 127, B: 80 }),
+		navy: new Color({ R: 0, G: 0, B: 128 }),
+		grey: new Color({ R: 128, G: 128, B: 128 }),
+		//#endregion
+	});
+	function asStyles<T extends Record<string, string>>(arg: T): T { return arg; }
+	const styles = asStyles({
+		reset: "\x1b[0m",
+		clear: "\x1b[0m",
+
+		bold: "\x1b[1m",
+		thick: "\x1b[1m",
+
+		dim: "\x1b[2m",
+		fade: "\x1b[2m",
+
+		italic: "\x1b[3m",
+
+		underscore: "\x1b[4m",
+		underline: "\x1b[4m",
+		line: "\x1b[4m",
+
+		blink: "\x1b[5m",
+		slowblink: "\x1b[5m",
+
+		flash: "\x1b[6m",
+		fastblink: "\x1b[6m",
+
+		inverse: "\x1b[7m",
+		invert: "\x1b[7m",
+		inverted: "\x1b[7m",
+		reversed: "\x1b[7m",
+
+		hidden: "\x1b[8m",
+		hide: "\x1b[8m",
+		invisible: "\x1b[8m",
+		
+		strike: "\x1b[9m",
+		strikethrough: "\x1b[9m",
+	});
 //#endregion
 
 export class Theme {
@@ -106,7 +164,7 @@ export class Theme {
 	/** 
 	 * @param {Color|string|null} foreground The foreground color
 	 * @param {Color|string|null} background The background color
-	 * @param {string|string[]|null} style The style or styles
+	 * @param {string|string[]|null} style The style or styles (e.g. 'bold' or ['bold', 'underscore'])
 	 * @returns {Theme} The theme
 	*/
 	constructor(foreground: Color|string|null = colors.transparent, background?: Color|string|null, style?: string|string[]|null) {
@@ -114,7 +172,7 @@ export class Theme {
         this.background = (background instanceof Color) ? background : (background) ? getColor(background) : colors.transparent;
         this._style = (Array.isArray(style)) ? style : (style) ? [style] : [];
 
-        this.validate();
+        this.validateStyle();
     }
 
     public get style(): string[] {
@@ -123,19 +181,15 @@ export class Theme {
 
     public set style(value: string|string[]) {
         this._style = (Array.isArray(value)) ? value : [value];
-        this.validate();
+        this.validateStyle();
     }
 
-	/** 
-	 * @param {...string} style The style or styles names to add (e.g. 'bold', 'underscore', etc.)
-	*/
+	/** @param {...string} style The style or styles names to add (e.g. 'bold', 'underscore', etc.) */
 	public addStyle(...style: string[]) {
 		this._style.push(...style);
-		this.validate();
+		this.validateStyle();
 	}
-	/** 
-	 * @param {...string} style The style or styles names to remove (e.g. 'bold', 'underscore', etc.)
-	*/
+	/** @param {...string} style The style or styles names to remove (e.g. 'bold', 'underscore', etc.) */
 	public removeStyle(...style: string[]) {
 		for (const s of style) {
 			const styleFlag = styles[s as keyof typeof styles];
@@ -149,7 +203,7 @@ export class Theme {
 
 	/** 
 	 * @param {string} input The string to apply the theme to
-	 * @returns {string} The themed string (e.g. \x1b[38;2;255;0;0m$Hello World\x1b[0m)
+	 * @returns {string} The themed string
 	*/
 	public getThemedString(input: string): string {
 		const fg = (this.foreground != null && this.foreground != colors.transparent) ? getColorCodePrefix(this.foreground) : '';
@@ -159,6 +213,7 @@ export class Theme {
 		return `${fg}${bg}${style}${input}${styles.reset}`
 	}
 
+	/** Used for debug purposes */
 	public getColorNames(): { foreground: string, background: string } {
 		const keys = Object.keys(colors);
 		let fg = '';
@@ -192,7 +247,7 @@ export class Theme {
 		return out;
 	}
 
-    private validate() {
+    private validateStyle() {
         for (let i = 0; i < this._style.length; i++) {
             if (Object.keys(styles).includes(this._style[i])) {
                 this._style[i] = styles[this._style[i] as keyof typeof styles];
@@ -201,6 +256,7 @@ export class Theme {
                 continue;
             }
             else {
+				if (this._style[i] === '') { continue; }
                 console.warn(`Invalid style input: ${this._style[i]}`);
                 this._style.splice(i, 1);
             }
@@ -210,51 +266,62 @@ export class Theme {
 
 //#region ColorProfile Classes
 export class TypeThemes { 
-
-	public string: { default: Theme };
-	public number: { default: Theme };
-	public boolean: { default: Theme };
+	public default: Theme;
+	public string: { default?: Theme };
+	public number: { default?: Theme };
+	public boolean: { default?: Theme };
+	//! Does making these optional introduce more bugs?
 	public object: {
-		default: Theme,
-		key: Theme,
-		value: { typeOverride: boolean, theme: Theme },
-		brackets: Theme,
-		punctuation: Theme,
+		default?: Theme,
+		key?: Theme,
+		/** Not functional yet, overwriten by whatever type the value is */
+		value?: Theme, //TODO
+		brackets?: Theme,
+		punctuation?: Theme,
 	};
+	//! Does making these optional introduce more bugs?
 	public array: {
-		default: Theme,
-		value: { typeOverride: boolean, theme: Theme },
-		brackets: Theme,
-		punctuation: Theme,
+		default?: Theme,
+		/** Not functional yet, overwriten by whatever type the value is */
+		value?: Theme, //TODO
+		brackets?: Theme,
+		punctuation?: Theme,
 	};
 
-	/** 
-	 * @param {Partial<TypeThemes>} input The color profile
-	 * @param {Theme} fallbackTheme The theme to use if a theme is not provided
-	*/
-	constructor(input: Partial<TypeThemes> = {}, fallbackTheme: Theme = new Theme()) {
-		this.string = { default: (input.string?.default instanceof Theme) ? input.string?.default : fallbackTheme };
-		this.number = { default: (input.number?.default instanceof Theme) ? input.number?.default : fallbackTheme};
-		this.boolean = { default: (input.boolean?.default instanceof Theme) ? input.boolean?.default : fallbackTheme};
-		this.object = {
-			default: (input.object?.default instanceof Theme) ? input.object?.default : fallbackTheme,
-			key: (input.object?.key instanceof Theme) ? input.object?.key : fallbackTheme,
-			value: {
-				typeOverride: input.object?.value.typeOverride ?? true,
-				theme: (input.object?.value.theme instanceof Theme) ? input.object?.value.theme : fallbackTheme
-			},
-			brackets: (input.object?.brackets instanceof Theme) ? input.object?.brackets : fallbackTheme,
-			punctuation: (input.object?.punctuation instanceof Theme) ? input.object?.punctuation : fallbackTheme,
-		};
-		this.array = {
-			default: (input.array?.default instanceof Theme) ? input.array?.default : fallbackTheme,
-			value: {
-				typeOverride: input.array?.value.typeOverride ?? true,
-				theme: (input.array?.value.theme instanceof Theme) ? input.array?.value.theme : fallbackTheme
-			},
-			brackets: (input.array?.brackets instanceof Theme) ? input.array?.brackets : fallbackTheme,
-			punctuation: (input.array?.punctuation instanceof Theme) ? input.array?.punctuation : fallbackTheme,
-		};
+	/** @param {Partial<TypeThemes>} input The color profile */
+	constructor(input: Partial<TypeThemes>);
+	/** @param {Theme} theme The default theme for all types */
+	constructor(theme: Theme);
+	constructor(input_theme: Partial<TypeThemes> | Theme = new Theme()) {
+		if (input_theme instanceof Theme) {
+			this.default = input_theme;
+			this.string = { default: input_theme };
+			this.number = { default: input_theme };
+			this.boolean = { default: input_theme };
+			this.object = { default: input_theme };
+			this.array = { default: input_theme };
+		}
+		else {
+			const input = input_theme as Partial<TypeThemes>;
+			this.default = (input.default instanceof Theme) ? input.default : new Theme();
+			this.string = { default: input.string?.default ?? this.default };
+			this.number = { default: input.number?.default ?? this.default };
+			this.boolean = { default: input.boolean?.default ?? this.default };
+	
+			this.object = {
+				default: input.object?.default ?? this.default,
+				key: input.object?.key,
+				value: input.object?.value,
+				brackets: input.object?.brackets,
+				punctuation: input.object?.punctuation,
+			};
+			this.array = {
+				default: input.array?.default ?? this.default,
+				value: input.array?.value,
+				brackets: input.array?.brackets,
+				punctuation: input.array?.punctuation,
+			};
+		}
 	}
 }
 
@@ -287,6 +354,10 @@ export class ThemeOverride {
 	/** 
 	 * @param {string|RegExp} target The target string or regex
 	 * @param {Theme} theme The theme to apply if the target is matched
+	 * @param {string} theme.foreground The foreground color (e.g. '#ffffff' or 'white')
+	 * @param {string} theme.background The background color (e.g. '#ffffff' or 'white')
+	 * @param {string|string[]} theme.style The style or styles (e.g. 'bold' or ['bold', 'underscore'])
+	 * @returns {ThemeOverride} The theme override
 	*/
 	constructor(target: string|string[]|RegExp|RegExp[], theme: Theme = new Theme()) {
 		this.target = target;
@@ -365,24 +436,62 @@ export class ThemeOverride {
 }
 
 export class ThemeProfile {
-	public name: string; //? The name of the color profile to be used to identify
-	public default: Theme; //? The default theme to use if one is not provided
-	public typeThemes: TypeThemes; //? The themes to use for each type
-	public colorSyntax: RegExp[]; //? The regex patterns to use to find any colored strings
-	public overrides: ThemeOverride[]; //? The theme overrides to use
+	/** The default theme to use if one is not provided 
+	 * @example new Theme('#ffffff')
+	*/
+	public default: Theme;
+
+	/** The themes to use for each type
+	 * @example { 
+	 * 	default: new Theme('#ffffff'),
+	 * 	string: { default: new Theme('#C4785B'),
+	 * 	object: { key: new Theme('#569CD6', null, 'bold') }
+	 * }
+	*/
+	public typeThemes: Partial<TypeThemes>;
+
+	/** The regex patterns used to find any color string syntax
+	 * @default /(?<flag>\[(?<fg>fg=(?<ftag>.+?)\s?)?(?<bg>bg=(?<btag>.+?)\s?)?(?<st>st=(?<stag>.+?)\s?)?\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g
+	 * @param {Group} flag [fg=red] or [bg=red] or [st=bold] or any combination of those
+	 * @param {Group} fg foreground
+	 * @param {Group} bg background
+	 * @param {Group} st style
+	 * @param {Group} ftag foreground tag
+	 * @param {Group} btag background tag
+	 * @param {Group} stag style tag
+	 * @param {Group} target the string that gets colored, anything else will be removed
+	 * @param {Group} end the end of the flag (always [/>])
+	 * @example input: '[fg=red bg=blue st=bold]Hello World[/>]'
+	 * @example output: '\x1b[38;2;255;0;0m\x1b[48;2;0;0;255m\x1b[1mHello World\x1b[0m'
+	*/
+	public colorSyntax: RegExp[];
+
+	/** The theme overrides to apply automatically when the target is matched
+	 * @example [ new ThemeOverride('Hello World', new Theme('#ff0000')) ]
+	*/
+	public overrides: ThemeOverride[]; 
 	
-	constructor(name: string, input: Partial<ThemeProfile>) {
-		this.name = name;
+	/** @param {Partial<ThemeProfile>} input The color profile */
+	constructor(input: Partial<ThemeProfile>) {
 		this.default = new Theme(input.default?.foreground, input.default?.background, input.default?.style);
-		
-		this.typeThemes = (input.typeThemes) ? new TypeThemes(input.typeThemes) : new TypeThemes();
-		this.colorSyntax = (input.colorSyntax) ? input.colorSyntax : [];
-		this.overrides = (input.overrides) ? input.overrides : [];
+
+		if (input.typeThemes) {
+			if (!input.typeThemes.default) input.typeThemes.default = this.default;
+		}
+		this.typeThemes = (input.typeThemes) ? new TypeThemes(input.typeThemes) : new TypeThemes(this.default);
+		this.colorSyntax = (input.colorSyntax) ? input.colorSyntax : defaultThemeProfile.colorSyntax;
+		this.overrides = (input.overrides) ? input.overrides : defaultThemeProfile.overrides;
 	}
 
+	/** 
+	 * @param {string} input The string to apply the theme to
+	 * @returns {string} The themed string
+	*/
 	public applyThemeProfile(input: string): string {
 		input = this.applyColorSyntax(input);
+		// console.log(input.split(/\x1b/g).join('').split('[0m'))
 		input = this.applyOverrides(input);
+		// console.log(input.split(/\x1b/g).join('').split('[0m'))
 		return input;
 	}
 
@@ -415,14 +524,19 @@ export class ThemeProfile {
 
 	private applyOverrides(input: string): string {
 		const overrideMatches: ThemeOverrideMatch[] = [];
+		let defaultResetString = styles.reset + this.default.themeFlags; //? the string to reset to the default theme. kept for later use
 
 		let safeInput: string = input;
 		const anyThemeMatch = safeInput.match(anyThemedString);
 		if (anyThemeMatch) {
 			//? replace any themed string (flag + string + reset) with placeholder characters to prevent the flags from being colored by overrides
 			for (const match of anyThemeMatch) {
-				safeInput = safeInput.replace(match, placeholderCharacter.repeat(match.length));
+				//? replace any reset strings with reset placeholder characters
+				safeInput = safeInput.replace(match, match.split(defaultResetString)[0] + resetPlaceholderCharacter.repeat((defaultResetString).length));
+				//? replace any non reset strings with placeholder characters
+				safeInput = safeInput.replace(match.split(defaultResetString)[0], placeholderCharacter.repeat(match.split(defaultResetString)[0].length));
 			}
+			// console.log([safeInput])
 		}
 
 		for (let i = 0; i < this.overrides.length; i++) {
@@ -445,29 +559,77 @@ export class ThemeProfile {
 			}
 		}
 		// console.log(overrideMatches)
-		
-		//! Any theme flags fuck this process up so any flags are removed from input
-		//TODO Make a way around this so any theme flags already preset are also included
-		let out = input; //? the input without any theme flags
+
+		let out = input; //? the output string
 
 		const compleatedOverrides: ThemeOverrideMatch[] = []; //? array of all overrides that have been compleated
 		const flagPositionArray: {flag: string, index: number}[] = [] //? array of all flag positions for where they should end up in the output string
+		// const indexOffsetPositions: {index: number, offset: number}[] = []; //? at "index" add up "offset" to the indexOffset
 		for (const match of overrideMatches) {
 			let resetTheme = this.default;
-			for (const override of compleatedOverrides) {
-				if (override.index > match.index) { break; } //? if the override is after the match, skip it
-				if (override.index + override.length > match.index) { //? if the override is in the match, set the resetTheme to the override theme
-					resetTheme = override.override.theme;
+			
+			//TODO bug Fix
+			//? add the index offset to the match index if it is after any previous matches that have been offset
+			// let indexOffset = indexOffsetPositions.reduce((acc, cur) => (cur.index < match.index) ? acc + cur.offset : acc, 0); //? acc = accumulator, cur = current value
+			// let getIndexOffset = () => {
+			// 	let out = 0;
+			// 	for (const offset of indexOffsetPositions) {
+			// 		if (offset.index < match.index) {
+			// 			out += offset.offset;
+			// 		}
+			// 	}
+			// 	return out;
+			// };
+			// console.log(indexOffsetPositions)
+			// match.index += getIndexOffset();
+			// console.log(`index offset: ${getIndexOffset()} | match index: ${match.index} | match length: ${match.length}`)
+
+			//+ bug fixed with indexOffsetPositions //! this introduces a new bug where if an override is indexed before any of the reset placeholder characters, that override will have shifted with the index offset and will be applied on the wrong index
+			//! introduced a new bug where if the split is more then 1 it will mess up the second loop and cut off the wrong part of the string.
+			//- if the match target contains a reset placeholder character, replace it with the current reset theme
+			// if (match.target.includes(resetPlaceholderCharacter)) {
+			// 	const resetPlaceholderSplit = match.target.split(resetPlaceholderCharacter.repeat(defaultResetString.length));
+			// 	console.log(resetPlaceholderSplit)
+			// 	//| for each reset placeholder character, replace the reset placeholder characters with the current reset theme
+			// 	for (let i = 0; i < resetPlaceholderSplit.length - 1; i++) {
+			// 		// const currentResetIndex = match.index + resetPlaceholderSplit[i].length; //! does not account for index offsets from previous matches
+			// 		const currentResetIndex = match.index + resetPlaceholderSplit[i].length;
+			// 		// console.log(resetPlaceholderSplit[i])
+			// 		console.log(`currentResetIndex: ${currentResetIndex}`)
+			// 		//? replace the reset placeholder characters with the reset theme
+			// 		// console.log([out])
+			// 		out = out.slice(0, currentResetIndex) + styles.reset + match.override.theme.themeFlags + out.slice(currentResetIndex + defaultResetString.length);
+			// 		console.log([out])
+
+			// 		//? add the offset to the index offset positions
+			// 		indexOffsetPositions.push({
+			// 			index: currentResetIndex,
+			// 			offset: (styles.reset + match.override.theme.themeFlags).length - defaultResetString.length
+			// 		});
+			// 	}
+			// 	//? replace all reset placeholder characters with placeholder characters at the end of the match target and the correct length
+			// 	match.target = resetPlaceholderSplit.join(placeholderCharacter.repeat((styles.reset + match.override.theme.themeFlags).length));
+			// 	//? set the match length to the new length
+			// 	match.length = match.target.length;
+			// }
+
+			//| for each compleated override, check if the match index is inside the current override index
+			for (const comOverride of compleatedOverrides) {
+				if (comOverride.index > match.index) { break; } //- if the override is after the match, break the loop
+				if ((comOverride.index + comOverride.length) > match.index) { //- if the override is in the current match, set the resetTheme to the override theme
+					resetTheme = comOverride.override.theme;
 				}
 			}
+
+			
 			
 			flagPositionArray.push({ flag: match.override.theme.themeFlags, index: match.index }); //? add the flag to the array with the position
 			flagPositionArray.push({ flag: styles.reset + resetTheme.themeFlags, index: match.index + match.length }); //? add the reset flag to the array with the position
 
 			compleatedOverrides.push(match);
 		}
-		
 		flagPositionArray.sort((a, b) => a.index - b.index); //? sort flag positions by index
+		
 		let positionIndex = 0;
 		for (let i = 0; i < flagPositionArray.length; i++) {
 			const data = flagPositionArray[i];
@@ -481,44 +643,41 @@ export class ThemeProfile {
 		// console.log(out.split(/\x1b/g).join('').split('[0m'))
 		return out;
 	}
+
+	/** @returns {ThemeProfile} A copy of this theme profile */
+	public clone(): ThemeProfile {
+		return new ThemeProfile({
+			default: this.default,
+			typeThemes: this.typeThemes,
+			colorSyntax: this.colorSyntax,
+			overrides: this.overrides,
+		});
+	}
 }
 //#endregion
 
-export const defaultColorProfile = new ThemeProfile('default', {
-	name: "default",
-	default: new Theme('#ffffff', null),
+export const defaultThemeProfile = new ThemeProfile({
+	// name: "default",
+	default: new Theme('#ffffff'),
 	typeThemes: {
-		string: { default: new Theme('#C4785B', null) },
+		string: { default: new Theme('#C4785B') },
 		number: { default: new Theme('#B5CEA8') },
 		boolean: { default: new Theme('#569CD6') },
 		object: {
 			default: new Theme('#9CDCFE'),
 			key: new Theme('#569CD6', null, 'bold'),
-			value: { typeOverride: true, theme: new Theme('#9CDCFE') },
+			value: new Theme('#9CDCFE'),
 			brackets: new Theme('#aaaaaa'),
 			punctuation: new Theme('#808080'),
 		},
 		array: {
 			default: new Theme('#9CDCFE'),
-			value: { typeOverride: true, theme: new Theme('#9CDCFE') },
+			value: new Theme('#9CDCFE'),
 			brackets: new Theme('#aaaaaa'),
 			punctuation: new Theme('#808080'),
 		}
 	},
-	/**
-	 * @description This is where custom theme overrides are defined
-	 * @param {Group} flag = [fg=red] or [bg=red] or [st=bold] or any combination of those
-	 * @param {Group} fg foreground | bg = background | st = style
-	 * @param {Group} bg = background | st = style
-	 * @param {Group} st = style
-	 * @param {Group} ftag = foreground tag | btag = background tag | stag = style tag
-	 * @param {Group} target = the string that gets colored, anything else will be removed
-	 * @param {Group} end = the end of the flag (always [/>])
-	 * @example input: [fg=red bg=blue st=bold]Hello World[/>]
-	 * @example output: \x1b[38;2;255;0;0m\x1b[48;2;0;0;255m\x1b[1mHello World\x1b[0m
-	*/
 	colorSyntax: [
-		//TODO Documentation about this
 		/(?<flag>\[(?<fg>fg=(?<ftag>.+?)\s?)?(?<bg>bg=(?<btag>.+?)\s?)?(?<st>st=(?<stag>.+?)\s?)?\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g,
 	],
 	overrides: [
@@ -526,22 +685,26 @@ export const defaultColorProfile = new ThemeProfile('default', {
 			/(\()(?:\)|.)*?(\))/g,
 			/(\{)(?:\}|.)*?(\})/g,
 			/(\[)(?:\]|.)*?(\])/g,
-		], new Theme('#c45b8c')),
+		], new Theme('#aaaaaa')),
+		new ThemeOverride([
+			' + ', ' - ', ' / ', ' * ', ' = ', ' % '
+		], new Theme('#bebebe', null, 'bold')),
 		new ThemeOverride([
 			'.', ':', ';', ','
-		], new Theme('#e6d119')),
-		new ThemeOverride(/(?<!\\)(['"`])(?:\\\1|.)*?(\1)/g, new Theme('#C4785B')),
+		], new Theme('#998440')),
+		new ThemeOverride([/(?<!\\)(['"`])(?:\\\1|.)*?(\1)/g], new Theme('#C4785B')),
 		new ThemeOverride(/[0-9]+/g, new Theme('#B5CEA8')),
-		new ThemeOverride(/ctn/gi, new Theme('#00FFFF', '#008000')),
-		new ThemeOverride('red', new Theme('#ff0000')),
-		new ThemeOverride('green', new Theme('#00ff00')),
-		new ThemeOverride('blue', new Theme('#0000ff')),
-		new ThemeOverride('orange', new Theme('#ff9900')),
-		new ThemeOverride('purple', new Theme('#990099')),
-		new ThemeOverride('glow', new Theme('#ff3c00', '#ffee00', 'dim')),
-		new ThemeOverride('warm', new Theme('#ff6600', null, ['bold', 'underscore', 'blink'])),
+		new ThemeOverride([/true|false/gi], new Theme('#569CD6')),
+		new ThemeOverride([/override/gi], new Theme('#2d4ee2')),
+		new ThemeOverride([/error/gi], new Theme('#ff0000', null, 'bold')),
+		new ThemeOverride([/ERROR/g, /danger/gi], new Theme('#be0000', null, ['bold', 'blink', 'underscore'])),
+		new ThemeOverride([/warn(ing)?/gi], new Theme('#ffbb00', null, 'bold')),
+		new ThemeOverride([/alert/gi], new Theme('#ffbb00', null, ['bold', 'blink'])),
+		// new ThemeOverride(/ red /gi, new Theme('#ff0000')),
+		// new ThemeOverride(/ green /gi, new Theme('#00ff00')),
+		// new ThemeOverride(/ blue /gi, new Theme('#0000ff')),
 	]
-} as unknown as ThemeProfile);
+} as ThemeProfile);
 
 //#region Methods
 	//#region Getters
@@ -549,7 +712,7 @@ export const defaultColorProfile = new ThemeProfile('default', {
 		 * @param {string} input The color. supports: hex (#123ABC) or named colors (red, blue, etc.)
 		 * @returns {Color} The RGB value of the color
 		*/
-		export function getColor(input: string): Color {
+		function getColor(input: string): Color {
 			if (input in colors) {
 				return colors[input as keyof typeof colors];
 			}
@@ -569,7 +732,7 @@ export const defaultColorProfile = new ThemeProfile('default', {
 			return new Color(red, green, blue);
 		}
 
-		export function getColorCodePrefix(color: Color|string, fgColor: boolean = true): string {
+		function getColorCodePrefix(color: Color|string, fgColor: boolean = true): string {
 			//? credits to new_duck - twitch viewer
 			if (typeof color === 'string') color = getColor(color);
 			
@@ -578,20 +741,11 @@ export const defaultColorProfile = new ThemeProfile('default', {
 				
 			return `${flag}${color.R};${color.G};${color.B}m`
 		}
-		export function getColoredString(input: string, color: string): string {
-			return `${getColorCodePrefix(color)}${input}${styles.reset}`
-		}
-		export function getThemedString(input: string, theme: Theme): string {
-			const fg = (theme.foreground != null) ? getColorCodePrefix(theme.foreground) : '';
-			const bg = (theme.background != null) ? getColorCodePrefix(theme.background, false) : '';
-			const style = (theme.style.length > 0) ? theme.style.join('') : '';
-			if (fg === '' && bg === '' && style === '') return input;
-			return `${fg}${bg}${style}${input}${styles.reset}`
-		}
 	//#endregion
 
 	//#region Constructors and Parsers
-		export function removeThemeFlags(input: string): string {
+		//TODO Export this or not? maybe usefull for a user?
+		function removeThemeFlags(input: string): string {
 			if (typeof input !== 'string') return input;
 			return input.replace(anyFlagRegex, '');
 		}

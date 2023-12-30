@@ -1,17 +1,9 @@
 import * as utils from '../utils';
-import * as color from './colorHandler';
+import { 
+	ThemeProfile, defaultThemeProfile 
+} from './colorHandler';
 
-interface IConsoleInstance {
-	name: string;
-	enabled: boolean;
-	suffix: string;
-	settings: {
-		indent: number;
-		indentString: string;
-	}
-	conditions: any;
-}
-
+// ? WIP
 // //* intercept console.log
 // if (console != null && false) {
 // 	const log = console.log.bind(console)
@@ -26,53 +18,68 @@ interface IConsoleInstance {
 // 	}
 // }
 
-export class ConsoleInstance implements IConsoleInstance {
-	name: string;
-	enabled: boolean;
-	suffix: string;
-	settings: {
-		indent: number;
-		indentString: string;
+export interface IConsoleOptions {
+	theme?: ThemeProfile;
+	indent?: number;
+	indentString?: string;
+}
+
+export class ConsoleInstance {
+	/** Whether the console is enabled or not [default: `true`] */
+	public enabled: boolean;
+	/** Theme profile for the console instance [default: `defaultThemeProfile`] */
+	public theme: ThemeProfile;
+	/** Indentation level of the console instance [default: `2`] */
+	public indent: number;
+	/** Indentation string of the console instance [default: `' '`] */
+	public indentString: string;
+	
+	/**
+	 * @param {ThemeProfile} theme Theme profile for the console instance
+	 * @param {Number} indent Indentation level of the console instance
+	 * @param {String} indentString Indentation string of the console instance
+	*/
+	constructor(theme?: ThemeProfile, indent?: number, indentString?: string);
+	/** @param {IConsoleOptions} options Options for the console instance */
+	constructor(options: Partial<IConsoleOptions>);
+	constructor(optionsOrTheme?: Partial<IConsoleOptions> | ThemeProfile, indent?: number, indentString?: string) {
+    	this.enabled = true;
+
+		this.theme = 		((optionsOrTheme instanceof ThemeProfile) ? optionsOrTheme : optionsOrTheme?.theme) ?? defaultThemeProfile;
+		this.indent = 		((optionsOrTheme instanceof ThemeProfile) ? indent : optionsOrTheme?.indent) ?? 2;
+		this.indentString = ((optionsOrTheme instanceof ThemeProfile) ? indentString : optionsOrTheme?.indentString) ?? ' ';
 	}
-	conditions: any;
 	
 	/** 
-	* @param {String} name Name of the console instance
-	* @param {Boolean} enabled Whether the console instance is enabled or not
-	* @param {String} suffix Suffix to be added to the console output
-	* @param {Object} settings Settings for the console instance
-	* @param {Number} settings.indent Indentation level of the console instance
-	* @param {String} settings.indentString Indentation string of the console instance
-	* @param {Object} conditions Conditions for the console instance
+	 * @param {any[]} args Message(s) to log to the console (if multiple, each will be on a new line)
+	 * @description Logs the message(s) to the console
 	*/
-	constructor(name: string = '', enabled: boolean = true, suffix: string = '', settings: {indent: number, indentString: string} = {indent: 2, indentString: '-'}, conditions: any = {}) {
-		this.name = name;
-		this.enabled = enabled;
-		this.suffix = suffix;
-		this.settings = settings;
-		this.conditions = conditions;
-	}
-	
-	public log(...args: any[]) {
+	public log(...args: any[]) : void {
 		if (!this.enabled) return;
 		// TODO: Add conditions
 
 		const logOut = true; //TODO get condition from args
 		if (logOut) {
-			console.log(this._getLog(...args));
+			console.log(this.getLog(...args));
 		}
 	}
 
-	private _getLog(...args: any[]) {
+	/** 
+	 * @param {any[]} args Message(s) to log to the console (if multiple, each will be on a new line)
+	 * @returns {String} Returns the formatted, parsed and colored message(s) as a string
+	*/
+	public getLog(...args: any[]) : string {
 		let log = '';
 		for (let i = 0; i < args.length; i++) {
 			const arg = args[i];
 			const collectionStringOptipons: utils.parser.ICollectionToStringOptions = {
-				indent: this.settings.indent,
-				indentString: this.settings.indentString,
+				theme: this.theme,
+				indent: this.indent,
+				indentString: this.indentString,
 			};
 			log += utils.parser.parseInput(arg, collectionStringOptipons).ToString + ((i != args.length - 1) ? '\n' : '');
 		}
+		// console.log(log.split(/\x1b/g).join('').split('[0m'))
 		return log;
 	}
 }

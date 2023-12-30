@@ -2,10 +2,7 @@ import {
 	Theme,
 	ThemeProfile,
 	TypeThemes,
-	defaultColorProfile,
-	getColor,
-	getColorCodePrefix,
-	getThemedString,
+	defaultThemeProfile,
 } from '../handlers/colorHandler';
 
 export interface ICollectionToStringOptions {
@@ -13,6 +10,7 @@ export interface ICollectionToStringOptions {
 	indentString?:	string;  //? indentation string
 	//! do we really need this? this might already be handled by indent and depth
 	currentIndent?:	number; //? current indentation level
+	theme?: 		ThemeProfile; //? theme profile
 	brackets?:		boolean; //? adds brackets around the output
 	color?:			boolean; //? colors the output
 	autoColor?:		boolean; //? colors the values automatically based on their type
@@ -54,19 +52,19 @@ export class MessageObject {
 		this.IndentCount = obj.IndentCount ?? 2;
 		this.IndentString = obj.IndentString ?? ' ';
 
-		this.Theme = obj.Theme ?? defaultColorProfile;
+		this.Theme = obj.Theme ?? defaultThemeProfile;
 	}
 
 	public get ToString(): string {
 		let out: string[] = [];
-		const addLine = (input: string, isLastItem: boolean = false, depth: number = this.Depth) => {
+		const addLine = (input: string, isLastItem: boolean = false, depth: number = this.Depth, type: string = 'object') => {
 			if (depth < 0) { depth = 0; }
 			
 			let line = `${getIndent(depth)}${input}`;
 			//? If the line contains a newline, add indent to each line
 			if (line.includes('\n')) { line = line.replace(/\n/g, `\n${getIndent(depth)}`); }
 			//? If the line is not the last item, add a comma to the end
-			if (!isLastItem) { line += colorize(',', 'object', 'punctuation'); }
+			if (!isLastItem) { line += colorize(',', type, 'punctuation'); }
 
 			out.push(`${line}`);
 		}
@@ -74,8 +72,9 @@ export class MessageObject {
 			return this.IndentString.repeat(this.IndentCount * depth);
 		}
 
-		const colorize = (input: string, type?: string, identifier?: string): string => {
-			const theme = this._getTypeTheme(type, identifier);
+		const colorize = (input: string, type?: string, identifier?: string, holderType?: string): string => {
+			const theme = this._getTypeTheme(type, identifier, holderType);
+			// console.log(theme)
 			let out = theme.getThemedString(input);
 			
 			return out;
@@ -94,13 +93,13 @@ export class MessageObject {
 			}
 			else {
 				if (this.Holder?.Type === 'array') {
-					addLine(`${colorize(contentObj.Value, contentObj.Type, 'value')}`, isLastItem);
+					addLine(`${colorize(contentObj.Value, contentObj.Type, 'value', this.Holder?.Type)}`, isLastItem, this.Depth, this.Holder?.Type);
 				}
 				else if (contentObj.Key !== '') {
-					addLine(`${colorize(contentObj.Key, 'object', 'key')}${colorize(':', 'object', 'punctuation')} ${colorize(contentObj.Value, contentObj.Type, 'value')}` + ((contentObj.Type === 'null') ? `<null>` : ''), isLastItem);
+					addLine(`${colorize(contentObj.Key, 'object', 'key', this.Holder?.Type)}${colorize(':', 'object', 'punctuation', this.Holder?.Type)} ${colorize(contentObj.Value, contentObj.Type, 'value', this.Holder?.Type)}` + ((contentObj.Type === 'null') ? `<null>` : ''), isLastItem);
 				}
 				else {
-					addLine(`${colorize(defaultColorProfile.applyThemeProfile(contentObj.Value.toString()))}`, isLastItem);
+					addLine(`${colorize(this.Theme.applyThemeProfile(contentObj.Value.toString()))}`, isLastItem);
 				}
 			}
 		}
@@ -145,28 +144,38 @@ export class MessageObject {
 	 * @param {string} identifier the identifier of the object (only applies to collections)
 	 * @returns {Theme} the theme to use for the object
 	*/
-	private _getTypeTheme(type?: string, identifier?: string): Theme {
-		const theme = (type) ? this.Theme.typeThemes[type as keyof TypeThemes] : this.Theme.default;
+	private _getTypeTheme(type?: string, identifier?: string, holderType?: string): Theme {
+		const getTheme = (t?: string) => {return (t && this.Theme.typeThemes[t as keyof TypeThemes]) ? this.Theme.typeThemes[t as keyof TypeThemes] : this.Theme.typeThemes.default}
+		const theme = getTheme(type);
 		if (theme) {
 			if (theme instanceof Theme) {
 				return theme;
 			}
-			else if (identifier) {
+			else if (identifier) { //? if the theme is an object, get the theme based on the identifier
 				const keys = Object.keys(theme);
 				for (let i = 0; i < keys.length; i++) {
 					const key = keys[i];
-					if (key === identifier) {
-						const field = theme[key as keyof typeof theme];
-						return (field instanceof Theme) ? field : field['theme' as keyof typeof field];
+					//? if the key is the identifier and the value is a theme, return the theme
+					if (key === identifier && theme[key as keyof typeof theme] !== undefined && theme[key as keyof typeof theme] !== null) {
+						return theme[key as keyof typeof theme] as Theme;
 					}
 				}
 				if (theme[identifier as keyof typeof theme] instanceof Theme) {
-					return theme[identifier as keyof typeof theme];
+					return theme[identifier as keyof typeof theme] as Theme;
 				}
-				else { return theme.default; }
+				else {
+					if (theme.default instanceof Theme) {
+						return theme.default;
+					}
+					else if (holderType) {
+						const holderTheme = getTheme(holderType) as ThemeProfile;
+						const field = holderTheme['default' as keyof typeof holderTheme] as Theme;
+						if (field instanceof Theme) { return field; }
+					}
+				}
 			}
 		}
-		return this.Theme.default;
+		return this.Theme.default ?? new Theme();
 	}
 }
 
@@ -227,6 +236,7 @@ function valueToMessageObject(input: string|boolean|number, options: Partial<ICo
 		Depth: 0,
 		IndentCount: options.indent,
 		IndentString: options.indentString,
+		Theme: options.theme,
 	});
 
 	const value = input;
@@ -246,6 +256,7 @@ export function collectionToMessageObject(collection: any, options: Required<ICo
 		Depth: (parent) ? parent.Depth + 1 : 1,
 		IndentCount: options.indent,
 		IndentString: options.indentString,
+		Theme: options.theme,
 	});
 	
 	recursionStorage.push(collection); 

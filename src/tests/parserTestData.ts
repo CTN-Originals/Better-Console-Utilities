@@ -2,8 +2,6 @@ import { ICollectionToStringOptions } from '../../src/utils/parser'
 import { 
 	Theme,
 	Color,
-	getColor,
-	getColorCodePrefix,
 } from '../handlers/colorHandler';
 
 export const simpleObject: { [key: string]: any } = {
@@ -19,10 +17,16 @@ export const simpleObject: { [key: string]: any } = {
 	],
 };
 
-export const simpleArray: string[] = [
+export const simpleArray: any[] = [
 	'first',
 	'second',
-	'third'
+	'third',
+	12345,
+	{
+		name: 'Hello World',
+		active: true,
+		count: 8,
+	}
 ];
 
 const color = new Color('#000080').seturate(0.1);
