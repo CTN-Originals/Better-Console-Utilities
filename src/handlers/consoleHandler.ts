@@ -55,13 +55,16 @@ export class ConsoleInstance {
 	 * @description Logs the message(s) to the console
 	*/
 	public log(...args: any[]) : void {
-		if (!this.enabled) return;
-		// TODO: Add conditions
+		if (!this._validate()) return;
+		console.log(this.getLog(...args));
+	}
 
-		const logOut = true; //TODO get condition from args
-		if (logOut) {
-			console.log(this.getLog(...args));
-		}
+	/** Logs the message(s) to the console with the default console.log function to preserve any functionality like object grouping
+	 * @param {any[]} args Message(s) to log to the console (if multiple, each will be on a new line)
+	*/
+	public logDefault(...args: any[]) : void {
+		if (!this._validate()) return;
+		console.log(...args);
 	}
 
 	/** 
@@ -81,6 +84,11 @@ export class ConsoleInstance {
 		}
 		// console.log(log.split(/\x1b/g).join('').split('[0m'))
 		return log;
+	}
+
+	private _validate() {
+		return this.enabled;
+		//TODO Conditional logging
 	}
 }
 
