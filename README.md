@@ -8,9 +8,9 @@
     <img src="https://img.shields.io/github/commit-activity/t/CTN-Originals/Better-Console-Utilities?style=flat&amp;logo=github&amp;color=32C955" alt="Repository Commits" />
   </a>
   <a href="https://www.npmjs.com/package/better-console-utilities" title="npm Package Version">
-    <img alt="npm version" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FCTN-Originals%2FBetter-Console-Utilities%2Fmain%2Fpackage.json&amp;query=%24.version&amp;label=npm version">
+    <img alt="npm version" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FCTN-Originals%2FBetter-Console-Utilities%2Fbase%2Fpackage.json&amp;query=%24.version&amp;label=npm version">
   </a>
-  <a href="https://github.com/CTN-Originals/Better-Console-Utilities/blob/main/LICENSE" title="License of this project">
+  <a href="https://github.com/CTN-Originals/Better-Console-Utilities/blob/base/LICENSE" title="License of this project">
     <img alt="Static Badge" src="https://img.shields.io/badge/LICENSE-BSD_3--Clause_License-FF5722">
   </a>
   <br>
