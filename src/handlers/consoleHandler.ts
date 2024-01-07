@@ -80,7 +80,7 @@ export class ConsoleInstance {
 				indent: this.indent,
 				indentString: this.indentString,
 			};
-			log += utils.parser.parseInput(arg, collectionStringOptipons).ToString + ((i != args.length - 1) ? '\n' : '');
+			log += utils.parser.parseInput(arg, collectionStringOptipons).ToString + ((i != args.length - 1) ? ' ' : '');
 		}
 		// console.log(log.split(/\x1b/g).join('').split('[0m'))
 		return log;
