@@ -193,7 +193,6 @@ export class Theme {
 	public removeStyle(...style: string[]) {
 		for (const s of style) {
 			const styleFlag = styles[s as keyof typeof styles];
-			console.log(style)
 			const index = this._style.findIndex((e) => e === styleFlag);
 			if (index !== -1) {
 				this._style.splice(index, 1);
