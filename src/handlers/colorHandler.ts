@@ -680,11 +680,12 @@ export const defaultThemeProfile = new ThemeProfile({
 		/(?<flag>\[(?<fg>fg=(?<ftag>.+?)\s?)?(?<bg>bg=(?<btag>.+?)\s?)?(?<st>st=(?<stag>.+?)\s?)?\])(?<target>\[\/>\]|.*?)(?<end>\[\/>\])/g,
 	],
 	overrides: [
-		new ThemeOverride([
-			/(\()(?:\)|.)*?(\))/g,
-			/(\{)(?:\}|.)*?(\})/g,
-			/(\[)(?:\]|.)*?(\])/g,
-		], new Theme('#aaaaaa')),
+		//! This override normally fails in some way and might be better to not include.
+		// new ThemeOverride([
+		// 	/(\()(?:\)|.)*?(\))/g,
+		// 	/(\{)(?:\}|.)*?(\})/g,
+		// 	/(\[)(?:\]|.)*?(\])/g,
+		// ], new Theme('#aaaaaa')),
 		new ThemeOverride([
 			' + ', ' - ', ' / ', ' * ', ' = ', ' % '
 		], new Theme('#bebebe', null, 'bold')),
